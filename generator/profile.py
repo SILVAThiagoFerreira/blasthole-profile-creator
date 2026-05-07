@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -79,15 +78,17 @@ def _kind_palette(kind: str, theme) -> tuple[str, str]:
 
 
 def _extract_badge_letter(name: str) -> str:
-    match = re.search(r'\b([A-Z])\b', name)
-    if match:
-        return match.group(1)
+    parts = name.split()
+    if parts and len(parts[-1]) == 1 and parts[-1].isupper():
+        return parts[-1]
     stripped = name.strip()
     return stripped[0].upper() if stripped else "?"
 
 
 def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
     h = hex_color.lstrip("#")
+    if len(h) != 6:
+        raise ValueError(f"Expected 6-character hex color, got {hex_color!r}")
     return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
 
 

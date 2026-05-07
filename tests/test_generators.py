@@ -75,6 +75,10 @@ class BadgeTests(unittest.TestCase):
         from generator.profile import _extract_badge_letter
         self.assertEqual(_extract_badge_letter(""), "?")
 
+    def test_extract_letter_ignores_trailing_number(self) -> None:
+        from generator.profile import _extract_badge_letter
+        self.assertEqual(_extract_badge_letter("Perfil A1"), "P")
+
 
 class HexRgbTests(unittest.TestCase):
     def test_red(self) -> None:
@@ -88,6 +92,11 @@ class HexRgbTests(unittest.TestCase):
     def test_without_hash(self) -> None:
         from generator.profile import _hex_to_rgb
         self.assertEqual(_hex_to_rgb("FFFFFF"), (255, 255, 255))
+
+    def test_malformed_raises_value_error(self) -> None:
+        from generator.profile import _hex_to_rgb
+        with self.assertRaises(ValueError):
+            _hex_to_rgb("#D71")
 
 
 if __name__ == "__main__":
