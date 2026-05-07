@@ -212,7 +212,7 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
     parts = [
         (stem,   "stemming", "#C8CDD5"),
         (bb_v,   "blastbag", "#1F2937"),
-        (ad_v,   "airdeck",  "#FFFFFF"),
+        (ad_v,   "airdeck",  None),       # color unused — rendered as hatch pattern
         (charge, "column",   accent),
         (sub,    "subdrill", "#4B5563"),
     ]
@@ -225,6 +225,7 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
         if seg_val <= 0:
             continue
         seg_h = int(hole_h * (seg_val / total))
+        # Snap subdrill (always last) to hole_bottom to absorb accumulated rounding error.
         y2 = hole_bottom if seg_key == "subdrill" else y_cur + seg_h
 
         if seg_key == "airdeck":
