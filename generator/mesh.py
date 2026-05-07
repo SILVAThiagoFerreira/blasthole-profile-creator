@@ -47,15 +47,6 @@ def parse_mesh_csv(data: bytes) -> list[MeshPoint]:
     return points
 
 
-def _kind_color(kind: str) -> str:
-    normalized = kind.lower().strip()
-    if "contorno" in normalized:
-        return "#d71920"
-    if "amort" in normalized or "buffer" in normalized:
-        return "#f28c28"
-    return "#1d6fb8"
-
-
 def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
     candidates = [
         (r"C:\Windows\Fonts\Montserrat-Bold.ttf" if bold else r"C:\Windows\Fonts\Montserrat-Regular.ttf"),

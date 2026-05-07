@@ -17,9 +17,9 @@
     "top_margin": 176,
     "bottom_margin": 92,
     "page_margin": 48,
-    "panel_gap": 28,
+    "panel_gap": 24,
     "mesh_panel_width": 500,
-    "profile_panel_gap": 18
+    "profile_panel_gap": 16
   },
   "export": {
     "jpg_quality": 95,
