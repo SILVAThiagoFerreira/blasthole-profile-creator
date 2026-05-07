@@ -99,5 +99,27 @@ class HexRgbTests(unittest.TestCase):
             _hex_to_rgb("#D71")
 
 
+class CylinderGradientTests(unittest.TestCase):
+    def test_gradient_segment_left_brighter_than_right(self) -> None:
+        from PIL import Image, ImageDraw
+        from generator.profile import _draw_gradient_segment
+        img = Image.new("RGBA", (200, 100), (255, 255, 255, 255))
+        draw = ImageDraw.Draw(img)
+        _draw_gradient_segment(draw, 10, 10, 190, 90, "#1D6FB8")
+        # Pixel on the left (highlight) must be brighter than pixel on the right (shadow)
+        left = img.getpixel((28, 50))    # ~15% of width
+        right = img.getpixel((175, 50))  # ~90% of width
+        left_brightness = left[0] + left[1] + left[2]
+        right_brightness = right[0] + right[1] + right[2]
+        self.assertGreater(left_brightness, right_brightness)
+
+    def test_gradient_segment_zero_width_does_not_crash(self) -> None:
+        from PIL import Image, ImageDraw
+        from generator.profile import _draw_gradient_segment
+        img = Image.new("RGBA", (100, 100), (255, 255, 255, 255))
+        draw = ImageDraw.Draw(img)
+        _draw_gradient_segment(draw, 50, 10, 50, 90, "#D71920")  # x1 == x2, must not crash
+
+
 if __name__ == "__main__":
     unittest.main()
