@@ -23,13 +23,13 @@ class FontTests(unittest.TestCase):
 
 
 class ShadowTests(unittest.TestCase):
-    def test_gaussian_shadow_does_not_crash(self) -> None:
+    def test_gaussian_shadow_does_not_crash(self):
         from PIL import Image
         from generator.layout import _gaussian_shadow
-        canvas = Image.new("RGBA", (400, 300), (240, 242, 245, 255))
+        canvas = Image.new("RGBA", (400, 300), (255, 255, 255, 255))
         _gaussian_shadow(canvas, (20, 20, 380, 280), radius=16, blur_radius=8)
-        r, g, b, a = canvas.getpixel((390, 290))
-        self.assertGreater(a, 0)
+        r, g, b, a = canvas.getpixel((200, 150))
+        self.assertLess(r, 255, "shadow must darken the canvas center pixel")
 
 
 class HeaderTests(unittest.TestCase):

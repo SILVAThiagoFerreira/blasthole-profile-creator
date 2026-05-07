@@ -206,12 +206,13 @@ def _draw_footer(canvas: Image.Image, theme: TemplateTheme, observation: str, la
         ("Amortecimento", theme.accent_orange),
         ("Contorno", theme.accent_red),
     ]
+    legend_font = _font(_s(15), bold=True)
     x = _s(48)
     y_legend = footer_y + _s(16)
     for label, color in entries:
         draw.rounded_rectangle((x, y_legend + _s(2), x + _s(14), y_legend + _s(16)), radius=_s(4), fill=color)
-        draw.text((x + _s(20), y_legend), label, font=_font(_s(15), bold=True), fill=theme.muted)
-        x += int(draw.textlength(label, font=_font(_s(15), bold=True))) + _s(36)
+        draw.text((x + _s(20), y_legend), label, font=legend_font, fill=theme.muted)
+        x += int(draw.textlength(label, font=legend_font)) + _s(36)
 
     if observation:
         _draw_wrapped_text(
@@ -223,7 +224,7 @@ def _draw_footer(canvas: Image.Image, theme: TemplateTheme, observation: str, la
 
 def _draw_layout(canvas: Image.Image, theme: TemplateTheme, mesh_panel: Image.Image, profile_panels: list[Image.Image]) -> None:
     width, height = canvas.size
-    top = _s(176)
+    top = HEADER_H + _s(8)
     bottom = _s(92)
     margin = _s(48)
     gap = _s(24)
