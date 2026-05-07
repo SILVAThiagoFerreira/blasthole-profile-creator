@@ -9,7 +9,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from src.config import get_layout_config
 
 
-SCALE = int(get_layout_config().get("scale", 1))
+SCALE = max(1, int(get_layout_config().get("scale", 1)))
 
 
 def _s(value: int | float) -> int:
@@ -85,9 +85,12 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
         draw.text((_s(28), _s(26)), "MALHA DE PERFURAÇÃO",
                   font=_font(_s(20), bold=True), fill=theme.title)
         draw.rectangle((_s(28), _s(64), _s(80), _s(68)), fill=theme.accent_red)
-        mesh = Image.open(io.BytesIO(mesh_input.uploaded_mesh)).convert("RGBA")
-        mesh = ImageOps.contain(mesh, (w - _s(80), h - _s(220)))
-        img.alpha_composite(mesh, ((w - mesh.size[0]) // 2, _s(110)))
+        try:
+            mesh = Image.open(io.BytesIO(mesh_input.uploaded_mesh)).convert("RGBA")
+            mesh = ImageOps.contain(mesh, (w - _s(80), h - _s(220)))
+            img.alpha_composite(mesh, ((w - mesh.size[0]) // 2, _s(110)))
+        except Exception:
+            pass
         draw.text((_s(28), h - _s(80)), "Imagem anexada pelo usuário.",
                   font=_font(_s(13), bold=True), fill=theme.muted)
         return img
