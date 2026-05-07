@@ -1,0 +1,21 @@
+{
+  "polygon_name": "PP170526 (220-210)",
+  "production": {
+    "diametro_furo": 140,
+    "altura_banco": 10.5,
+    "subperfuracao": 0.6,
+    "stemming": 2.3,
+    "inclinacao": 0,
+    "azimute": 0,
+    "densidade": 1.15
+  },
+  "buffer": {
+    "diametro_furo": 102,
+    "altura_banco": 10.4,
+    "subperfuracao": 0,
+    "stemming": 3.5,
+    "inclinacao": 0,
+    "azimute": 0,
+    "densidade": 1.05
+  }
+}

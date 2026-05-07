@@ -1,0 +1,133 @@
+{
+  "app": {
+    "title": "Enaex Profile Creator",
+    "subtitle": "Geração automática de lâminas técnicas 16:9 no padrão visual Enaex.",
+    "default_profile_type": "Perfis técnicos"
+  },
+  "paths": {
+    "input_dir": "input",
+    "output_dir": "output",
+    "log_dir": "logs",
+    "logo_path": "VISUAL/Enaex Brasil - White.png"
+  },
+  "layout": {
+    "scale": 2,
+    "output_size": [1920, 1080],
+    "header_height": 168,
+    "top_margin": 176,
+    "bottom_margin": 92,
+    "page_margin": 48,
+    "panel_gap": 28,
+    "mesh_panel_width": 500,
+    "profile_panel_gap": 18
+  },
+  "export": {
+    "jpg_quality": 95,
+    "jpg_subsampling": 0,
+    "write_png": true,
+    "write_jpg": true,
+    "write_pdf": true
+  },
+  "validation": {
+    "min_profiles": 1,
+    "max_profiles": 3,
+    "required_text_fields": ["polygon_name", "template_name", "profile_type"],
+    "non_negative_numeric_fields": [
+      "diametro_furo",
+      "altura_banco",
+      "subperfuracao",
+      "stemming",
+      "air_deck",
+      "blastbag",
+      "inclinacao",
+      "azimute",
+      "densidade"
+    ]
+  },
+  "defaults": {
+    "template_name": "Enaex clean",
+    "polygon_name": "PP170526 (220-210)",
+    "observation": "Perfil técnico para reporte operacional.",
+    "profile_type": "Perfis técnicos",
+    "profile_count": 2,
+    "labels": {
+      "stemming": "Tampão",
+      "blastbag": "Blastbag",
+      "airdeck": "Deck de ar",
+      "column": "Carga",
+      "subdrill": "Subperf."
+    },
+    "profiles": [
+      {
+        "name": "Perfil A",
+        "kind": "produção",
+        "diametro_furo": 140.0,
+        "altura_banco": 10.5,
+        "subperfuracao": 0.6,
+        "stemming": 2.3,
+        "air_deck": 0.35,
+        "blastbag": 0.15,
+        "inclinacao": 0.0,
+        "azimute": 0.0,
+        "densidade": 1.15
+      },
+      {
+        "name": "Perfil B",
+        "kind": "amortecimento",
+        "diametro_furo": 102.0,
+        "altura_banco": 10.4,
+        "subperfuracao": 0.0,
+        "stemming": 3.5,
+        "air_deck": 0.2,
+        "blastbag": 0.1,
+        "inclinacao": 0.0,
+        "azimute": 0.0,
+        "densidade": 1.05
+      }
+    ]
+  },
+  "templates": {
+    "Enaex clean": {
+      "bg": "#f4f6f7",
+      "panel_bg": "#ffffff",
+      "panel_alt": "#f8fafb",
+      "panel_border": "#d8dee3",
+      "title": "#171a1f",
+      "text": "#1f2933",
+      "muted": "#5f6b76",
+      "accent_red": "#d71920",
+      "accent_blue": "#1d6fb8",
+      "accent_orange": "#f28c28",
+      "accent_dark": "#223a8d",
+      "shadow": [20, 28, 38, 18]
+    },
+    "Técnico minimalista": {
+      "bg": "#fafafa",
+      "panel_bg": "#ffffff",
+      "panel_alt": "#fcfcfc",
+      "panel_border": "#dde2e7",
+      "title": "#111827",
+      "text": "#1f2937",
+      "muted": "#6b7280",
+      "accent_red": "#c81d25",
+      "accent_blue": "#2563eb",
+      "accent_orange": "#d97706",
+      "accent_dark": "#1837b8",
+      "shadow": [0, 0, 0, 0]
+    },
+    "Relatório executivo": {
+      "bg": "#eef2f5",
+      "panel_bg": "#ffffff",
+      "panel_alt": "#f6f9fc",
+      "panel_border": "#cdd6df",
+      "title": "#122033",
+      "text": "#1b2733",
+      "muted": "#667581",
+      "accent_red": "#bd1e24",
+      "accent_blue": "#2d6cdf",
+      "accent_orange": "#db7a11",
+      "accent_dark": "#1c3db6",
+      "shadow": [18, 24, 34, 20]
+    }
+  }
+}
