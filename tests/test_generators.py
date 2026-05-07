@@ -58,5 +58,37 @@ class HeaderTests(unittest.TestCase):
         self.assertGreater(b, 220)
 
 
+class BadgeTests(unittest.TestCase):
+    def test_extract_letter_from_perfil_a(self) -> None:
+        from generator.profile import _extract_badge_letter
+        self.assertEqual(_extract_badge_letter("Perfil A"), "A")
+
+    def test_extract_letter_from_perfil_b(self) -> None:
+        from generator.profile import _extract_badge_letter
+        self.assertEqual(_extract_badge_letter("Perfil B"), "B")
+
+    def test_extract_letter_falls_back_to_first_char(self) -> None:
+        from generator.profile import _extract_badge_letter
+        self.assertEqual(_extract_badge_letter("producao"), "P")
+
+    def test_extract_letter_empty_returns_question(self) -> None:
+        from generator.profile import _extract_badge_letter
+        self.assertEqual(_extract_badge_letter(""), "?")
+
+
+class HexRgbTests(unittest.TestCase):
+    def test_red(self) -> None:
+        from generator.profile import _hex_to_rgb
+        self.assertEqual(_hex_to_rgb("#D71920"), (215, 25, 32))
+
+    def test_blue(self) -> None:
+        from generator.profile import _hex_to_rgb
+        self.assertEqual(_hex_to_rgb("#1D6FB8"), (29, 111, 184))
+
+    def test_without_hash(self) -> None:
+        from generator.profile import _hex_to_rgb
+        self.assertEqual(_hex_to_rgb("FFFFFF"), (255, 255, 255))
+
+
 if __name__ == "__main__":
     unittest.main()

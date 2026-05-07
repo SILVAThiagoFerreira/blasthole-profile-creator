@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -75,6 +76,19 @@ def _kind_palette(kind: str, theme) -> tuple[str, str]:
     if "contorno" in normalized:
         return theme.accent_red, "#ffe3e5"
     return theme.accent_blue, "#e9f2fb"
+
+
+def _extract_badge_letter(name: str) -> str:
+    match = re.search(r'\b([A-Z])\b', name)
+    if match:
+        return match.group(1)
+    stripped = name.strip()
+    return stripped[0].upper() if stripped else "?"
+
+
+def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
+    h = hex_color.lstrip("#")
+    return int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
 
 
 def _draw_arrow(draw: ImageDraw.ImageDraw, x: int, y1: int, y2: int, color: str, label: str, font, align: str = "left") -> None:
