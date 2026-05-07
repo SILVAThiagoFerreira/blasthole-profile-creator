@@ -75,47 +75,97 @@ def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
 
 def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540, 760)) -> Image.Image:
     size = (_s(size[0]), _s(size[1]))
-    if mesh_input.uploaded_mesh:
-        img = Image.new("RGBA", size, theme.panel_alt)
-        draw = ImageDraw.Draw(img)
-        w, h = size
-        draw.rounded_rectangle((_s(18), _s(18), w - _s(18), h - _s(18)), radius=_s(26), fill=theme.panel_alt, outline=theme.panel_border, width=_s(2))
-        draw.text((_s(34), _s(34)), "MALHA DE PERFURAÇÃO", font=_font(_s(22), bold=True), fill=theme.title)
-        draw.line((_s(34), _s(72), _s(90), _s(72)), fill=theme.accent_red, width=_s(4))
-        mesh = Image.open(io.BytesIO(mesh_input.uploaded_mesh)).convert("RGBA")
-        mesh = ImageOps.contain(mesh, (w - _s(80), h - _s(220)))
-        img.alpha_composite(mesh, ((w - mesh.size[0]) // 2, _s(120)))
-        draw.text((_s(36), h - _s(86)), "Imagem anexada pelo usuário.", font=_font(_s(13), bold=True), fill=theme.muted)
-        return img
-
-    img = Image.new("RGBA", size, theme.panel_alt)
-    draw = ImageDraw.Draw(img)
     w, h = size
 
-    draw.rounded_rectangle((_s(18), _s(18), w - _s(18), h - _s(18)), radius=_s(26), fill=theme.panel_alt, outline=theme.panel_border, width=_s(2))
-    draw.text((_s(34), _s(34)), "MALHA DE PERFURAÇÃO", font=_font(_s(22), bold=True), fill=theme.title)
-    draw.line((_s(34), _s(72), _s(90), _s(72)), fill=theme.accent_red, width=_s(4))
-    draw.text((_s(34), _s(88)), mesh_input.polygon_name, font=_font(_s(15)), fill=theme.muted)
+    if mesh_input.uploaded_mesh:
+        img = Image.new("RGBA", size, "#FFFFFF")
+        draw = ImageDraw.Draw(img)
+        draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
+                                radius=_s(22), fill="#FFFFFF")
+        draw.text((_s(28), _s(26)), "MALHA DE PERFURAÇÃO",
+                  font=_font(_s(20), bold=True), fill=theme.title)
+        draw.rectangle((_s(28), _s(64), _s(80), _s(68)), fill=theme.accent_red)
+        mesh = Image.open(io.BytesIO(mesh_input.uploaded_mesh)).convert("RGBA")
+        mesh = ImageOps.contain(mesh, (w - _s(80), h - _s(220)))
+        img.alpha_composite(mesh, ((w - mesh.size[0]) // 2, _s(110)))
+        draw.text((_s(28), h - _s(80)), "Imagem anexada pelo usuário.",
+                  font=_font(_s(13), bold=True), fill=theme.muted)
+        return img
 
-    plot = (_s(40), _s(108), w - _s(40), h - _s(130))
-    draw.rounded_rectangle(plot, radius=_s(20), fill="#ffffff", outline=theme.panel_border, width=_s(1))
-    x1, y1, x2, y2 = plot
-    icon_cx = (x1 + x2) // 2
-    icon_cy = y1 + _s(120)
-    draw.rounded_rectangle((icon_cx - _s(66), icon_cy - _s(56), icon_cx + _s(66), icon_cy + _s(46)), radius=_s(24), outline=theme.panel_border, width=_s(2), fill="#fbfcfd")
-    draw.ellipse((icon_cx - _s(12), icon_cy - _s(10), icon_cx + _s(12), icon_cy + _s(14)), fill=theme.accent_red)
-    draw.line((icon_cx, icon_cy - _s(18), icon_cx, icon_cy + _s(18)), fill=theme.accent_red, width=_s(3))
-    draw.line((icon_cx - _s(18), icon_cy, icon_cx + _s(18), icon_cy), fill=theme.accent_red, width=_s(3))
-    draw.text((icon_cx - _s(150), icon_cy + _s(62)), "Anexe a imagem da malha", font=_font(_s(15), bold=True), fill=theme.text)
-    draw.text((icon_cx - _s(136), icon_cy + _s(86)), "Se não houver anexo, o painel fica apenas como referência.", font=_font(_s(13)), fill=theme.muted)
+    img = Image.new("RGBA", size, "#FFFFFF")
+    draw = ImageDraw.Draw(img)
 
-    # legend
-    legend_y = h - _s(104)
+    # Card base
+    draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
+                            radius=_s(22), fill="#FFFFFF")
+
+    # Title
+    draw.text((_s(28), _s(26)), "MALHA DE PERFURAÇÃO",
+              font=_font(_s(20), bold=True), fill=theme.title)
+    draw.rectangle((_s(28), _s(64), _s(80), _s(67)), fill=theme.accent_red)
+    draw.text((_s(28), _s(78)), mesh_input.polygon_name,
+              font=_font(_s(14)), fill=theme.muted)
+
+    # Upload area with dashed border
+    upload_box = (_s(32), _s(104), w - _s(32), h - _s(130))
+    ub_x1, ub_y1, ub_x2, ub_y2 = upload_box
+    dash_len, gap_len = _s(12), _s(6)
+    for side in ["top", "bottom", "left", "right"]:
+        if side == "top":
+            x, y, dx, dy = ub_x1, ub_y1, 1, 0
+            total = ub_x2 - ub_x1
+        elif side == "bottom":
+            x, y, dx, dy = ub_x1, ub_y2, 1, 0
+            total = ub_x2 - ub_x1
+        elif side == "left":
+            x, y, dx, dy = ub_x1, ub_y1, 0, 1
+            total = ub_y2 - ub_y1
+        else:
+            x, y, dx, dy = ub_x2, ub_y1, 0, 1
+            total = ub_y2 - ub_y1
+        pos = 0
+        drawing_dash = True
+        while pos < total:
+            seg = dash_len if drawing_dash else gap_len
+            end = min(pos + seg, total)
+            if drawing_dash:
+                if dx:
+                    draw.line((x + pos, y, x + end, y), fill="#D1D5DB", width=_s(2))
+                else:
+                    draw.line((x, y + pos, x, y + end), fill="#D1D5DB", width=_s(2))
+            pos = end
+            drawing_dash = not drawing_dash
+
+    # Upload icon (circle + up arrow)
+    ic_cx = (ub_x1 + ub_x2) // 2
+    ic_cy = ub_y1 + _s(110)
+    draw.ellipse((ic_cx - _s(36), ic_cy - _s(36), ic_cx + _s(36), ic_cy + _s(36)),
+                 outline="#D1D5DB", width=_s(2), fill="#F9FAFB")
+    draw.line((ic_cx, ic_cy + _s(16), ic_cx, ic_cy - _s(16)), fill="#9CA3AF", width=_s(2))
+    draw.polygon([(ic_cx, ic_cy - _s(16)), (ic_cx - _s(8), ic_cy - _s(4)), (ic_cx + _s(8), ic_cy - _s(4))],
+                 fill="#9CA3AF")
+
+    # Instructions
+    inst_font = _font(_s(14), bold=True)
+    inst = "Anexe a imagem da malha"
+    inst_w = int(draw.textlength(inst, font=inst_font))
+    draw.text((ic_cx - inst_w // 2, ic_cy + _s(50)), inst, font=inst_font, fill=theme.text)
+    sub_font = _font(_s(12))
+    sub_text = "Se não houver anexo, o painel fica apenas como referência."
+    sub_w = int(draw.textlength(sub_text, font=sub_font))
+    draw.text((ic_cx - sub_w // 2, ic_cy + _s(76)), sub_text, font=sub_font, fill=theme.muted)
+
+    # Legend
+    legend_y = h - _s(106)
     entries = [("Produção", theme.accent_blue), ("Amortecimento", theme.accent_orange), ("Contorno", theme.accent_red)]
-    x = _s(42)
-    for label, color in entries:
-        draw.rounded_rectangle((x, legend_y, x + _s(18), legend_y + _s(18)), radius=_s(6), fill=color)
-        draw.text((x + _s(24), legend_y - _s(2)), label, font=_font(_s(14)), fill=theme.text)
-        x += _s(136)
-    draw.text((_s(42), h - _s(56)), "Somente imagem anexada, sem geração sintética da malha.", font=_font(_s(13)), fill=theme.muted)
+    lx = _s(36)
+    lf = _font(_s(13), bold=True)
+    for lbl, lcolor in entries:
+        draw.rounded_rectangle((lx, legend_y + _s(2), lx + _s(14), legend_y + _s(16)), radius=_s(4), fill=lcolor)
+        draw.text((lx + _s(20), legend_y), lbl, font=lf, fill=theme.text)
+        lx += int(draw.textlength(lbl, font=lf)) + _s(32)
+
+    draw.text((_s(36), h - _s(56)),
+              "Somente imagem anexada, sem geração sintética da malha.",
+              font=_font(_s(12)), fill=theme.muted)
     return img
