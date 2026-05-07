@@ -121,5 +121,29 @@ class CylinderGradientTests(unittest.TestCase):
         _draw_gradient_segment(draw, 50, 10, 50, 90, "#D71920")  # x1 == x2, must not crash
 
 
+class ProfileCardTests(unittest.TestCase):
+    def _render(self, name: str = "Perfil A", kind: str = "produção") -> "Image.Image":
+        from PIL import Image
+        from generator.profile import ProfileInput, render_profile_panel
+        from generator.layout import TEMPLATE_PRESETS
+        theme = TEMPLATE_PRESETS["Enaex clean"]
+        profile = ProfileInput(name=name, kind=kind, diametro_furo=140,
+                               altura_banco=10.5, subperfuracao=0.6, stemming=2.3,
+                               air_deck=0.35, blastbag=0.15, inclinacao=0.0,
+                               azimute=0.0, densidade=1.15)
+        labels = {"stemming": "Tampão", "blastbag": "Blastbag",
+                  "airdeck": "Deck de ar", "column": "Carga", "subdrill": "Subperf."}
+        return render_profile_panel(profile, theme, labels=labels, size=(540, 760))
+
+    def test_panel_renders_correct_size(self) -> None:
+        img = self._render()
+        # Scale=2: 540*2=1080, 760*2=1520
+        self.assertEqual(img.size, (1080, 1520))
+
+    def test_panel_b_renders_without_error(self) -> None:
+        img = self._render(name="Perfil B", kind="amortecimento")
+        self.assertEqual(img.size[0], 1080)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -132,42 +132,64 @@ def _draw_arrow(draw: ImageDraw.ImageDraw, x: int, y1: int, y2: int, color: str,
     draw.text((text_x, (y1 + y2) / 2 - _s(10)), label, font=font, fill=color)
 
 
-def _draw_metric_row(draw: ImageDraw.ImageDraw, box: tuple[int, int, int, int], label: str, value: str, color: str, theme, kind: str) -> None:
+def _draw_metric_row(
+    draw: ImageDraw.ImageDraw,
+    box: tuple[int, int, int, int],
+    label: str,
+    value: str,
+    color: str,
+    theme,
+    kind: str,
+    alternate: bool = False,
+) -> None:
     x1, y1, x2, y2 = box
-    icon_x = x1 + _s(10)
-    icon_y = y1 + _s(8)
-    if kind == "diameter":
-        draw.ellipse((icon_x, icon_y, icon_x + _s(26), icon_y + _s(26)), outline=color, width=_s(2))
-        draw.line((icon_x + _s(6), icon_y + _s(13), icon_x + _s(20), icon_y + _s(13)), fill=color, width=_s(2))
-        draw.line((icon_x + _s(13), icon_y + _s(6), icon_x + _s(13), icon_y + _s(20)), fill=color, width=_s(2))
-    elif kind == "height":
-        draw.line((icon_x + _s(13), icon_y, icon_x + _s(13), icon_y + _s(26)), fill=color, width=_s(2))
-        draw.polygon([(icon_x + _s(13), icon_y), (icon_x + _s(8), icon_y + _s(8)), (icon_x + _s(18), icon_y + _s(8))], fill=color)
-        draw.polygon([(icon_x + _s(13), icon_y + _s(26)), (icon_x + _s(8), icon_y + _s(18)), (icon_x + _s(18), icon_y + _s(18))], fill=color)
-    elif kind == "subdrill":
-        draw.line((icon_x + _s(13), icon_y, icon_x + _s(13), icon_y + _s(26)), fill=color, width=_s(2))
-        draw.polygon([(icon_x + _s(13), icon_y + _s(26)), (icon_x + _s(8), icon_y + _s(18)), (icon_x + _s(18), icon_y + _s(18))], fill=color)
-    elif kind == "stemming":
-        draw.rectangle((icon_x + _s(4), icon_y + _s(6), icon_x + _s(22), icon_y + _s(20)), outline=color, width=_s(2))
-    elif kind == "blastbag":
-        draw.rounded_rectangle((icon_x + _s(4), icon_y + _s(8), icon_x + _s(22), icon_y + _s(18)), radius=_s(5), fill="#2f343b", outline=color, width=_s(1))
-    elif kind == "airdeck":
-        draw.rectangle((icon_x + _s(4), icon_y + _s(8), icon_x + _s(22), icon_y + _s(18)), outline=color, width=_s(2))
-        for yy in range(icon_y + _s(10), icon_y + _s(18), _s(4)):
-            draw.line((icon_x + _s(6), yy, icon_x + _s(20), yy), fill=color, width=_s(1))
-    elif kind == "inclination":
-        draw.line((icon_x + _s(4), icon_y + _s(22), icon_x + _s(22), icon_y + _s(22)), fill=color, width=_s(2))
-        draw.line((icon_x + _s(4), icon_y + _s(22), icon_x + _s(20), icon_y + _s(6)), fill=color, width=_s(2))
-    elif kind == "azimuth":
-        draw.ellipse((icon_x + _s(2), icon_y + _s(2), icon_x + _s(24), icon_y + _s(24)), outline=color, width=_s(2))
-        draw.line((icon_x + _s(13), icon_y + _s(13), icon_x + _s(20), icon_y + _s(8)), fill=color, width=_s(2))
-        draw.line((icon_x + _s(13), icon_y + _s(13), icon_x + _s(9), icon_y + _s(20)), fill=color, width=_s(2))
-    else:
-        draw.rectangle((icon_x + _s(4), icon_y + _s(6), icon_x + _s(22), icon_y + _s(20)), outline=color, width=_s(2))
+    if alternate:
+        draw.rectangle((x1, y1, x2, y2 - 1), fill="#F9FAFB")
 
-    draw.text((x1 + _s(46), y1 + _s(8)), label.upper(), font=_font(_s(11), bold=True), fill=theme.muted)
-    draw.text((x2 - _s(18) - draw.textlength(value, font=_font(_s(12), bold=True)), y1 + _s(8)), value, font=_font(_s(12), bold=True), fill=theme.title)
-    draw.line((x1 + _s(8), y2 - 1, x2 - _s(8), y2 - 1), fill=theme.panel_border, width=_s(1))
+    icon_x = x1 + _s(10)
+    icon_y = y1 + _s(7)
+    icon_size = _s(24)
+    ic = icon_x + icon_size // 2
+    iy = icon_y + icon_size // 2
+
+    if kind == "diameter":
+        draw.ellipse((icon_x, icon_y, icon_x + icon_size, icon_y + icon_size), outline=color, width=_s(2))
+        draw.line((icon_x + _s(5), iy, icon_x + icon_size - _s(5), iy), fill=color, width=_s(2))
+        draw.line((ic, icon_y + _s(5), ic, icon_y + icon_size - _s(5)), fill=color, width=_s(2))
+    elif kind == "height":
+        draw.line((ic, icon_y, ic, icon_y + icon_size), fill=color, width=_s(2))
+        draw.polygon([(ic, icon_y), (ic - _s(5), icon_y + _s(8)), (ic + _s(5), icon_y + _s(8))], fill=color)
+        draw.polygon([(ic, icon_y + icon_size), (ic - _s(5), icon_y + icon_size - _s(8)), (ic + _s(5), icon_y + icon_size - _s(8))], fill=color)
+    elif kind == "subdrill":
+        draw.line((ic, icon_y, ic, icon_y + icon_size), fill=color, width=_s(2))
+        draw.polygon([(ic, icon_y + icon_size), (ic - _s(5), icon_y + icon_size - _s(8)), (ic + _s(5), icon_y + icon_size - _s(8))], fill=color)
+    elif kind == "stemming":
+        draw.rectangle((icon_x + _s(3), icon_y + _s(5), icon_x + icon_size - _s(3), icon_y + icon_size - _s(5)), outline=color, width=_s(2))
+    elif kind == "blastbag":
+        draw.rounded_rectangle((icon_x + _s(3), icon_y + _s(7), icon_x + icon_size - _s(3), icon_y + icon_size - _s(7)), radius=_s(5), fill="#2F343B", outline=color, width=_s(1))
+    elif kind == "airdeck":
+        draw.rectangle((icon_x + _s(3), icon_y + _s(6), icon_x + icon_size - _s(3), icon_y + icon_size - _s(6)), outline=color, width=_s(2))
+        for yy in range(icon_y + _s(9), icon_y + icon_size - _s(6), _s(4)):
+            draw.line((icon_x + _s(6), yy, icon_x + icon_size - _s(6), yy), fill=color, width=_s(1))
+    elif kind == "inclination":
+        draw.line((icon_x + _s(3), icon_y + icon_size - _s(3), icon_x + icon_size - _s(3), icon_y + icon_size - _s(3)), fill=color, width=_s(2))
+        draw.line((icon_x + _s(3), icon_y + icon_size - _s(3), icon_x + icon_size - _s(5), icon_y + _s(5)), fill=color, width=_s(2))
+    elif kind == "azimuth":
+        draw.ellipse((icon_x + _s(2), icon_y + _s(2), icon_x + icon_size - _s(2), icon_y + icon_size - _s(2)), outline=color, width=_s(2))
+        draw.line((ic, iy, ic + _s(7), iy - _s(6)), fill=color, width=_s(2))
+        draw.line((ic, iy, ic - _s(4), iy + _s(7)), fill=color, width=_s(2))
+    elif kind == "density":
+        # Drop/teardrop icon for density
+        draw.ellipse((ic - _s(6), iy, ic + _s(6), iy + _s(10)), fill=color)
+        draw.polygon([(ic, icon_y + _s(2)), (ic - _s(6), iy + _s(4)), (ic + _s(6), iy + _s(4))], fill=color)
+    else:
+        draw.rectangle((icon_x + _s(3), icon_y + _s(5), icon_x + icon_size - _s(3), icon_y + icon_size - _s(5)), outline=color, width=_s(2))
+
+    draw.text((x1 + _s(44), y1 + _s(7)), label.upper(), font=_font(_s(10), bold=True), fill=theme.muted)
+    val_font = _font(_s(12), bold=True)
+    val_w = int(draw.textlength(value, font=val_font))
+    draw.text((x2 - _s(14) - val_w, y1 + _s(7)), value, font=val_font, fill=theme.title)
+    draw.line((x1 + _s(6), y2 - 1, x2 - _s(6), y2 - 1), fill="#E5E7EB", width=_s(1))
 
 
 def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], size: tuple[int, int] = (540, 760)) -> Image.Image:
@@ -178,13 +200,30 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
     accent, accent_soft = _kind_palette(profile.kind, theme)
     kind_label = _kind_name(profile.kind)
 
-    draw.rounded_rectangle((_s(18), _s(18), w - _s(18), h - _s(18)), radius=_s(20), fill=theme.panel_alt, outline=theme.panel_border, width=_s(2))
-    draw.rectangle((_s(18), _s(18), w - _s(18), _s(92)), fill="#ffffff", outline=theme.panel_border, width=0)
-    draw.ellipse((_s(34), _s(30), _s(74), _s(70)), fill=accent)
-    draw.text((_s(47), _s(38)), str((1 if kind_label == "Produção" else 2 if kind_label == "Amortecimento" else 3)), font=_font(_s(18), bold=True), fill="#ffffff")
-    draw.text((_s(94), _s(32)), _short(profile.name, 22).upper(), font=_font(_s(19), bold=True), fill=accent)
-    draw.text((_s(94), _s(58)), f"{kind_label.upper()}  •  {int(profile.diametro_furo)} MM", font=_font(_s(12), bold=True), fill=theme.muted)
-    draw.line((_s(34), _s(92), w - _s(34), _s(92)), fill=accent, width=_s(2))
+    # ── Card background ───────────────────────────────────────────────────
+    draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
+                            radius=_s(22), fill="#FFFFFF")
+
+    # ── Card header ───────────────────────────────────────────────────────
+    badge_letter = _extract_badge_letter(profile.name)
+    badge_r = _s(22)
+    badge_cx, badge_cy = _s(46), _s(50)
+    draw.ellipse((badge_cx - badge_r, badge_cy - badge_r,
+                  badge_cx + badge_r, badge_cy + badge_r), fill=accent)
+    bl_font = _font(_s(20), bold=True)
+    bl_w = int(draw.textlength(badge_letter, font=bl_font))
+    draw.text((badge_cx - bl_w // 2, badge_cy - _s(13)),
+              badge_letter, font=bl_font, fill="#FFFFFF")
+
+    name_font = _font(_s(18), bold=True)
+    draw.text((_s(82), _s(30)), _short(profile.name, 22).upper(),
+              font=name_font, fill=accent)
+    sub_text = f"{kind_label.upper()}  •  {int(profile.diametro_furo)} MM"
+    draw.text((_s(82), _s(58)), sub_text,
+              font=_font(_s(11), bold=True), fill=theme.muted)
+
+    # Accent separator line
+    draw.rectangle((_s(18), _s(88), w - _s(18), _s(92)), fill=accent)
 
     # ── Cylinder zone ─────────────────────────────────────────────────────
     drawing_box = (_s(34), _s(108), _s(178), h - _s(110))
@@ -265,48 +304,64 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
               f"BANCO {_fmt(profile.altura_banco)} M",
               font=_font(_s(10), bold=True), fill=theme.muted)
 
-    draw.rounded_rectangle(info_box, radius=_s(18), fill="#ffffff", outline=theme.panel_border, width=_s(1))
-
+    # ── Parameters zone ───────────────────────────────────────────────────
+    draw.rounded_rectangle(info_box, radius=_s(16), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
     ix1, iy1, ix2, iy2 = info_box
-    draw.text((ix1 + _s(18), iy1 + _s(18)), "PARÂMETROS TÉCNICOS", font=_font(_s(18), bold=True), fill=theme.title)
-    summary_box = (ix1 + _s(12), iy1 + _s(52), ix2 - _s(12), iy1 + _s(126))
-    draw.rounded_rectangle(summary_box, radius=_s(14), fill="#f8fafc", outline=theme.panel_border, width=_s(1))
 
-    def _chip(x: int, y: int, label: str, value: str, fill: str) -> int:
-        text = f"{label}: {value}"
-        pill_w = max(_s(92), int(draw.textlength(text, font=_font(_s(12), bold=True)) + _s(24)))
-        pill_h = _s(26)
-        draw.rounded_rectangle((x, y, x + pill_w, y + pill_h), radius=_s(12), fill=fill)
-        draw.text((x + _s(10), y + _s(5)), text, font=_font(_s(12), bold=True), fill=theme.title)
-        return x + pill_w + _s(8)
-
-    chip_y = iy1 + _s(66)
-    chip_x = ix1 + _s(22)
-    chip_x = _chip(chip_x, chip_y, labels.get("stemming", "Tampão"), f"{_fmt(stem)} m", "#eef2f7")
-    chip_x = _chip(chip_x, chip_y, labels.get("column", "Carga"), f"{_fmt(charge)} m", accent_soft)
-    if sub > 0:
-        _chip(chip_x, chip_y, labels.get("subdrill", "Subperf."), f"{_fmt(sub)} m", "#eef2f7")
+    draw.text((ix1 + _s(16), iy1 + _s(14)), "PARÂMETROS TÉCNICOS",
+              font=_font(_s(15), bold=True), fill=theme.title)
 
     rows = [
-        ("Diâmetro do furo", f"{int(profile.diametro_furo)} mm"),
-        ("Altura do banco", f"{_fmt(profile.altura_banco)} m"),
-        (labels.get("subdrill", "Subperfuração"), f"{_fmt(profile.subperfuracao)} m"),
-        (labels.get("stemming", "Tampão"), f"{_fmt(profile.stemming)} m"),
-        (labels.get("blastbag", "Blastbag"), f"{_fmt(profile.blastbag)} m"),
-        (labels.get("airdeck", "Deck de ar"), f"{_fmt(profile.air_deck)} m"),
-        ("Inclinação", f"{_fmt(profile.inclinacao, 1)}°"),
-        ("Azimute", f"{_fmt(profile.azimute, 1)}°"),
-        ("Densidade", f"{_fmt(profile.densidade, 2)} g/cm³"),
+        ("Diâmetro do furo",                     f"{int(profile.diametro_furo)} mm",        "diameter"),
+        ("Altura do banco",                       f"{_fmt(profile.altura_banco)} m",          "height"),
+        (labels.get("subdrill", "Subperfuração"), f"{_fmt(profile.subperfuracao)} m",         "subdrill"),
+        (labels.get("stemming", "Tampão"),        f"{_fmt(profile.stemming)} m",              "stemming"),
+        (labels.get("blastbag", "Blastbag"),      f"{_fmt(profile.blastbag)} m",              "blastbag"),
+        (labels.get("airdeck", "Deck de ar"),     f"{_fmt(profile.air_deck)} m",              "airdeck"),
+        ("Inclinação",                            f"{_fmt(profile.inclinacao, 1)}°",          "inclination"),
+        ("Azimute",                               f"{_fmt(profile.azimute, 1)}°",             "azimuth"),
+        ("Densidade",                             f"{_fmt(profile.densidade, 2)} g/cm³",      "density"),
     ]
-    y = iy1 + _s(138)
-    metric_h = _s(42)
-    metric_icons = ["diameter", "height", "subdrill", "stemming", "blastbag", "airdeck", "inclination", "azimuth", "density"]
-    for (label, value), icon_kind in zip(rows, metric_icons):
-        _draw_metric_row(draw, (ix1 + 10, y, ix2 - 10, y + metric_h), label, value, accent, theme, icon_kind)
-        y += metric_h + 2
 
-    footer_bar = (ix1 + _s(18), iy2 - _s(58), ix2 - _s(18), iy2 - _s(20))
-    draw.rounded_rectangle(footer_bar, radius=_s(16), fill="#f7f9fb", outline=theme.panel_border, width=_s(1))
-    draw.rectangle((footer_bar[0] + _s(1), footer_bar[1] + _s(1), footer_bar[2] - _s(1), footer_bar[1] + _s(8)), fill=accent)
-    draw.text((footer_bar[0] + _s(14), footer_bar[1] + _s(14)), f"{_short(profile.name, 20)} | {kind_label}", font=_font(_s(12), bold=True), fill=theme.title)
+    y_row = iy1 + _s(44)
+    metric_h = _s(40)
+    for idx, (label_r, value_r, icon_kind) in enumerate(rows):
+        _draw_metric_row(
+            draw,
+            (ix1 + _s(8), y_row, ix2 - _s(8), y_row + metric_h),
+            label_r, value_r, accent, theme, icon_kind,
+            alternate=(idx % 2 == 1),
+        )
+        y_row += metric_h
+
+    # ── Summary chips ─────────────────────────────────────────────────────
+    chips_y = iy2 - _s(64)
+    chips = [
+        (labels.get("stemming", "Tampão"), f"{_fmt(stem)} m", "#F3F4F6"),
+        (labels.get("column", "Carga"),    f"{_fmt(charge)} m", "#EBF2FB"),
+    ]
+    if sub > 0:
+        chips.append((labels.get("subdrill", "Subperf."), f"{_fmt(sub)} m", "#F3F4F6"))
+    if bb_v > 0:
+        chips.append((labels.get("blastbag", "Blastbag"), f"{_fmt(bb_v)} m", "#F3F4F6"))
+
+    chip_x = ix1 + _s(12)
+    chip_font = _font(_s(11), bold=True)
+    for chip_label, chip_val, chip_fill in chips:
+        text = f"{chip_label}: {chip_val}"
+        tw = int(draw.textlength(text, font=chip_font))
+        chip_w = tw + _s(20)
+        if chip_x + chip_w > ix2 - _s(12):
+            break
+        draw.rounded_rectangle((chip_x, chips_y, chip_x + chip_w, chips_y + _s(28)),
+                                radius=_s(10), fill=chip_fill)
+        draw.text((chip_x + _s(10), chips_y + _s(6)), text, font=chip_font, fill=theme.title)
+        chip_x += chip_w + _s(8)
+
+    # ── Footer bar ────────────────────────────────────────────────────────
+    footer_bar = (ix1 + _s(12), iy2 - _s(28), ix2 - _s(12), iy2 - _s(4))
+    draw.rounded_rectangle(footer_bar, radius=_s(10), fill=accent)
+    fb_font = _font(_s(11), bold=True)
+    fb_text = f"{_short(profile.name, 20)} | {kind_label}"
+    draw.text((footer_bar[0] + _s(14), footer_bar[1] + _s(6)), fb_text, font=fb_font, fill="#FFFFFF")
     return img
