@@ -122,6 +122,11 @@ class CylinderGradientTests(unittest.TestCase):
 
 
 class ProfileCardTests(unittest.TestCase):
+    def _panel_scale(self) -> int:
+        from src.config import load_config
+        cfg = load_config()
+        return int(cfg["layout"].get("panel_scale", cfg["layout"].get("scale", 1)))
+
     def _render(self, name: str = "Perfil A", kind: str = "produção") -> "Image.Image":
         from PIL import Image
         from generator.profile import ProfileInput, render_profile_panel
@@ -137,21 +142,18 @@ class ProfileCardTests(unittest.TestCase):
 
     def test_panel_renders_correct_size(self) -> None:
         img = self._render()
-        # Scale=2: 540*2=1080, 760*2=1520
-        self.assertEqual(img.size, (1080, 1520))
+        scale = self._panel_scale()
+        self.assertEqual(img.size, (540 * scale, 760 * scale))
 
     def test_panel_b_renders_without_error(self) -> None:
         img = self._render(name="Perfil B", kind="amortecimento")
-        self.assertEqual(img.size[0], 1080)
+        self.assertEqual(img.size[0], 540 * self._panel_scale())
 
     def test_alternating_row_fill_is_visible(self) -> None:
         """Row index 1 (odd) should have #F9FAFB fill — verify pixel is not pure white."""
         img = self._render()
-        # info_box top: _s(108) = 216. Header inside info_box: _s(44) = 88. First row height: _s(40) = 80.
-        # Row 1 (index 1, alternate=True) top = 216 + 88 + 80 = 384.
-        # x inside info_box: info_box left = _s(190) = 380, pick x=600 (well inside).
-        # y in center of row 1: 384 + 40 = 424.
-        px = img.getpixel((600, 424))
+        ratio = img.size[0] / 1080
+        px = img.getpixel((int(600 * ratio), int(424 * ratio)))
         # #F9FAFB = (249, 250, 251) — close to white but not pure white
         self.assertLess(px[0], 255, "alternating row should not be pure white")
         self.assertGreater(px[0], 240, "alternating row fill should be near-white (#F9FAFB)")
@@ -159,12 +161,42 @@ class ProfileCardTests(unittest.TestCase):
     def test_footer_bar_is_blue_for_producao(self) -> None:
         """Footer bar for 'produção' should be blue accent (#1D6FB8)."""
         img = self._render(name="Perfil A", kind="produção")
-        # info_box: iy1=_s(108)=216, iy2=h-_s(110). h=760*2=1520. iy2=1520-220=1300.
-        # footer_bar top = iy2 - _s(28) = 1300 - 56 = 1244
-        # Sample center: x=600, y=1260 (inside footer bar).
-        px = img.getpixel((600, 1260))
+        ratio = img.size[0] / 1080
+        px = img.getpixel((int(600 * ratio), int(1260 * ratio)))
         # Blue accent #1D6FB8 = (29, 111, 184): blue channel > red channel significantly
         self.assertGreater(px[2], px[0] + 50, "footer bar should be noticeably blue for produção kind")
+
+
+class FourProfileLayoutTests(unittest.TestCase):
+    def test_four_profiles_render_on_canvas(self) -> None:
+        from generator.layout import build_final_image
+        from generator.mesh import MeshInput
+        from generator.profile import ProfileInput
+        from src.config import load_config
+
+        cfg = load_config()
+        labels = cfg["defaults"]["labels"]
+        profiles = [
+            ProfileInput(**cfg["defaults"]["profiles"][0]),
+            ProfileInput(**cfg["defaults"]["profiles"][1]),
+            ProfileInput(**cfg["defaults"]["profiles"][0]),
+            ProfileInput(**cfg["defaults"]["profiles"][1]),
+        ]
+        img = build_final_image(
+            polygon_name=cfg["defaults"]["polygon_name"],
+            profile_type=cfg["defaults"]["profile_type"],
+            template_name=cfg["defaults"]["template_name"],
+            observation=cfg["defaults"]["observation"],
+            labels=labels,
+            mesh_input=MeshInput(polygon_name=cfg["defaults"]["polygon_name"], uploaded_mesh=None),
+            profiles=profiles,
+        )
+        self.assertEqual(img.size, (3840, 2160))
+        sample_points = [(3000, 700), (3200, 900), (3400, 1100)]
+        self.assertTrue(
+            any(img.getpixel(point) != (255, 255, 255) for point in sample_points),
+            "fourth profile region should not be blank",
+        )
 
 
 if __name__ == "__main__":

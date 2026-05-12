@@ -8,10 +8,12 @@
     "input_dir": "input",
     "output_dir": "output",
     "log_dir": "logs",
-    "logo_path": "VISUAL/Enaex Brasil - White.png"
+    "state_dir": "state",
+    "logo_path": "VISUAL/Enaex Brasil.png"
   },
   "layout": {
     "scale": 2,
+    "panel_scale": 3,
     "output_size": [1920, 1080],
     "header_height": 168,
     "top_margin": 176,
@@ -28,9 +30,14 @@
     "write_jpg": true,
     "write_pdf": true
   },
+  "site": {
+    "storage_key": "enaex.profile-creator.web.state.v1",
+    "preview_size": [1920, 1080],
+    "export_size": [3840, 2160]
+  },
   "validation": {
     "min_profiles": 1,
-    "max_profiles": 3,
+    "max_profiles": 4,
     "required_text_fields": ["polygon_name", "template_name", "profile_type"],
     "non_negative_numeric_fields": [
       "diametro_furo",
@@ -88,7 +95,7 @@
   },
   "templates": {
     "Enaex clean": {
-      "bg": "#F0F2F5",
+      "bg": "#FFFFFF",
       "panel_bg": "#FFFFFF",
       "panel_alt": "#F9FAFB",
       "panel_border": "#E5E7EB",
@@ -102,7 +109,7 @@
       "shadow": [17, 24, 39, 45]
     },
     "Técnico minimalista": {
-      "bg": "#F8FAFC",
+      "bg": "#FFFFFF",
       "panel_bg": "#FFFFFF",
       "panel_alt": "#F9FAFB",
       "panel_border": "#E2E8F0",
@@ -116,7 +123,7 @@
       "shadow": [15, 23, 42, 35]
     },
     "Relatório executivo": {
-      "bg": "#EEF2F7",
+      "bg": "#FFFFFF",
       "panel_bg": "#FFFFFF",
       "panel_alt": "#F8FAFC",
       "panel_border": "#CBD5E1",

@@ -9,7 +9,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from src.config import get_layout_config
 
 
-SCALE = max(1, int(get_layout_config().get("scale", 1)))
+_LAYOUT = get_layout_config()
+SCALE = max(1, int(_LAYOUT.get("panel_scale", _LAYOUT.get("scale", 1))))
 
 
 def _s(value: int | float) -> int:
@@ -72,16 +73,24 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
         img = Image.new("RGBA", size, "#FFFFFF")
         draw = ImageDraw.Draw(img)
         draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
-                                radius=_s(22), fill="#FFFFFF")
+                                radius=_s(22), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
         draw.text((_s(28), _s(26)), "MALHA DE PERFURAÇÃO",
                   font=_font(_s(20), bold=True), fill=theme.title)
         draw.rectangle((_s(28), _s(64), _s(80), _s(68)), fill=theme.accent_red)
+        draw.rounded_rectangle((_s(28), _s(82), _s(170), _s(110)), radius=_s(10), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
+        draw.text((_s(40), _s(88)), "ARQUIVO ANEXADO", font=_font(_s(10), bold=True), fill=theme.muted)
         try:
             mesh = Image.open(io.BytesIO(mesh_input.uploaded_mesh)).convert("RGBA")
-            mesh = ImageOps.contain(mesh, (w - _s(80), h - _s(220)))
-            img.alpha_composite(mesh, ((w - mesh.size[0]) // 2, _s(110)))
+            frame = (_s(32), _s(128), w - _s(32), h - _s(122))
+            draw.rounded_rectangle(frame, radius=_s(20), fill="#F9FAFB", outline="#E5E7EB", width=_s(1))
+            mesh = ImageOps.contain(mesh, (frame[2] - frame[0] - _s(20), frame[3] - frame[1] - _s(20)))
+            x = frame[0] + ((frame[2] - frame[0]) - mesh.size[0]) // 2
+            y = frame[1] + ((frame[3] - frame[1]) - mesh.size[1]) // 2
+            img.alpha_composite(mesh, (x, y))
         except Exception:
-            pass
+            draw.rounded_rectangle((_s(40), _s(140), w - _s(40), h - _s(150)), radius=_s(18), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
+            draw.text((_s(56), _s(170)), "Pré-visualização indisponível", font=_font(_s(14), bold=True), fill=theme.text)
+            draw.text((_s(56), _s(198)), "A imagem será exportada normalmente.", font=_font(_s(12)), fill=theme.muted)
         draw.text((_s(28), h - _s(80)), "Imagem anexada pelo usuário.",
                   font=_font(_s(13), bold=True), fill=theme.muted)
         return img
@@ -91,7 +100,8 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
 
     # Card base
     draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
-                            radius=_s(22), fill="#FFFFFF")
+                            radius=_s(22), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
+    draw.rectangle((_s(16), _s(16), w - _s(16), _s(22)), fill=theme.accent_red)
 
     # Title
     draw.text((_s(28), _s(26)), "MALHA DE PERFURAÇÃO",
@@ -103,6 +113,7 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
     # Upload area with dashed border
     upload_box = (_s(32), _s(104), w - _s(32), h - _s(130))
     ub_x1, ub_y1, ub_x2, ub_y2 = upload_box
+    draw.rounded_rectangle(upload_box, radius=_s(20), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
     dash_len, gap_len = _s(12), _s(6)
     for side in ["top", "bottom", "left", "right"]:
         if side == "top":
@@ -130,6 +141,13 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
             pos = end
             drawing_dash = not drawing_dash
 
+    # Technical grid to make the placeholder feel intentional rather than empty.
+    grid_step = _s(30)
+    for gx in range(ub_x1 + _s(18), ub_x2 - _s(12), grid_step):
+        draw.line((gx, ub_y1 + _s(18), gx, ub_y2 - _s(18)), fill="#E9EEF4", width=_s(1))
+    for gy in range(ub_y1 + _s(18), ub_y2 - _s(12), grid_step):
+        draw.line((ub_x1 + _s(18), gy, ub_x2 - _s(18), gy), fill="#E9EEF4", width=_s(1))
+
     # Upload icon (circle + up arrow)
     ic_cx = (ub_x1 + ub_x2) // 2
     ic_cy = ub_y1 + _s(110)
@@ -148,6 +166,13 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
     sub_text = "Se não houver anexo, o painel fica apenas como referência."
     sub_w = int(draw.textlength(sub_text, font=sub_font))
     draw.text((ic_cx - sub_w // 2, ic_cy + _s(76)), sub_text, font=sub_font, fill=theme.muted)
+
+    # Small footer chip for a more polished placeholder state.
+    chip_text = "MODO REFERÊNCIA"
+    chip_font = _font(_s(11), bold=True)
+    chip_w = int(draw.textlength(chip_text, font=chip_font)) + _s(24)
+    draw.rounded_rectangle((ic_cx - chip_w // 2, h - _s(94), ic_cx + chip_w // 2, h - _s(62)), radius=_s(12), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
+    draw.text((ic_cx - chip_w // 2 + _s(12), h - _s(87)), chip_text, font=chip_font, fill=theme.muted)
 
     # Legend
     legend_y = h - _s(106)

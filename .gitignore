@@ -1,0 +1,14 @@
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Generated run artifacts
+output/*
+!output/README.md
+logs/*
+!logs/README.md
+state/*.tmp
+
+# Static-site and editor leftovers
+Captura de tela*.png
+.DS_Store

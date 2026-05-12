@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Enaex Profile Creator. Site estático para construção de perfil de carga com preview vetorial e exportação local.">
+  <title>Enaex Profile Creator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="hero">
+      <div class="hero__copy">
+        <p class="eyebrow">SaaS industrial estático</p>
+        <h1>Enaex Profile Creator</h1>
+        <p class="hero__subtitle">Versão pronta para GitHub Pages com renderização vetorial, exportação local e memória salva no navegador.</p>
+        <div class="hero__badges">
+          <span class="pill">SVG nativo</span>
+          <span class="pill">PNG, PDF e JPG</span>
+          <span class="pill">Até 4 perfis</span>
+          <span class="pill pill--accent">Memória local</span>
+        </div>
+      </div>
+      <div class="hero__panel panel panel--hero">
+        <div class="panel__head panel__head--compact">
+          <div>
+            <p class="eyebrow">Estado do projeto</p>
+            <h2>Site estático</h2>
+          </div>
+          <span class="status-pill" id="memoryStatus">Carregando…</span>
+        </div>
+        <div class="hero__stats">
+          <div class="stat"><span>Render</span><strong>SVG</strong></div>
+          <div class="stat"><span>Export</span><strong>3840x2160</strong></div>
+          <div class="stat"><span>Persistência</span><strong>localStorage</strong></div>
+        </div>
+      </div>
+    </header>
+
+    <main class="workspace">
+      <section class="panel builder-panel">
+        <div class="panel__head">
+          <div>
+            <p class="eyebrow">Configuração</p>
+            <h2>Montar lâmina</h2>
+          </div>
+          <div class="panel__meta">
+            <button class="ghost-button" type="button" id="resetButton">Restaurar padrão</button>
+            <button class="ghost-button" type="button" id="saveButton">Salvar memória</button>
+          </div>
+        </div>
+        <div class="builder-toolbar">
+          <div class="segmented-control" aria-label="Quantidade de perfis">
+            <button type="button" id="profileMinus" aria-label="Remover perfil">−</button>
+            <span id="profileCountLabel">2 perfis</span>
+            <button type="button" id="profilePlus" aria-label="Adicionar perfil">+</button>
+          </div>
+          <span class="helper-pill" id="projectSeed">Memória carregada do projeto</span>
+        </div>
+        <form id="builderForm" class="builder-form" autocomplete="off"></form>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="panel__head">
+          <div>
+            <p class="eyebrow">Preview</p>
+            <h2>Lâmina vetorial</h2>
+          </div>
+          <div class="download-group">
+            <button class="primary-button" type="button" data-download="svg">Baixar SVG</button>
+            <button class="primary-button" type="button" data-download="png">PNG</button>
+            <button class="primary-button" type="button" data-download="jpg">JPG</button>
+            <button class="primary-button" type="button" data-download="pdf">PDF</button>
+          </div>
+        </div>
+        <div class="preview-frame">
+          <div class="preview-canvas" id="previewCanvas" aria-live="polite"></div>
+        </div>
+        <div class="validation" id="validation"></div>
+      </section>
+    </main>
+  </div>
+
+  <noscript>
+    <div class="noscript">Este site precisa de JavaScript para funcionar.</div>
+  </noscript>
+</body>
+</html>

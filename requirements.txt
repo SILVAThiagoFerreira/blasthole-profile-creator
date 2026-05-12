@@ -2,3 +2,4 @@ streamlit
 pillow
 reportlab
 matplotlib
+cairosvg

@@ -28,6 +28,18 @@ class ValidationTests(unittest.TestCase):
         }
         validate_run_request(request, cfg["validation"])
 
+    def test_four_profiles_are_allowed(self) -> None:
+        cfg = load_config()
+        profiles = cfg["defaults"]["profiles"]
+        request = {
+            "polygon_name": cfg["defaults"]["polygon_name"],
+            "template_name": cfg["defaults"]["template_name"],
+            "profile_type": cfg["defaults"]["profile_type"],
+            "profile_count": 4,
+            "profiles": [profiles[0], profiles[1], profiles[0], profiles[1]],
+        }
+        validate_run_request(request, cfg["validation"])
+
 
 if __name__ == "__main__":
     unittest.main()

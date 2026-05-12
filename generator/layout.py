@@ -6,11 +6,11 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 from .mesh import MeshInput, render_mesh_panel
 from .profile import ProfileInput, render_profile_panel
-from src.config import get_layout_config, load_config
+from src.config import get_layout_config, get_paths_config, get_project_root, load_config
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,6 +23,21 @@ HEADER_H = int(_LAYOUT.get("header_height", 168) * SCALE)
 
 def _s(value: int | float) -> int:
     return int(round(value * SCALE))
+
+
+def _hex_to_rgba(hex_color: str, alpha: int = 255) -> tuple[int, int, int, int]:
+    color = hex_color.lstrip("#")
+    return int(color[0:2], 16), int(color[2:4], 16), int(color[4:6], 16), alpha
+
+
+def _mix_hex(a: str, b: str, t: float) -> str:
+    t = max(0.0, min(1.0, t))
+    ar, ag, ab = int(a[1:3], 16), int(a[3:5], 16), int(a[5:7], 16)
+    br, bg, bb = int(b[1:3], 16), int(b[3:5], 16), int(b[5:7], 16)
+    rr = int(ar + (br - ar) * t)
+    gg = int(ag + (bg - ag) * t)
+    bb = int(ab + (bb - ab) * t)
+    return f"#{rr:02X}{gg:02X}{bb:02X}"
 
 
 @dataclass(frozen=True)
@@ -63,10 +78,40 @@ TEMPLATE_PRESETS: dict[str, TemplateTheme] = {
 
 
 def load_default_logo_bytes() -> bytes | None:
-    logo_path = BASE_DIR / "VISUAL" / "Enaex Brasil - White.png"
+    logo_path = get_project_root() / get_paths_config().get("logo_path", "")
     if logo_path.exists():
         return logo_path.read_bytes()
+    legacy_logo_path = BASE_DIR / "VISUAL" / "Enaex Brasil - White.png"
+    if legacy_logo_path.exists():
+        return legacy_logo_path.read_bytes()
+    logo_svg_path = BASE_DIR / "VISUAL" / "enaex-logo-official.svg"
+    if logo_svg_path.exists():
+        return _build_default_logo_bytes()
     return None
+
+
+def _build_default_logo_bytes() -> bytes:
+    logo = Image.new("RGBA", (1200, 320), "#FFFFFF")
+    draw = ImageDraw.Draw(logo)
+
+    red = "#E20613"
+    gray = "#3E434D"
+
+    scale = 5.5
+    ox, oy = 28, 34
+    mark_1 = [(20.91 * scale + ox, 0 * scale + oy), (31.31 * scale + ox, 5.86 * scale + oy), (41.68 * scale + ox, 0 * scale + oy), (41.71 * scale + ox, 11.69 * scale + oy), (52.21 * scale + ox, 17.57 * scale + oy), (41.78 * scale + ox, 23.5 * scale + oy), (41.74 * scale + ox, 35.22 * scale + oy), (31.31 * scale + ox, 29.39 * scale + oy), (20.91 * scale + ox, 35.19 * scale + oy), (20.93 * scale + ox, 23.54 * scale + oy), (31.21 * scale + ox, 17.57 * scale + oy), (20.97 * scale + ox, 11.78 * scale + oy)]
+    mark_2 = [(0 * scale + ox, 17.6 * scale + oy), (10.48 * scale + ox, 11.72 * scale + oy), (20.89 * scale + ox, 17.56 * scale + oy), (10.48 * scale + ox, 23.52 * scale + oy)]
+    draw.polygon(mark_1, fill=red)
+    draw.polygon(mark_2, fill=red)
+
+    text_font = _font(112, bold=True)
+    draw.text((330, 86), "ENAEX", font=text_font, fill=gray)
+
+    bbox = logo.getbbox() or (0, 0, logo.size[0], logo.size[1])
+    cropped = logo.crop(bbox)
+    buffer = io.BytesIO()
+    cropped.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:
@@ -102,6 +147,13 @@ def _gaussian_shadow(base: Image.Image, box: tuple[int, int, int, int], radius: 
     )
     blurred = shadow_layer.filter(ImageFilter.GaussianBlur(radius=blur_radius * SCALE))
     base.alpha_composite(blurred)
+
+
+def _draw_background(canvas: Image.Image, theme: TemplateTheme) -> None:
+    draw = ImageDraw.Draw(canvas)
+    width, height = canvas.size
+    draw.rectangle((0, 0, width, height), fill="#FFFFFF")
+    draw.line((_s(48), HEADER_H + _s(8), width - _s(48), HEADER_H + _s(8)), fill="#EEF2F7", width=_s(1))
 
 
 def _draw_wrapped_text(draw: ImageDraw.ImageDraw, text: str, box: tuple[int, int, int, int], font: ImageFont.FreeTypeFont, fill: str, line_spacing: int = 6) -> None:
@@ -141,6 +193,11 @@ def _fit_font(draw: ImageDraw.ImageDraw, text: str, max_width: int, start_size: 
 def _paste_logo(canvas: Image.Image, logo_bytes: bytes, box: tuple[int, int, int, int]) -> None:
     with Image.open(io.BytesIO(logo_bytes)) as logo:
         logo = logo.convert("RGBA")
+        bg = Image.new("RGBA", logo.size, (255, 255, 255, 255))
+        diff = ImageChops.difference(logo, bg)
+        bbox = diff.getbbox()
+        if bbox:
+            logo = logo.crop(bbox)
         logo = ImageOps.contain(logo, (box[2] - box[0], box[3] - box[1]))
         x = box[0] + ((box[2] - box[0]) - logo.size[0]) // 2
         y = box[1] + ((box[3] - box[1]) - logo.size[1]) // 2
@@ -157,15 +214,17 @@ def _draw_header(canvas: Image.Image, theme: TemplateTheme, polygon_name: str, p
     draw.rectangle((0, 0, width, _s(6)), fill=theme.accent_red)
     # Bottom separator
     draw.line((0, HEADER_H - _s(1), width, HEADER_H - _s(1)), fill="#E5E7EB", width=_s(1))
+    draw.line((_s(36), _s(154), width - _s(36), _s(154)), fill="#EEF2F7", width=_s(1))
 
-    # Red badge with logo (left)
+    # Logo badge (left)
     badge_box = (_s(36), _s(18), _s(236), _s(142))
-    draw.rounded_rectangle(badge_box, radius=_s(18), fill=theme.accent_red)
+    draw.rounded_rectangle(badge_box, radius=_s(18), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
+    draw.rectangle((badge_box[0], badge_box[1], badge_box[2], badge_box[1] + _s(6)), fill=theme.accent_red)
     if logo_bytes:
-        _paste_logo(canvas, logo_bytes, (_s(48), _s(30), _s(224), _s(130)))
+        _paste_logo(canvas, logo_bytes, (_s(50), _s(34), _s(220), _s(128)))
     else:
-        draw.text((_s(56), _s(46)), "ENAEX", font=_font(_s(30), bold=True), fill="#FFFFFF")
-        draw.text((_s(56), _s(84)), "BRASIL", font=_font(_s(22), bold=True), fill="#FFCDD0")
+        draw.text((_s(56), _s(50)), "ENAEX", font=_font(_s(30), bold=True), fill=theme.accent_red)
+        draw.text((_s(56), _s(88)), "BRASIL", font=_font(_s(22), bold=True), fill=theme.muted)
 
     # Title block (center)
     title_x = _s(262)
@@ -179,6 +238,8 @@ def _draw_header(canvas: Image.Image, theme: TemplateTheme, polygon_name: str, p
     draw.text((title_x, _s(114)), "Lâmina técnica 16:9",
               font=_fit_font(draw, "Lâmina técnica 16:9", title_max_w, _s(14)),
               fill="#9CA3AF")
+    draw.rounded_rectangle((title_x, _s(146), title_x + _s(182), _s(170)), radius=_s(10), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
+    draw.text((title_x + _s(14), _s(150)), "Entrega técnica", font=_font(_s(12), bold=True), fill=theme.muted)
 
     # Right badge (profile type)
     badge_font = _font(_s(19), bold=True)
@@ -222,7 +283,7 @@ def _draw_footer(canvas: Image.Image, theme: TemplateTheme, observation: str, la
         )
 
 
-def _draw_layout(canvas: Image.Image, theme: TemplateTheme, mesh_panel: Image.Image, profile_panels: list[Image.Image]) -> None:
+def _draw_layout(canvas: Image.Image, theme: TemplateTheme, mesh_panel: Image.Image, profile_panels: list[Image.Image], compact: bool = False) -> None:
     width, height = canvas.size
     top = HEADER_H + _s(8)
     bottom = _s(92)
@@ -232,23 +293,41 @@ def _draw_layout(canvas: Image.Image, theme: TemplateTheme, mesh_panel: Image.Im
     mesh_w = _s(500)
     profile_area_w = width - (margin * 2) - mesh_w - gap
     profile_count = max(len(profile_panels), 1)
-    profile_gap = _s(16) if profile_count > 1 else 0
-    profile_w = (profile_area_w - profile_gap * (profile_count - 1)) // profile_count
-
     cards = [(margin, top, mesh_w, card_h, mesh_panel)]
-    x_cursor = margin + mesh_w + gap
-    for panel in profile_panels:
-        cards.append((x_cursor, top, profile_w, card_h, panel))
-        x_cursor += profile_w + profile_gap
+
+    if profile_count <= 3:
+        profile_gap = _s(16) if profile_count > 1 else 0
+        profile_w = (profile_area_w - profile_gap * (profile_count - 1)) // profile_count
+        x_cursor = margin + mesh_w + gap
+        for panel in profile_panels:
+            cards.append((x_cursor, top, profile_w, card_h, panel))
+            x_cursor += profile_w + profile_gap
+    else:
+        cols = 2
+        rows = 2
+        cell_w = (profile_area_w - gap) // cols
+        cell_h = (card_h - gap) // rows
+        start_x = margin + mesh_w + gap
+        start_y = top
+        for idx, panel in enumerate(profile_panels[:4]):
+            row = idx // cols
+            col = idx % cols
+            x = start_x + col * (cell_w + gap)
+            y = start_y + row * (cell_h + gap)
+            cards.append((x, y, cell_w, cell_h, panel))
 
     for x, y, w, h, panel in cards:
         box = (x, y, x + w, y + h)
         _gaussian_shadow(canvas, box, radius=_s(28), blur_radius=10)
         draw = ImageDraw.Draw(canvas)
-        draw.rounded_rectangle(box, radius=_s(28), fill=theme.panel_bg)
+        draw.rounded_rectangle(box, radius=_s(28), fill=theme.panel_bg, outline=theme.panel_border, width=_s(1))
+        draw.rounded_rectangle((x + _s(2), y + _s(2), x + w - _s(2), y + h - _s(2)), radius=_s(26), outline="#FFFFFF", width=_s(1))
         panel_fit = ImageOps.contain(panel, (w - _s(24), h - _s(24)))
         px = x + (w - panel_fit.size[0]) // 2
-        py = y + _s(12)
+        if compact:
+            py = y + (h - panel_fit.size[1]) // 2
+        else:
+            py = y + max(_s(12), (h - panel_fit.size[1]) // 2)
         canvas.alpha_composite(panel_fit, (px, py))
 
 
@@ -267,9 +346,12 @@ def build_final_image(
     if logo_bytes is None:
         logo_bytes = load_default_logo_bytes()
 
+    _draw_background(canvas, theme)
     _draw_header(canvas, theme, polygon_name, profile_type, logo_bytes)
     mesh_panel = render_mesh_panel(mesh_input, theme, size=(540, 760))
-    profile_panels = [render_profile_panel(profile, theme, labels=labels, size=(540, 760)) for profile in profiles]
-    _draw_layout(canvas, theme, mesh_panel, profile_panels)
+    compact = len(profiles) > 3
+    profile_size = (540, 520) if compact else (540, 760)
+    profile_panels = [render_profile_panel(profile, theme, labels=labels, size=profile_size, compact=compact) for profile in profiles]
+    _draw_layout(canvas, theme, mesh_panel, profile_panels, compact=compact)
     _draw_footer(canvas, theme, observation, labels)
     return canvas.convert("RGB")

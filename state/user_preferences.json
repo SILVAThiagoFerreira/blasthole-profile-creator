@@ -1,0 +1,46 @@
+{
+  "request": {
+    "labels": {
+      "airdeck": "Deck de ar",
+      "blastbag": "Blastbag",
+      "column": "Carga",
+      "stemming": "Tampão",
+      "subdrill": "Subperf."
+    },
+    "observation": "Perfil técnico para reporte operacional.",
+    "polygon_name": "PP170526 (220-210)",
+    "profile_count": 2,
+    "profile_type": "Perfis técnicos",
+    "profiles": [
+      {
+        "air_deck": 0.35,
+        "altura_banco": 10.5,
+        "azimute": 0.0,
+        "blastbag": 0.15,
+        "densidade": 1.15,
+        "diametro_furo": 140.0,
+        "inclinacao": 0.0,
+        "kind": "Produção",
+        "name": "Perfil A",
+        "stemming": 2.3,
+        "subperfuracao": 0.6
+      },
+      {
+        "air_deck": 0.2,
+        "altura_banco": 10.4,
+        "azimute": 0.0,
+        "blastbag": 0.1,
+        "densidade": 1.05,
+        "diametro_furo": 102.0,
+        "inclinacao": 0.0,
+        "kind": "Amortecimento",
+        "name": "Perfil B",
+        "stemming": 3.5,
+        "subperfuracao": 0.0
+      }
+    ],
+    "template_name": "Enaex clean"
+  },
+  "saved_at": "2026-05-12T10:04:21",
+  "schema_version": 1
+}
