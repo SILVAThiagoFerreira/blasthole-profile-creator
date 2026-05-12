@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "Blasthole Profile Creator",
-    "subtitle": "Geração automática de lâminas técnicas 16:9 no padrão visual Enaex.",
+    "subtitle": "Geração automática de lâminas técnicas no padrão visual Enaex.",
     "default_profile_type": "Perfis técnicos"
   },
   "paths": {

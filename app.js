@@ -1,7 +1,7 @@
 const FALLBACK_CONFIG = {
   app: {
     title: 'Blasthole Profile Creator',
-    subtitle: 'Geração automática de lâminas técnicas 16:9 no padrão visual Enaex.',
+    subtitle: 'Geração automática de lâminas técnicas no padrão visual Enaex.',
     default_profile_type: 'Perfis técnicos',
   },
   paths: {
@@ -918,7 +918,6 @@ function renderMeshPanel(theme, box) {
       <text x="${x + 40}" y="${y + 102}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">ARQUIVO ANEXADO</text>
       <rect x="${x + 32}" y="${y + 128}" width="${w - 64}" height="${h - 176}" rx="20" fill="#F9FAFB" stroke="#E5E7EB"/>
       <image href="${state.mesh.dataUrl}" x="${x + 44}" y="${y + 140}" width="${w - 88}" height="${h - 200}" preserveAspectRatio="xMidYMid meet"/>
-      <text x="${x + 28}" y="${y + h - 20}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${escapeXml(`Imagem anexada: ${shortText(state.mesh.name || 'sem nome', 40)}`)}</text>
     `;
   }
 
@@ -958,7 +957,7 @@ function renderHeader(theme, box) {
   const titleSize = fitFontSize(title, w - 560, 34, `'IBM Plex Sans', sans-serif`, 700, 24);
   const polygonSize = fitFontSize(state.polygonName, w - 560, 30, `'IBM Plex Sans', sans-serif`, 700, 20);
   const logoBox = { x: x + 36, y: y + 18, w: 200, h: 124 };
-  const rightBadgeText = state.profileType;
+  const rightBadgeText = String(state.profileType || 'PERFIS TÉCNICOS').toUpperCase();
   const badgeFont = 19;
   const badgeTextWidth = measureTextWidth(rightBadgeText, badgeFont, `'IBM Plex Sans', sans-serif`, 700);
   const badgeW = Math.max(210, badgeTextWidth + 52);
@@ -978,12 +977,10 @@ function renderHeader(theme, box) {
     })()}
     <text x="${x + 262}" y="${y + 36}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
     <text x="${x + 262}" y="${y + 82}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
-    <text x="${x + 262}" y="${y + 118}" fill="#9CA3AF" font-family="IBM Plex Sans, sans-serif" font-size="14">Lâmina técnica 16:9</text>
     <rect x="${x + 262}" y="${y + 146}" width="182" height="24" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
     <text x="${x + 276}" y="${y + 162}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700">Entrega técnica</text>
     <rect x="${badgeX}" y="${y + 38}" width="${badgeW}" height="70" rx="20" fill="${theme.accent_red}"/>
-    <text x="${badgeX + badgeW / 2}" y="${y + 60}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
-    <text x="${badgeX + badgeW / 2}" y="${y + 80}" text-anchor="middle" fill="#FFCDD0" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700">16:9</text>
+    <text x="${badgeX + badgeW / 2}" y="${y + 74}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
   `;
 }
 
@@ -1061,7 +1058,7 @@ function renderLayout(currentConfig) {
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">
       <title id="svgTitle">Blasthole Profile Creator</title>
-      <desc id="svgDesc">Lâmina técnica para perfil de carga com dados editáveis e composição vetorial.</desc>
+      <desc id="svgDesc">Perfil de carga com dados editáveis e composição vetorial.</desc>
       <defs>
         <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="${theme.bg}"/>
