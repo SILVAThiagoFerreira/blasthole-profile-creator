@@ -239,6 +239,10 @@ function kindLabel(kind) {
   return KIND_LABELS[normalizeKind(kind)] || KIND_LABELS.personalizado;
 }
 
+function labelSet() {
+  return config?.defaults?.labels || FALLBACK_CONFIG.defaults.labels;
+}
+
 function normalizeKind(value) {
   const raw = String(value ?? '').trim().toLowerCase();
   if (!raw) return 'personalizado';
@@ -773,21 +777,22 @@ function renderProfileCard(profile, theme, box, compact, index) {
     yCur = y2;
   }
 
+  const labels = labelSet();
   const metricRows = compact
     ? [
       ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
       ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
-      ['subdrill', 'Subperf.', `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
-      ['stemming', 'Tampão', `${formatDecimal(stem)} m`, 'stemming'],
-      ['column', 'Carga', `${formatDecimal(charge)} m`, 'column'],
+      ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
+      ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
+      ['column', labels.column, `${formatDecimal(charge)} m`, 'column'],
     ]
     : [
       ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
       ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
-      ['subdrill', kindLabel('subdrill'), `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
-      ['stemming', kindLabel('stemming'), `${formatDecimal(profile.stemming)} m`, 'stemming'],
-      ['blastbag', kindLabel('blastbag'), `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
-      ['airdeck', kindLabel('airdeck'), `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
+      ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
+      ['stemming', labels.stemming, `${formatDecimal(profile.stemming)} m`, 'stemming'],
+      ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
+      ['airdeck', labels.airdeck, `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
       ['inclination', 'Inclinação', `${formatDecimal(profile.inclinacao, 1)}°`, 'inclination'],
       ['azimuth', 'Azimute', `${formatDecimal(profile.azimute, 1)}°`, 'azimuth'],
       ['density', 'Densidade', `${formatDecimal(profile.densidade, 2)} g/cm³`, 'density'],
@@ -811,17 +816,17 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
   const chips = compact
     ? [
-      [kindLabel('blastbag'), `${formatDecimal(bb)} m`],
-      [kindLabel('airdeck'), `${formatDecimal(ad)} m`],
+      [labels.blastbag, `${formatDecimal(bb)} m`],
+      [labels.airdeck, `${formatDecimal(ad)} m`],
       ['Incl.', `${formatDecimal(profile.inclinacao, 1)}°`],
       ['Azim.', `${formatDecimal(profile.azimute, 1)}°`],
       ['Dens.', `${formatDecimal(profile.densidade, 2)}`],
     ]
     : [
-      [kindLabel('stemming'), `${formatDecimal(stem)} m`],
-      [kindLabel('column'), `${formatDecimal(charge)} m`],
-      [kindLabel('subdrill'), `${formatDecimal(sub)} m`],
-      [kindLabel('blastbag'), `${formatDecimal(bb)} m`],
+      [labels.stemming, `${formatDecimal(stem)} m`],
+      [labels.column, `${formatDecimal(charge)} m`],
+      [labels.subdrill, `${formatDecimal(sub)} m`],
+      [labels.blastbag, `${formatDecimal(bb)} m`],
     ];
 
   const chipFont = compact ? 9 : 11;
@@ -978,7 +983,7 @@ function renderHeader(theme, box) {
   `;
 }
 
-function renderFooter(theme, box) {
+function renderFooter(theme, box, showLegend = false) {
   const { x, y, w, h } = box;
   const legend = [
     ['Produção', theme.accent_blue],
@@ -986,17 +991,14 @@ function renderFooter(theme, box) {
     ['Contorno', theme.accent_red],
   ];
 
-  let posX = x + 48;
-  const legendMarkup = legend.map(([label, color]) => {
-    const width = measureTextWidth(label, 15, `'IBM Plex Sans', sans-serif`, 700);
-    const chunk = `<rect x="${posX}" y="${y + 16}" width="14" height="14" rx="4" fill="${color}"/><text x="${posX + 20}" y="${y + 28}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700">${escapeXml(label)}</text>`;
-    posX += width + 36;
-    return chunk;
-  }).join('');
+  const legendMarkup = showLegend ? legend.map(([label, color], index) => {
+    const posX = x + 48 + legend.slice(0, index).reduce((acc, [previousLabel]) => acc + measureTextWidth(previousLabel, 15, `'IBM Plex Sans', sans-serif`, 700) + 36, 0);
+    return `<rect x="${posX}" y="${y + 16}" width="14" height="14" rx="4" fill="${color}"/><text x="${posX + 20}" y="${y + 28}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700">${escapeXml(label)}</text>`;
+  }).join('') : '';
 
   const observationLines = wrapText(state.observation, w - 96, 17, `'IBM Plex Sans', sans-serif`, 400).slice(0, 3);
   const observationMarkup = observationLines.length
-    ? textBlock(x + 48, y + 54, observationLines, { size: 17, weight: 400, fill: theme.muted })
+    ? textBlock(x + 48, y + (showLegend ? 54 : 28), observationLines, { size: 16, weight: 400, fill: theme.muted })
     : '';
 
   return `
@@ -1050,7 +1052,7 @@ function renderLayout(currentConfig) {
   }).join('');
 
   const header = renderHeader(theme, { x: 0, y: 0, w: viewW, h: 168 });
-  const footer = renderFooter(theme, { x: 0, y: viewH - bottom, w: viewW, h: bottom });
+  const footer = renderFooter(theme, { x: 0, y: viewH - bottom, w: viewW, h: bottom }, Boolean(state.mesh?.dataUrl));
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">
@@ -1076,72 +1078,44 @@ function renderGlobalSection(currentConfig) {
   const templateOptions = Object.keys(currentConfig.templates).map((template) => `<option value="${escapeXml(template)}"${template === state.templateName ? ' selected' : ''}>${escapeXml(template)}</option>`).join('');
   const meshName = state.mesh?.name ? shortText(state.mesh.name, 32) : 'Nenhum arquivo anexado';
   return `
-    <section class="section">
-      <div class="section__head">
-        <div>
-          <p class="section__title">Contexto</p>
-          <p class="section__subtitle">Configuração global do documento e anexo opcional da malha.</p>
-        </div>
+    <div class="form-grid form-grid--two">
+      <div class="field">
+        <label for="templateName">Template</label>
+        <select id="templateName" data-path="templateName">${templateOptions}</select>
       </div>
-      <div class="form-grid form-grid--two">
-        <div class="field">
-          <label for="templateName">Template</label>
-          <select id="templateName" data-path="templateName">${templateOptions}</select>
-        </div>
-        <div class="field">
-          <label for="polygonName">Nome da poligonal</label>
-          <input id="polygonName" data-path="polygonName" type="text" value="${escapeXml(state.polygonName)}" placeholder="Nome da poligonal">
-        </div>
-        <div class="field" style="grid-column: 1 / -1;">
-          <label for="observation">Observação final</label>
-          <textarea id="observation" data-path="observation" placeholder="Observação final">${escapeXml(state.observation)}</textarea>
-        </div>
+      <div class="field">
+        <label for="polygonName">Nome da poligonal</label>
+        <input id="polygonName" data-path="polygonName" type="text" value="${escapeXml(state.polygonName)}" placeholder="Nome da poligonal">
       </div>
-      <div class="image-upload-row" style="margin-top: 14px;">
-        <div class="field" style="flex: 1 1 300px; min-width: 260px;">
-          <label for="meshFile">Anexar imagem da malha</label>
-          <input id="meshFile" data-role="mesh-file" type="file" accept="image/png,image/jpeg,image/jpg">
-        </div>
-        <span class="file-chip" id="meshChip">${escapeXml(meshName)}</span>
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="observation">Observação final</label>
+        <textarea id="observation" data-path="observation" placeholder="Observação final">${escapeXml(state.observation)}</textarea>
       </div>
-      <p class="hint" style="margin-top: 12px;">O anexo da malha permanece apenas na sessão atual por segurança e tamanho de armazenamento.</p>
-    </section>`;
+    </div>
+    <div class="image-upload-row" style="margin-top: 14px;">
+      <div class="field" style="flex: 1 1 300px; min-width: 260px;">
+        <label for="meshFile">Anexar imagem da malha</label>
+        <input id="meshFile" data-role="mesh-file" type="file" accept="image/png,image/jpeg,image/jpg">
+      </div>
+      <span class="file-chip" id="meshChip">${escapeXml(meshName)}</span>
+    </div>
+    <p class="hint" style="margin-top: 12px;">O anexo da malha permanece apenas na sessão atual por segurança e tamanho de armazenamento.</p>`;
 }
 
 function renderLabelSection() {
   return `
-    <section class="section">
-      <div class="section__head">
-        <div>
-          <p class="section__title">Terminologia</p>
-          <p class="section__subtitle">Rótulos editáveis usados na lâmina final.</p>
-        </div>
-      </div>
-      <div class="form-grid form-grid--three">
-        ${renderInput('Tampão / stemming', 'labels.stemming', state.labels.stemming)}
-        ${renderInput('Blastbag', 'labels.blastbag', state.labels.blastbag)}
-        ${renderInput('Deck de ar', 'labels.airdeck', state.labels.airdeck)}
-        ${renderInput('Carga / coluna', 'labels.column', state.labels.column)}
-        ${renderInput('Subperfuração', 'labels.subdrill', state.labels.subdrill)}
-      </div>
-    </section>`;
+    <div class="form-grid form-grid--three">
+      ${renderInput('Tampão / stemming', 'labels.stemming', state.labels.stemming)}
+      ${renderInput('Blastbag', 'labels.blastbag', state.labels.blastbag)}
+      ${renderInput('Deck de ar', 'labels.airdeck', state.labels.airdeck)}
+      ${renderInput('Carga / coluna', 'labels.column', state.labels.column)}
+      ${renderInput('Subperfuração', 'labels.subdrill', state.labels.subdrill)}
+    </div>`;
 }
 
 function renderProfilesSection() {
   const cards = state.profiles.slice(0, state.profileCount).map((profile, index) => renderProfileEditor(profile, index)).join('');
-  return `
-    <section class="section">
-      <div class="section__head">
-        <div>
-          <p class="section__title">Perfis</p>
-          <p class="section__subtitle">Até ${config.validation.max_profiles} perfis por lâmina. A pré-visualização se adapta automaticamente.</p>
-        </div>
-        <span class="helper-pill">${state.profileCount} ${pluralProfiles(state.profileCount)}</span>
-      </div>
-      <div class="profile-list">
-        ${cards}
-      </div>
-    </section>`;
+  return `<div class="profile-list">${cards}</div>`;
 }
 
 function renderInput(label, path, value, type = 'text', extra = {}) {
