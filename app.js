@@ -1,6 +1,6 @@
 const FALLBACK_CONFIG = {
   app: {
-    title: 'Enaex Profile Creator',
+    title: 'Blasthole Profile Creator',
     subtitle: 'Geração automática de lâminas técnicas 16:9 no padrão visual Enaex.',
     default_profile_type: 'Perfis técnicos',
   },
@@ -278,6 +278,11 @@ function createDefaultState(currentConfig) {
     profileCount: clamp(Number(defaults.profile_count) || 2, currentConfig.validation.min_profiles, currentConfig.validation.max_profiles),
     labels: clone(defaults.labels),
     profiles: clone(defaults.profiles),
+    logo: {
+      name: '',
+      type: '',
+      dataUrl: '',
+    },
     mesh: {
       name: '',
       type: '',
@@ -354,6 +359,14 @@ function mergeLoadedState(currentConfig, savedState) {
     profileCount,
     labels,
     profiles,
+    logo: (() => {
+      const asset = request.logo && typeof request.logo === 'object' ? request.logo : {};
+      return {
+        name: isNonEmptyString(asset.name) ? String(asset.name).trim() : '',
+        type: isNonEmptyString(asset.type) ? String(asset.type).trim() : '',
+        dataUrl: isNonEmptyString(asset.dataUrl) ? String(asset.dataUrl) : '',
+      };
+    })(),
     mesh: clone(base.mesh),
   };
 
@@ -457,6 +470,7 @@ function serializeForStorage(appState) {
     profileCount: appState.profileCount,
     labels: clone(appState.labels),
     profiles: clone(appState.profiles),
+    logo: clone(appState.logo),
   };
 }
 
@@ -916,20 +930,6 @@ function renderMeshPanel(theme, box) {
     grid.push(`<line x1="${x + 16}" y1="${gy}" x2="${x + w - 16}" y2="${gy}" stroke="rgba(29,111,184,0.08)" stroke-width="1"/>`);
   }
 
-  const legend = [
-    ['Produção', theme.accent_blue],
-    ['Amortecimento', theme.accent_orange],
-    ['Contorno', theme.accent_red],
-  ];
-
-  let legendX = x + 36;
-  const legendMarkup = legend.map(([label, color]) => {
-    const width = measureTextWidth(label, 13, `'IBM Plex Sans', sans-serif`, 700);
-    const chunk = `<rect x="${legendX}" y="${y + h - 104}" width="14" height="14" rx="4" fill="${color}"/><text x="${legendX + 20}" y="${y + h - 92}" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${escapeXml(label)}</text>`;
-    legendX += width + 52;
-    return chunk;
-  }).join('');
-
   return `
     <g filter="url(#shadow)">
       <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
@@ -948,7 +948,6 @@ function renderMeshPanel(theme, box) {
     <text x="${x + w / 2}" y="${y + 276}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Se não houver anexo, o painel fica apenas como referência.</text>
     <rect x="${x + w / 2 - 62}" y="${y + h - 98}" width="124" height="28" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
     <text x="${x + w / 2}" y="${y + h - 78}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">MODO REFERÊNCIA</text>
-    ${legendMarkup}
     <text x="${x + 36}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Somente imagem anexada, sem geração sintética da malha.</text>
   `;
 }
@@ -971,7 +970,12 @@ function renderHeader(theme, box) {
     <line x1="${x + 36}" y1="${y + 154}" x2="${x + w - 36}" y2="${y + 154}" stroke="#EEF2F7" stroke-width="1"/>
     <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="${logoBox.h}" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
     <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="6" rx="3" fill="${theme.accent_red}"/>
-    ${logoDataUrl ? `<image href="${logoDataUrl}" x="${logoBox.x + 14}" y="${logoBox.y + 16}" width="${logoBox.w - 28}" height="${logoBox.h - 26}" preserveAspectRatio="xMidYMid meet"/>` : `<text x="${logoBox.x + 20}" y="${logoBox.y + 64}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="28" font-weight="700">ENAEX</text>`}
+    ${(() => {
+      const logoUrl = state.logo?.dataUrl || logoDataUrl;
+      return logoUrl
+        ? `<image href="${logoUrl}" x="${logoBox.x + 14}" y="${logoBox.y + 16}" width="${logoBox.w - 28}" height="${logoBox.h - 26}" preserveAspectRatio="xMidYMid meet"/>`
+        : `<text x="${logoBox.x + 20}" y="${logoBox.y + 64}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="28" font-weight="700">ENAEX</text>`;
+    })()}
     <text x="${x + 262}" y="${y + 36}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
     <text x="${x + 262}" y="${y + 82}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
     <text x="${x + 262}" y="${y + 118}" fill="#9CA3AF" font-family="IBM Plex Sans, sans-serif" font-size="14">Lâmina técnica 16:9</text>
@@ -1056,7 +1060,7 @@ function renderLayout(currentConfig) {
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">
-      <title id="svgTitle">Enaex Profile Creator</title>
+      <title id="svgTitle">Blasthole Profile Creator</title>
       <desc id="svgDesc">Lâmina técnica para perfil de carga com dados editáveis e composição vetorial.</desc>
       <defs>
         <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
@@ -1076,6 +1080,7 @@ function renderLayout(currentConfig) {
 
 function renderGlobalSection(currentConfig) {
   const templateOptions = Object.keys(currentConfig.templates).map((template) => `<option value="${escapeXml(template)}"${template === state.templateName ? ' selected' : ''}>${escapeXml(template)}</option>`).join('');
+  const logoName = state.logo?.name ? shortText(state.logo.name, 32) : 'Logo Enaex padrão';
   const meshName = state.mesh?.name ? shortText(state.mesh.name, 32) : 'Nenhum arquivo anexado';
   return `
     <div class="form-grid form-grid--two">
@@ -1092,6 +1097,14 @@ function renderGlobalSection(currentConfig) {
         <textarea id="observation" data-path="observation" placeholder="Observação final">${escapeXml(state.observation)}</textarea>
       </div>
     </div>
+    <div class="image-upload-row" style="margin-top: 14px;">
+      <div class="field" style="flex: 1 1 300px; min-width: 260px;">
+        <label for="logoFile">Logo do cabeçalho</label>
+        <input id="logoFile" data-role="logo-file" type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml">
+      </div>
+      <span class="file-chip" id="logoChip">${escapeXml(logoName)}</span>
+    </div>
+    <p class="hint" style="margin-top: 10px;">O logo anexado substitui o Enaex padrão no cabeçalho e nas exportações.</p>
     <div class="image-upload-row" style="margin-top: 14px;">
       <div class="field" style="flex: 1 1 300px; min-width: 260px;">
         <label for="meshFile">Anexar imagem da malha</label>
@@ -1187,9 +1200,16 @@ function renderForms() {
   dom.globalFields.innerHTML = renderGlobalSection(config);
   dom.labelFields.innerHTML = renderLabelSection();
   dom.profilesFields.innerHTML = renderProfilesSection();
+  dom.logoChip = document.getElementById('logoChip');
   dom.meshChip = document.getElementById('meshChip');
   dom.profileCountLabel.textContent = `${state.profileCount} ${pluralProfiles(state.profileCount)}`;
+  syncLogoChip();
   syncMeshChip();
+}
+
+function syncLogoChip() {
+  if (!dom.logoChip) return;
+  dom.logoChip.textContent = state.logo?.name ? shortText(state.logo.name, 36) : 'Logo Enaex padrão';
 }
 
 function syncMeshChip() {
@@ -1288,17 +1308,34 @@ function handleInputEvent(event) {
       scheduleUpdate();
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
+    blobToDataUrl(file).then((dataUrl) => {
       state.mesh = {
         name: file.name,
         type: file.type,
-        dataUrl: String(reader.result || ''),
+        dataUrl,
       };
       syncMeshChip();
       scheduleUpdate();
-    };
-    reader.readAsDataURL(file);
+    });
+  }
+
+  if (target.matches('[data-role="logo-file"]')) {
+    const file = target.files?.[0];
+    if (!file) {
+      state.logo = { name: '', type: '', dataUrl: '' };
+      syncLogoChip();
+      scheduleUpdate();
+      return;
+    }
+    blobToDataUrl(file).then((dataUrl) => {
+      state.logo = {
+        name: file.name,
+        type: file.type,
+        dataUrl,
+      };
+      syncLogoChip();
+      scheduleUpdate();
+    });
   }
 }
 
@@ -1361,7 +1398,7 @@ async function downloadArtifact(type) {
 
   const svg = lastValidSvg || renderLayout(config);
   if (type === 'svg') {
-    downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), 'enaex-profile-creator.svg');
+    downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), 'blasthole-profile-creator.svg');
     return;
   }
 
@@ -1371,13 +1408,13 @@ async function downloadArtifact(type) {
 
   if (type === 'png') {
     const blob = await canvasToBlob(canvas, 'image/png');
-    downloadBlob(blob, 'enaex-profile-creator.png');
+    downloadBlob(blob, 'blasthole-profile-creator.png');
     return;
   }
 
   if (type === 'jpg') {
     const blob = await canvasToBlob(canvas, 'image/jpeg', config.export?.jpg_quality ? config.export.jpg_quality / 100 : 0.96);
-    downloadBlob(blob, 'enaex-profile-creator.jpg');
+    downloadBlob(blob, 'blasthole-profile-creator.jpg');
     return;
   }
 
@@ -1389,7 +1426,7 @@ async function downloadArtifact(type) {
     }
     const pdf = new jsPDFCtor({ orientation: 'landscape', unit: 'px', format: [exportW, exportH] });
     pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, exportW, exportH, undefined, 'FAST');
-    pdf.save('enaex-profile-creator.pdf');
+    pdf.save('blasthole-profile-creator.pdf');
   }
 }
 
@@ -1490,6 +1527,7 @@ async function init() {
   dom.memoryStatus = document.getElementById('memoryStatus');
   dom.profileCountLabel = document.getElementById('profileCountLabel');
   dom.projectSeed = document.getElementById('projectSeed');
+  dom.logoChip = null;
   dom.meshChip = null;
   dom.downloadButtons = Array.from(document.querySelectorAll('[data-download]'));
 

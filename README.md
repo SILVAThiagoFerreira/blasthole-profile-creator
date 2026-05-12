@@ -1,4 +1,4 @@
-# Enaex Profile Creator
+# Blasthole Profile Creator
 
 Site estático para construção de perfil de carga, pronto para GitHub Pages, com preview vetorial e exportação local.
 
@@ -7,7 +7,7 @@ Site estático para construção de perfil de carga, pronto para GitHub Pages, c
 1. Interface web para montar perfis técnicos.
 2. Preview vetorial em alta resolução no navegador.
 3. Exportação em `SVG`, `PNG`, `JPG` e `PDF`.
-4. Memória persistida no navegador e seed do projeto em `state/user_preferences.json`.
+4. Memória persistida no navegador, seed do projeto em `state/user_preferences.json` e logo substituível por upload.
 5. Base pronta para hospedagem no GitHub Pages.
 
 ## Execução local
