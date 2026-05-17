@@ -14,7 +14,7 @@
     "profiles": [
       {
         "air_deck": 0.35,
-        "altura_banco": 10.5,
+        "altura_banco": 10.0,
         "azimute": 0.0,
         "blastbag": 0.15,
         "densidade": 1.15,
@@ -27,7 +27,7 @@
       },
       {
         "air_deck": 0.2,
-        "altura_banco": 10.4,
+        "altura_banco": 10.0,
         "azimute": 0.0,
         "blastbag": 0.1,
         "densidade": 1.05,

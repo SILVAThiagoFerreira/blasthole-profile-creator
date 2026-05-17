@@ -31,7 +31,7 @@
     "write_pdf": true
   },
   "site": {
-    "storage_key": "enaex.profile-creator.web.state.v2",
+    "storage_key": "enaex.profile-creator.web.state.v3",
     "preview_size": [1920, 1080],
     "export_size": [3840, 2160]
   },
@@ -69,7 +69,7 @@
         "name": "Profile A",
         "kind": "produção",
         "diametro_furo": 140.0,
-        "altura_banco": 10.5,
+        "altura_banco": 10.0,
         "subperfuracao": 0.6,
         "stemming": 2.3,
         "air_deck": 0.35,
@@ -82,7 +82,7 @@
         "name": "Profile B",
         "kind": "amortecimento",
         "diametro_furo": 102.0,
-        "altura_banco": 10.4,
+        "altura_banco": 10.0,
         "subperfuracao": 0.0,
         "stemming": 3.5,
         "air_deck": 0.2,

@@ -30,7 +30,7 @@ const FALLBACK_CONFIG = {
     write_pdf: true,
   },
   site: {
-    storage_key: 'enaex.profile-creator.web.state.v2',
+    storage_key: 'enaex.profile-creator.web.state.v3',
     preview_size: [1920, 1080],
     export_size: [3840, 2160],
   },
@@ -57,7 +57,7 @@ const FALLBACK_CONFIG = {
         name: 'Profile A',
         kind: 'produção',
         diametro_furo: 140.0,
-        altura_banco: 10.5,
+        altura_banco: 10.0,
         subperfuracao: 0.6,
         stemming: 2.3,
         air_deck: 0.35,
@@ -70,7 +70,7 @@ const FALLBACK_CONFIG = {
         name: 'Profile B',
         kind: 'amortecimento',
         diametro_furo: 102.0,
-        altura_banco: 10.4,
+        altura_banco: 10.0,
         subperfuracao: 0.0,
         stemming: 3.5,
         air_deck: 0.2,
@@ -155,7 +155,7 @@ const PROFILE_FIELDS = [
   'densidade',
 ];
 
-const DEFAULT_STORAGE_KEY = 'enaex.profile-creator.web.state.v2';
+const DEFAULT_STORAGE_KEY = 'enaex.profile-creator.web.state.v3';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
 const DEFAULT_PREVIEW_SIZE = [1920, 1080];
 
@@ -794,15 +794,15 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const labels = labelSet();
   const metricRows = compact
     ? [
-      ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
+      ['diameter', 'Hole diameter', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
+      ['height', 'Bench height', `${formatDecimal(profile.altura_banco)} m`, 'height'],
       ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
       ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
       ['column', labels.column, `${formatDecimal(charge)} m`, 'column'],
     ]
     : [
-      ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
+      ['diameter', 'Hole diameter', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
+      ['height', 'Bench height', `${formatDecimal(profile.altura_banco)} m`, 'height'],
       ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
       ['stemming', labels.stemming, `${formatDecimal(profile.stemming)} m`, 'stemming'],
       ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
