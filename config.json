@@ -2,7 +2,8 @@
   "app": {
     "title": "Criador de Perfis de Carga",
     "subtitle": "Geração de lâminas profissionais no padrão visual Enaex.",
-    "default_profile_type": "Perfis técnicos"
+    "default_profile_type": "Perfis técnicos",
+    "default_language": "pt-BR"
   },
   "paths": {
     "input_dir": "input",
@@ -32,6 +33,8 @@
   },
   "site": {
     "storage_key": "enaex.profile-creator.web.state.v4",
+    "language_storage_key": "enaex.profile-creator.web.language.v1",
+    "supported_languages": ["pt-BR", "en", "zh-CN"],
     "preview_size": [1920, 1080],
     "export_size": [3840, 2160]
   },

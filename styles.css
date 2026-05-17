@@ -1149,7 +1149,7 @@ body::after {
 .topbar {
   min-height: 76px;
   display: grid;
-  grid-template-columns: minmax(300px, 1fr) auto auto;
+  grid-template-columns: minmax(300px, 1fr) auto auto auto;
   gap: 14px;
   align-items: center;
   padding: 10px 12px;
@@ -1238,6 +1238,51 @@ body::after {
 .topbar__actions {
   gap: 6px;
   padding: 6px;
+}
+
+.topbar__language {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px 0 14px;
+  border: 1px solid var(--app-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--app-text);
+}
+
+.topbar__language:focus-within {
+  border-color: rgba(227, 6, 19, 0.42);
+  box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.12);
+}
+
+.topbar__language select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 0 18px 0 0;
+}
+
+.topbar__language::after {
+  content: '';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(244, 246, 249, 0.82);
+  border-bottom: 2px solid rgba(244, 246, 249, 0.82);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
 }
 
 .topbar__actions span {
@@ -1687,7 +1732,8 @@ h2 {
   }
 
   .topbar__meta,
-  .topbar__actions {
+  .topbar__actions,
+  .topbar__language {
     justify-content: flex-start;
   }
 
@@ -1758,6 +1804,14 @@ h2 {
   }
 
   .topbar__actions {
+    width: 100%;
+  }
+
+  .topbar__language {
+    width: 100%;
+  }
+
+  .topbar__language select {
     width: 100%;
   }
 

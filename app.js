@@ -3,6 +3,7 @@ const FALLBACK_CONFIG = {
     title: 'Criador de Perfis de Carga',
     subtitle: 'Geração de lâminas profissionais no padrão visual Enaex.',
     default_profile_type: 'Perfis técnicos',
+    default_language: 'pt-BR',
   },
   paths: {
     output_dir: 'output',
@@ -31,6 +32,8 @@ const FALLBACK_CONFIG = {
   },
   site: {
     storage_key: 'enaex.profile-creator.web.state.v4',
+    language_storage_key: 'enaex.profile-creator.web.language.v1',
+    supported_languages: ['pt-BR', 'en', 'zh-CN'],
     preview_size: [1920, 1080],
     export_size: [3840, 2160],
   },
@@ -127,19 +130,687 @@ const FALLBACK_CONFIG = {
   },
 };
 
-const KIND_OPTIONS = ['produção', 'amortecimento', 'contorno', 'personalizado'];
-const KIND_LABELS = {
-  produção: 'Produção',
-  amortecimento: 'Amortecimento',
-  contorno: 'Contorno',
-  personalizado: 'Personalizado',
+const DEFAULT_LANGUAGE = 'pt-BR';
+const DEFAULT_LANGUAGE_STORAGE_KEY = 'enaex.profile-creator.web.language.v1';
+const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'en', 'zh-CN'];
+
+const COPY = {
+  'pt-BR': {
+    meta: {
+      title: 'Criador de Perfis de Carga',
+      description: 'Interface profissional para criação, validação e exportação local de perfis de carga Enaex.',
+    },
+    brand: {
+      title: 'Criador de Perfis',
+      subtitle: 'Soluções Técnicas em Mineração',
+    },
+    topbar: {
+      meta: 'Motor local no navegador',
+      formats: 'Formatos de exportação',
+    },
+    hero: {
+      eyebrow: 'ENAEX MTS / PERFIS DE CARGA',
+      title: 'Perfis de carga profissionais.',
+      subtitle: 'Crie, valide e exporte lâminas técnicas de perfis de carga em uma única interface no navegador.',
+      badges: ['Sem instalação', 'SVG ao vivo', 'Exportação 4K', 'Interface Enaex'],
+    },
+    heroPanel: {
+      eyebrow: 'Estado',
+      title: 'Motor Local',
+      loading: 'Carregando',
+      stats: {
+        rendering: 'Renderização',
+        export: 'Exportação',
+        storage: 'Armazenamento',
+        storageValue: 'Local',
+      },
+    },
+    controls: {
+      language: 'Idioma',
+      profileCountWord: { one: 'perfil', many: 'perfis' },
+      profileCountAria: 'Quantidade de perfis',
+      projectSeed: 'Memória do projeto',
+      browserMemory: 'Memória do navegador',
+      projectMemory: 'Memória do projeto',
+      defaultConfig: 'Configuração padrão',
+    },
+    buttons: {
+      reset: 'Restaurar',
+      save: 'Salvar',
+      removeProfile: 'Remover perfil',
+      addProfile: 'Adicionar perfil',
+    },
+    preview: {
+      eyebrow: 'Pré-visualização',
+      title: 'Lâmina ao vivo',
+    },
+    builderPanel: {
+      eyebrow: 'Painel de Controle',
+      title: 'Editor',
+    },
+    sections: {
+      config: {
+        title: 'Configuração',
+        subtitle: 'Documento, logo e arquivos da malha.',
+      },
+      labels: {
+        title: 'Rótulos',
+        subtitle: 'Terminologia usada na lâmina exportada.',
+      },
+      profiles: {
+        title: 'Perfis',
+        subtitle: (max) => `Até ${max} perfis por lâmina.`,
+      },
+    },
+    stateLabels: {
+      templateName: 'Modelo',
+      polygonName: 'Identificação da malha',
+      profileType: 'Tipo de perfil',
+    },
+    fieldLabels: {
+      template: 'Modelo',
+      polygonName: 'Identificação da malha',
+      observation: 'Observações',
+      logo: 'Logo do cabeçalho',
+      mesh: 'Imagem da malha',
+      profileName: 'Nome do perfil',
+      kind: 'Categoria visual',
+      diameter: 'Diâmetro do furo (mm)',
+      height: 'Altura do banco (m)',
+      subdrill: 'Subperfuração (m)',
+      stemming: 'Tampão (m)',
+      blastbag: 'Blastbag (m)',
+      airdeck: 'Deck de ar (m)',
+      inclination: 'Inclinação (graus)',
+      azimuth: 'Azimute (graus)',
+      density: 'Densidade (g/cm3)',
+    },
+    fieldPlaceholders: {
+      observation: 'Observação opcional da exportação.',
+    },
+    labels: {
+      stemming: 'Tampão',
+      blastbag: 'Blastbag',
+      airdeck: 'Deck de ar',
+      column: 'Coluna de carga',
+      subdrill: 'Subperfuração',
+    },
+    defaults: {
+      profileType: 'Perfis técnicos',
+      observation: 'Perfil técnico para reporte operacional.',
+      profileNames: ['Perfil A', 'Perfil B'],
+      profileNamePrefix: 'Perfil',
+    },
+    fileChips: {
+      logoDefault: 'Logo Enaex padrão',
+      meshDefault: 'Nenhuma malha anexada',
+    },
+    memory: {
+      browserActive: 'Memória local ativa',
+      projectLoaded: 'Memória do projeto carregada',
+      defaultConfig: 'Configuração padrão',
+    },
+    validation: {
+      ready: 'Pronto para exportar. Pré-visualização validada.',
+      fixBefore: 'Corrija antes de exportar:',
+      required: (label) => `${label} é obrigatório.`,
+      modelInvalid: 'Modelo visual inválido.',
+      countInvalid: 'Quantidade de perfis inválida.',
+      countRange: (min, max) => `Quantidade de perfis deve ficar entre ${min} e ${max}.`,
+      profilesMismatch: 'Perfis não correspondem à quantidade selecionada.',
+      profileNameRequired: (index) => `Nome do perfil ${index} é obrigatório.`,
+      numericRequired: (field, index) => `${field} do perfil ${index} deve ser numérico.`,
+      nonNegative: (field, index) => `${field} do perfil ${index} deve ser maior ou igual a zero.`,
+      previewError: (message) => `Falha ao gerar pré-visualização: ${message}`,
+      pdfUnavailable: 'Biblioteca PDF indisponível no momento.',
+      saveSuccess: 'Memória salva no navegador.',
+      saveFailure: 'Não foi possível salvar a memória local.',
+    },
+    svg: {
+      title: 'Criador de Perfis de Carga',
+      desc: 'Perfil de carga editável com composição vetorial.',
+      headerTitle: 'PERFIL DE CARGA',
+      headerBadge: 'Entrega técnica',
+      meshTitle: 'MALHA DE PERFURAÇÃO',
+      meshAttached: 'ARQUIVO ANEXADO',
+      meshPrompt: 'Anexe a imagem da malha',
+      meshNoAttachment: 'Sem anexo, este painel permanece como referência.',
+      referenceMode: 'MODO REFERÊNCIA',
+      referenceModeDesc: 'Somente imagem anexada, sem geração sintética da malha.',
+      dataTitle: 'DADOS TÉCNICOS',
+      dataTitleCompact: 'DADOS',
+      bench: 'BANCO',
+      benchUnit: 'M',
+      footerLegend: {
+        production: 'Produção',
+        cushioning: 'Amortecimento',
+        contour: 'Contorno',
+      },
+      shortLabels: {
+        inclination: 'Incl.',
+        azimuth: 'Azim.',
+        density: 'Dens.',
+      },
+    },
+    kinds: {
+      'produção': 'Produção',
+      'amortecimento': 'Amortecimento',
+      'contorno': 'Contorno',
+      'personalizado': 'Personalizado',
+    },
+    templates: {
+      'Enaex clean': 'Enaex limpo',
+      'Técnico minimalista': 'Técnico minimalista',
+      'Relatório executivo': 'Relatório executivo',
+    },
+    languageNames: {
+      'pt-BR': 'Português (Brasil)',
+      en: 'English',
+      'zh-CN': '中文',
+    },
+    downloads: {
+      baseName: 'criador-perfis-carga',
+    },
+  },
+  en: {
+    meta: {
+      title: 'Charge Profile Creator',
+      description: 'Professional interface for creating, validating, and exporting Enaex charge profiles locally.',
+    },
+    brand: {
+      title: 'Profile Creator',
+      subtitle: 'Mining Technical Solutions',
+    },
+    topbar: {
+      meta: 'Local engine in browser',
+      formats: 'Export formats',
+    },
+    hero: {
+      eyebrow: 'ENAEX MTS / CHARGE PROFILES',
+      title: 'Professional charge profiles.',
+      subtitle: 'Create, validate, and export technical charge-profile sheets in one browser interface.',
+      badges: ['No install', 'Live SVG', '4K export', 'Enaex interface'],
+    },
+    heroPanel: {
+      eyebrow: 'Status',
+      title: 'Local Engine',
+      loading: 'Loading',
+      stats: {
+        rendering: 'Rendering',
+        export: 'Export',
+        storage: 'Storage',
+        storageValue: 'Local',
+      },
+    },
+    controls: {
+      language: 'Language',
+      profileCountWord: { one: 'profile', many: 'profiles' },
+      profileCountAria: 'Profile count',
+      projectSeed: 'Project memory',
+      browserMemory: 'Browser memory',
+      projectMemory: 'Project memory',
+      defaultConfig: 'Default configuration',
+    },
+    buttons: {
+      reset: 'Reset',
+      save: 'Save',
+      removeProfile: 'Remove profile',
+      addProfile: 'Add profile',
+    },
+    preview: {
+      eyebrow: 'Preview',
+      title: 'Live preview',
+    },
+    builderPanel: {
+      eyebrow: 'Control Panel',
+      title: 'Editor',
+    },
+    sections: {
+      config: {
+        title: 'Configuration',
+        subtitle: 'Document, logo, and mesh files.',
+      },
+      labels: {
+        title: 'Labels',
+        subtitle: 'Terminology used in the exported sheet.',
+      },
+      profiles: {
+        title: 'Profiles',
+        subtitle: (max) => `Up to ${max} profiles per sheet.`,
+      },
+    },
+    stateLabels: {
+      templateName: 'Template',
+      polygonName: 'Mesh ID',
+      profileType: 'Profile type',
+    },
+    fieldLabels: {
+      template: 'Template',
+      polygonName: 'Mesh ID',
+      observation: 'Notes',
+      logo: 'Header logo',
+      mesh: 'Mesh image',
+      profileName: 'Profile name',
+      kind: 'Visual category',
+      diameter: 'Hole diameter (mm)',
+      height: 'Bench height (m)',
+      subdrill: 'Subdrilling (m)',
+      stemming: 'Stemming (m)',
+      blastbag: 'Blastbag (m)',
+      airdeck: 'Air deck (m)',
+      inclination: 'Inclination (degrees)',
+      azimuth: 'Azimuth (degrees)',
+      density: 'Density (g/cm3)',
+    },
+    fieldPlaceholders: {
+      observation: 'Optional note for the export.',
+    },
+    labels: {
+      stemming: 'Stemming',
+      blastbag: 'Blastbag',
+      airdeck: 'Air deck',
+      column: 'Charge column',
+      subdrill: 'Subdrilling',
+    },
+    defaults: {
+      profileType: 'Technical profiles',
+      observation: 'Technical profile for operational reporting.',
+      profileNames: ['Profile A', 'Profile B'],
+      profileNamePrefix: 'Profile',
+    },
+    fileChips: {
+      logoDefault: 'Default Enaex logo',
+      meshDefault: 'No mesh attached',
+    },
+    memory: {
+      browserActive: 'Local memory active',
+      projectLoaded: 'Project memory loaded',
+      defaultConfig: 'Default configuration',
+    },
+    validation: {
+      ready: 'Ready to export. Preview validated.',
+      fixBefore: 'Fix before export:',
+      required: (label) => `${label} is required.`,
+      modelInvalid: 'Invalid visual template.',
+      countInvalid: 'Invalid profile count.',
+      countRange: (min, max) => `Profile count must be between ${min} and ${max}.`,
+      profilesMismatch: 'Profiles do not match the selected count.',
+      profileNameRequired: (index) => `Profile ${index} name is required.`,
+      numericRequired: (field, index) => `${field} for profile ${index} must be numeric.`,
+      nonNegative: (field, index) => `${field} for profile ${index} must be zero or greater.`,
+      previewError: (message) => `Preview generation failed: ${message}`,
+      pdfUnavailable: 'PDF library is unavailable right now.',
+      saveSuccess: 'Browser memory saved.',
+      saveFailure: 'Could not save local memory.',
+    },
+    svg: {
+      title: 'Charge Profile Creator',
+      desc: 'Editable charge profile with vector composition.',
+      headerTitle: 'CHARGE PROFILE',
+      headerBadge: 'Technical delivery',
+      meshTitle: 'DRILLING MESH',
+      meshAttached: 'ATTACHED FILE',
+      meshPrompt: 'Attach the mesh image',
+      meshNoAttachment: 'Without an attachment, this panel remains a reference.',
+      referenceMode: 'REFERENCE MODE',
+      referenceModeDesc: 'Attached image only, no synthetic mesh generation.',
+      dataTitle: 'TECHNICAL DATA',
+      dataTitleCompact: 'DATA',
+      bench: 'BENCH',
+      benchUnit: 'M',
+      footerLegend: {
+        production: 'Production',
+        cushioning: 'Cushioning',
+        contour: 'Contour',
+      },
+      shortLabels: {
+        inclination: 'Inc.',
+        azimuth: 'Az.',
+        density: 'Den.',
+      },
+    },
+    kinds: {
+      'produção': 'Production',
+      'amortecimento': 'Cushioning',
+      'contorno': 'Contour',
+      'personalizado': 'Custom',
+    },
+    templates: {
+      'Enaex clean': 'Enaex Clean',
+      'Técnico minimalista': 'Minimal Technical',
+      'Relatório executivo': 'Executive Report',
+    },
+    languageNames: {
+      'pt-BR': 'Portuguese (Brazil)',
+      en: 'English',
+      'zh-CN': 'Chinese',
+    },
+    downloads: {
+      baseName: 'charge-profile-creator',
+    },
+  },
+  'zh-CN': {
+    meta: {
+      title: '装药剖面创建器',
+      description: '用于本地创建、验证并导出 Enaex 装药剖面的专业界面。',
+    },
+    brand: {
+      title: '剖面创建器',
+      subtitle: '采矿技术解决方案',
+    },
+    topbar: {
+      meta: '浏览器本地引擎',
+      formats: '导出格式',
+    },
+    hero: {
+      eyebrow: 'ENAEX MTS / 装药剖面',
+      title: '专业装药剖面。',
+      subtitle: '在一个浏览器界面中创建、验证并导出技术装药剖面图。',
+      badges: ['无需安装', '实时 SVG', '4K 导出', 'Enaex 界面'],
+    },
+    heroPanel: {
+      eyebrow: '状态',
+      title: '本地引擎',
+      loading: '加载中',
+      stats: {
+        rendering: '渲染',
+        export: '导出',
+        storage: '存储',
+        storageValue: '本地',
+      },
+    },
+    controls: {
+      language: '语言',
+      profileCountWord: '个剖面',
+      profileCountAria: '剖面数量',
+      projectSeed: '项目记忆',
+      browserMemory: '浏览器记忆',
+      projectMemory: '项目记忆',
+      defaultConfig: '默认配置',
+    },
+    buttons: {
+      reset: '重置',
+      save: '保存',
+      removeProfile: '移除剖面',
+      addProfile: '添加剖面',
+    },
+    preview: {
+      eyebrow: '预览',
+      title: '实时预览',
+    },
+    builderPanel: {
+      eyebrow: '控制面板',
+      title: '编辑器',
+    },
+    sections: {
+      config: {
+        title: '配置',
+        subtitle: '文档、Logo 和网格文件。',
+      },
+      labels: {
+        title: '标签',
+        subtitle: '导出图中使用的术语。',
+      },
+      profiles: {
+        title: '剖面',
+        subtitle: (max) => `每张图最多 ${max} 个剖面。`,
+      },
+    },
+    stateLabels: {
+      templateName: '模板',
+      polygonName: '网格编号',
+      profileType: '剖面类型',
+    },
+    fieldLabels: {
+      template: '模板',
+      polygonName: '网格编号',
+      observation: '备注',
+      logo: '页眉 Logo',
+      mesh: '网格图片',
+      profileName: '剖面名称',
+      kind: '可视类别',
+      diameter: '孔径 (mm)',
+      height: '台阶高度 (m)',
+      subdrill: '超深 (m)',
+      stemming: '堵塞 (m)',
+      blastbag: '缓冲袋 (m)',
+      airdeck: '空气间隔 (m)',
+      inclination: '倾角 (度)',
+      azimuth: '方位角 (度)',
+      density: '密度 (g/cm3)',
+    },
+    fieldPlaceholders: {
+      observation: '导出时的可选备注。',
+    },
+    labels: {
+      stemming: '堵塞',
+      blastbag: '缓冲袋',
+      airdeck: '空气间隔',
+      column: '装药柱',
+      subdrill: '超深',
+    },
+    defaults: {
+      profileType: '技术剖面',
+      observation: '用于运行报告的技术剖面。',
+      profileNames: ['剖面 A', '剖面 B'],
+      profileNamePrefix: '剖面',
+    },
+    fileChips: {
+      logoDefault: '默认 Enaex Logo',
+      meshDefault: '未附加网格',
+    },
+    memory: {
+      browserActive: '本地记忆已启用',
+      projectLoaded: '项目记忆已加载',
+      defaultConfig: '默认配置',
+    },
+    validation: {
+      ready: '准备导出。预览已验证。',
+      fixBefore: '导出前请修正：',
+      required: (label) => `${label} 为必填项。`,
+      modelInvalid: '无效的可视模板。',
+      countInvalid: '无效的剖面数量。',
+      countRange: (min, max) => `剖面数量必须在 ${min} 和 ${max} 之间。`,
+      profilesMismatch: '剖面与所选数量不一致。',
+      profileNameRequired: (index) => `剖面 ${index} 的名称必填。`,
+      numericRequired: (field, index) => `剖面 ${index} 的 ${field} 必须为数字。`,
+      nonNegative: (field, index) => `剖面 ${index} 的 ${field} 必须大于或等于零。`,
+      previewError: (message) => `预览生成失败：${message}`,
+      pdfUnavailable: '当前无法使用 PDF 库。',
+      saveSuccess: '已保存到浏览器。',
+      saveFailure: '无法保存本地记忆。',
+    },
+    svg: {
+      title: '装药剖面创建器',
+      desc: '可编辑的装药剖面，采用矢量组成。',
+      headerTitle: '装药剖面',
+      headerBadge: '技术交付',
+      meshTitle: '钻孔网格',
+      meshAttached: '已附加文件',
+      meshPrompt: '请附加网格图片',
+      meshNoAttachment: '未附加时，此面板仅作为参考。',
+      referenceMode: '参考模式',
+      referenceModeDesc: '仅使用附加图片，不生成合成网格。',
+      dataTitle: '技术数据',
+      dataTitleCompact: '数据',
+      bench: '台阶',
+      benchUnit: 'M',
+      footerLegend: {
+        production: '生产',
+        cushioning: '缓冲',
+        contour: '轮廓',
+      },
+      shortLabels: {
+        inclination: '倾角',
+        azimuth: '方位',
+        density: '密度',
+      },
+    },
+    kinds: {
+      'produção': '生产',
+      'amortecimento': '缓冲',
+      'contorno': '轮廓',
+      'personalizado': '自定义',
+    },
+    templates: {
+      'Enaex clean': 'Enaex 简洁',
+      'Técnico minimalista': '极简技术',
+      'Relatório executivo': '执行报告',
+    },
+    languageNames: {
+      'pt-BR': '葡萄牙语（巴西）',
+      en: '英语',
+      'zh-CN': '中文',
+    },
+    downloads: {
+      baseName: 'charge-profile-creator',
+    },
+  },
 };
+
+const KIND_OPTIONS = ['produção', 'amortecimento', 'contorno', 'personalizado'];
 const KIND_ACCENTS = {
   produção: { accent: '#1D6FB8', soft: '#E9F2FB', title: 'Produção' },
   amortecimento: { accent: '#F28C28', soft: '#FFF1E2', title: 'Amortecimento' },
   contorno: { accent: '#D71920', soft: '#FFE3E5', title: 'Contorno' },
   personalizado: { accent: '#223A8D', soft: '#E8ECFA', title: 'Personalizado' },
 };
+
+function normalizeLanguage(value) {
+  const raw = String(value ?? '').trim();
+  if (!raw) return DEFAULT_LANGUAGE;
+  const normalized = raw.replace('_', '-').toLowerCase();
+  if (normalized.startsWith('pt')) return 'pt-BR';
+  if (normalized.startsWith('zh')) return 'zh-CN';
+  if (normalized.startsWith('en')) return 'en';
+  return DEFAULT_LANGUAGE;
+}
+
+function getSupportedLanguages(currentConfig = config) {
+  const source = Array.isArray(currentConfig?.site?.supported_languages)
+    ? currentConfig.site.supported_languages
+    : DEFAULT_SUPPORTED_LANGUAGES;
+  return source.map(normalizeLanguage).filter((value, index, array) => array.indexOf(value) === index);
+}
+
+function getLanguageStorageKey(currentConfig = config) {
+  return currentConfig?.site?.language_storage_key || DEFAULT_LANGUAGE_STORAGE_KEY;
+}
+
+function getActiveLanguage() {
+  return normalizeLanguage(state?.language || config?.app?.default_language || DEFAULT_LANGUAGE);
+}
+
+function getCopy(lang = getActiveLanguage()) {
+  return COPY[normalizeLanguage(lang)] || COPY[DEFAULT_LANGUAGE];
+}
+
+function defaultProfileName(lang, index) {
+  const copy = getCopy(lang);
+  return copy.defaults.profileNames[index] || `${copy.defaults.profileNamePrefix} ${index + 1}`;
+}
+
+function profileCountText(count, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  const unit = copy.controls.profileCountWord;
+  if (typeof unit === 'string') return `${count} ${unit}`;
+  return `${count} ${count === 1 ? unit.one : unit.many}`;
+}
+
+function getSeedSourceLabel(source, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  if (source === 'browser') return copy.controls.browserMemory;
+  if (source === 'project') return copy.controls.projectMemory;
+  return copy.controls.defaultConfig;
+}
+
+function getMemoryStatusText(source, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  if (source === 'browser') return copy.memory.browserActive;
+  if (source === 'project') return copy.memory.projectLoaded;
+  return copy.memory.defaultConfig;
+}
+
+function fieldLabel(field, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  return copy.fieldLabels[field] || field;
+}
+
+function stateLabel(field, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  return copy.stateLabels[field] || fieldLabel(field, lang);
+}
+
+function kindLabel(kind, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  return copy.kinds[normalizeKind(kind)] || copy.kinds.personalizado;
+}
+
+function templateDisplayName(templateName, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  return copy.templates[templateName] || templateName;
+}
+
+function languageDisplayName(code, lang = getActiveLanguage()) {
+  const copy = getCopy(lang);
+  return copy.languageNames[normalizeLanguage(code)] || copy.languageNames[DEFAULT_LANGUAGE];
+}
+
+function getDownloadBaseName(lang = getActiveLanguage()) {
+  return getCopy(lang).downloads.baseName;
+}
+
+function readLanguagePreference(currentConfig = config) {
+  try {
+    const raw = localStorage.getItem(getLanguageStorageKey(currentConfig));
+    return raw ? normalizeLanguage(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveLanguagePreference(currentConfig, language) {
+  try {
+    localStorage.setItem(getLanguageStorageKey(currentConfig), normalizeLanguage(language));
+  } catch {
+    /* noop */
+  }
+}
+
+function translateStateDefaults(previousLanguage, nextLanguage) {
+  if (!state) return;
+  const prev = normalizeLanguage(previousLanguage);
+  const next = normalizeLanguage(nextLanguage);
+  if (prev === next) return;
+
+  const prevCopy = getCopy(prev);
+  const nextCopy = getCopy(next);
+
+  state.profileType = nextCopy.defaults.profileType;
+
+  if (state.observation === prevCopy.defaults.observation) {
+    state.observation = nextCopy.defaults.observation;
+  }
+
+  if (state.labels && typeof state.labels === 'object') {
+    for (const key of Object.keys(nextCopy.labels)) {
+      if (state.labels[key] === prevCopy.labels[key]) {
+        state.labels[key] = nextCopy.labels[key];
+      }
+    }
+  }
+
+  if (Array.isArray(state.profiles)) {
+    state.profiles.forEach((profile, index) => {
+      if (!profile || typeof profile !== 'object') return;
+      if (profile.name === defaultProfileName(prev, index)) {
+        profile.name = defaultProfileName(next, index);
+      }
+    });
+  }
+
+  state.language = next;
+}
 
 const PROFILE_FIELDS = [
   'name',
@@ -219,10 +890,14 @@ function mixHex(a, b, t) {
   );
 }
 
-function formatDecimal(value, digits = 2) {
+function formatDecimal(value, digits = 2, lang = getActiveLanguage()) {
   const num = Number(value);
-  if (!Number.isFinite(num)) return `0,${'0'.repeat(digits)}`;
-  return num.toFixed(digits).replace('.', ',');
+  const safeValue = Number.isFinite(num) ? num : 0;
+  return new Intl.NumberFormat(normalizeLanguage(lang), {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+    useGrouping: false,
+  }).format(safeValue);
 }
 
 function shortText(text, max = 18) {
@@ -232,23 +907,23 @@ function shortText(text, max = 18) {
 }
 
 function pluralProfiles(count) {
-  return count === 1 ? 'perfil' : 'perfis';
-}
-
-function kindLabel(kind) {
-  return KIND_LABELS[normalizeKind(kind)] || KIND_LABELS.personalizado;
+  return profileCountText(count);
 }
 
 function labelSet() {
-  return config?.defaults?.labels || FALLBACK_CONFIG.defaults.labels;
+  return state?.labels || getCopy().labels;
 }
 
 function normalizeKind(value) {
   const raw = String(value ?? '').trim().toLowerCase();
   if (!raw) return 'personalizado';
-  if (raw in KIND_LABELS) return raw;
-  const match = Object.entries(KIND_LABELS).find(([, label]) => label.toLowerCase() === raw);
-  return match ? match[0] : 'personalizado';
+  if (KIND_OPTIONS.includes(raw)) return raw;
+  for (const language of getSupportedLanguages()) {
+    const copy = getCopy(language);
+    const match = Object.entries(copy.kinds).find(([, label]) => label.toLowerCase() === raw);
+    if (match) return match[0];
+  }
+  return 'personalizado';
 }
 
 function isNonEmptyString(value) {
@@ -268,16 +943,24 @@ function getStorageKey(currentConfig) {
   return currentConfig?.site?.storage_key || DEFAULT_STORAGE_KEY;
 }
 
-function createDefaultState(currentConfig) {
+function createDefaultState(currentConfig, language = currentConfig?.app?.default_language || DEFAULT_LANGUAGE) {
   const defaults = currentConfig.defaults;
+  const lang = normalizeLanguage(language);
+  const copy = getCopy(lang);
+  const profiles = clone(defaults.profiles).map((profile, index) => ({
+    ...profile,
+    kind: normalizeKind(profile.kind),
+    name: copy.defaults.profileNames[index] || `${copy.defaults.profileNamePrefix} ${index + 1}`,
+  }));
   return {
-    profileType: currentConfig.app.default_profile_type,
+    language: lang,
+    profileType: copy.defaults.profileType,
     templateName: defaults.template_name,
     polygonName: defaults.polygon_name,
-    observation: defaults.observation,
+    observation: copy.defaults.observation,
     profileCount: clamp(Number(defaults.profile_count) || 2, currentConfig.validation.min_profiles, currentConfig.validation.max_profiles),
-    labels: clone(defaults.labels),
-    profiles: clone(defaults.profiles),
+    labels: clone(copy.labels),
+    profiles,
     logo: {
       name: '',
       type: '',
@@ -291,7 +974,7 @@ function createDefaultState(currentConfig) {
   };
 }
 
-function normalizeProfile(source, fallback, index, defaultCount) {
+function normalizeProfile(source, fallback, index, defaultCount, language = DEFAULT_LANGUAGE) {
   const profile = clone(fallback);
   if (source && typeof source === 'object') {
     for (const field of PROFILE_FIELDS) {
@@ -299,7 +982,7 @@ function normalizeProfile(source, fallback, index, defaultCount) {
     }
   }
 
-  profile.name = isNonEmptyString(profile.name) ? String(profile.name).trim() : `Perfil ${index + 1}`;
+  profile.name = isNonEmptyString(profile.name) ? String(profile.name).trim() : defaultProfileName(language, index);
   profile.kind = normalizeKind(profile.kind);
   profile.diametro_furo = normalizeNumber(profile.diametro_furo, fallback.diametro_furo);
   profile.altura_banco = normalizeNumber(profile.altura_banco, fallback.altura_banco);
@@ -312,17 +995,18 @@ function normalizeProfile(source, fallback, index, defaultCount) {
   profile.densidade = normalizeNumber(profile.densidade, fallback.densidade);
 
   if (index >= defaultCount && !isNonEmptyString(source?.name)) {
-    profile.name = `Perfil ${index + 1}`;
+    profile.name = defaultProfileName(language, index);
   }
 
   return profile;
 }
 
 function mergeLoadedState(currentConfig, savedState) {
-  const base = createDefaultState(currentConfig);
+  const request = savedState?.request && typeof savedState.request === 'object' ? savedState.request : savedState;
+  const requestedLanguage = normalizeLanguage(request?.language || currentConfig.app.default_language || DEFAULT_LANGUAGE);
+  const base = createDefaultState(currentConfig, requestedLanguage);
   const validation = currentConfig.validation;
   const defaultCount = base.profiles.length;
-  const request = savedState?.request && typeof savedState.request === 'object' ? savedState.request : savedState;
 
   if (!request || typeof request !== 'object') return base;
 
@@ -332,7 +1016,7 @@ function mergeLoadedState(currentConfig, savedState) {
 
   const polygonName = isNonEmptyString(request.polygon_name) ? String(request.polygon_name).trim() : base.polygonName;
   const observation = typeof request.observation === 'string' ? request.observation : base.observation;
-  const profileType = isNonEmptyString(request.profile_type) ? String(request.profile_type).trim() : base.profileType;
+  const profileType = base.profileType;
 
   const labels = clone(base.labels);
   if (request.labels && typeof request.labels === 'object') {
@@ -348,10 +1032,11 @@ function mergeLoadedState(currentConfig, savedState) {
 
   for (let index = 0; index < profileCount; index += 1) {
     const fallback = base.profiles[index] || base.profiles[base.profiles.length - 1];
-    profiles.push(normalizeProfile(savedProfiles[index], fallback, index, defaultCount));
+    profiles.push(normalizeProfile(savedProfiles[index], fallback, index, defaultCount, requestedLanguage));
   }
 
   const state = {
+    language: requestedLanguage,
     profileType,
     templateName,
     polygonName,
@@ -378,25 +1063,27 @@ function mergeLoadedState(currentConfig, savedState) {
 function validateState(appState, currentConfig) {
   const issues = [];
   const validation = currentConfig.validation;
+  const lang = normalizeLanguage(appState?.language || getActiveLanguage());
+  const copy = getCopy(lang);
 
   for (const field of validation.required_text_fields) {
     if (!isNonEmptyString(appState[fieldToStateKey(field)] ?? appState[field])) {
-      issues.push(`${stateLabel(field)} é obrigatório.`);
+      issues.push(copy.validation.required(stateLabel(field, lang)));
     }
   }
 
   if (!isNonEmptyString(appState.templateName) || !currentConfig.templates[appState.templateName]) {
-    issues.push('Modelo visual inválido.');
+    issues.push(copy.validation.modelInvalid);
   }
 
   if (!Number.isInteger(appState.profileCount)) {
-    issues.push('Quantidade de perfis inválida.');
+    issues.push(copy.validation.countInvalid);
   } else if (appState.profileCount < validation.min_profiles || appState.profileCount > validation.max_profiles) {
-    issues.push(`Quantidade de perfis deve ficar entre ${validation.min_profiles} e ${validation.max_profiles}.`);
+    issues.push(copy.validation.countRange(validation.min_profiles, validation.max_profiles));
   }
 
   if (!Array.isArray(appState.profiles) || appState.profiles.length !== appState.profileCount) {
-    issues.push('Perfis não correspondem à quantidade selecionada.');
+    issues.push(copy.validation.profilesMismatch);
   }
 
   const numericFields = [
@@ -412,13 +1099,13 @@ function validateState(appState, currentConfig) {
   ];
 
   appState.profiles?.forEach((profile, index) => {
-    if (!isNonEmptyString(profile.name)) issues.push(`Nome do perfil ${index + 1} é obrigatório.`);
+    if (!isNonEmptyString(profile.name)) issues.push(copy.validation.profileNameRequired(index + 1));
     for (const field of numericFields) {
       const value = profile[field];
       if (!Number.isFinite(value)) {
-        issues.push(`${fieldLabel(field)} do perfil ${index + 1} deve ser numérico.`);
+        issues.push(copy.validation.numericRequired(fieldLabel(field, lang), index + 1));
       } else if (value < 0) {
-        issues.push(`${fieldLabel(field)} do perfil ${index + 1} deve ser maior ou igual a zero.`);
+        issues.push(copy.validation.nonNegative(fieldLabel(field, lang), index + 1));
       }
     }
   });
@@ -435,41 +1122,9 @@ function fieldToStateKey(field) {
   return map[field] || field;
 }
 
-function stateLabel(field) {
-  const map = {
-    polygon_name: 'Identificação da malha',
-    template_name: 'Modelo',
-    profile_type: 'Tipo de perfil',
-  };
-  return map[field] || fieldLabel(field);
-}
-
-function fieldLabel(field) {
-  const map = {
-    name: 'Nome',
-    kind: 'Categoria visual',
-    diametro_furo: 'Diâmetro do furo',
-    altura_banco: 'Altura do banco',
-    subperfuracao: 'Subperfuração',
-    stemming: 'Tampão',
-    blastbag: 'Blastbag',
-    air_deck: 'Deck de ar',
-    inclinacao: 'Inclinação',
-    azimute: 'Azimute',
-    densidade: 'Densidade',
-  };
-  return map[field] || field;
-}
-
-function templateDisplayName(templateName) {
-  const map = {
-    'Enaex clean': 'Enaex limpo',
-  };
-  return map[templateName] || templateName;
-}
-
 function serializeForStorage(appState) {
   return {
+    language: normalizeLanguage(appState.language || DEFAULT_LANGUAGE),
     profileType: appState.profileType,
     templateName: appState.templateName,
     polygonName: appState.polygonName,
@@ -490,10 +1145,12 @@ function saveStateToStorage(currentConfig, appState) {
 
   try {
     localStorage.setItem(storageKey, JSON.stringify(payload));
+    saveLanguagePreference(currentConfig, appState.language);
     seedSource = 'browser';
-    updateMemoryStatus('Memória local ativa');
+    updateMemoryStatus(getMemoryStatusText('browser', appState.language));
+    if (dom.projectSeed) dom.projectSeed.textContent = getSeedSourceLabel('browser', appState.language);
   } catch (error) {
-    showValidation(['Não foi possível salvar a memória local.']);
+    showValidation([getCopy(appState.language).validation.saveFailure]);
   }
 }
 
@@ -523,17 +1180,17 @@ function updateMemoryStatus(text) {
 function showValidation(issues, persist = false) {
   if (!dom.validation) return;
   if (!issues.length) {
-    dom.validation.innerHTML = '<div class="success">Pronto para exportar. Pré-visualização validada.</div>';
+    dom.validation.innerHTML = `<div class="success">${escapeXml(getCopy().validation.ready)}</div>`;
     toggleDownloads(true);
     if (persist && lastValidState) {
-      updateMemoryStatus(seedSource === 'browser' ? 'Memória local ativa' : 'Memória do projeto carregada');
+      updateMemoryStatus(getMemoryStatusText(seedSource));
     }
     return;
   }
 
   toggleDownloads(false);
   const messages = issues.map((issue) => (typeof issue === 'string' ? issue : issue?.message || issue?.text || String(issue)));
-  dom.validation.innerHTML = `<div class="error"><strong>Corrija antes de exportar:</strong><ul>${messages.map((issue) => `<li>${escapeXml(issue)}</li>`).join('')}</ul></div>`;
+  dom.validation.innerHTML = `<div class="error"><strong>${escapeXml(getCopy().validation.fixBefore)}</strong><ul>${messages.map((issue) => `<li>${escapeXml(issue)}</li>`).join('')}</ul></div>`;
 }
 
 function toggleDownloads(enabled) {
@@ -708,11 +1365,13 @@ function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alterna
 }
 
 function renderProfileCard(profile, theme, box, compact, index) {
+  const lang = getActiveLanguage();
+  const copy = getCopy(lang);
   const { x, y, w, h } = box;
   const accentInfo = KIND_ACCENTS[profile.kind] || KIND_ACCENTS.personalizado;
   const accent = accentInfo.accent;
   const accentSoft = accentInfo.soft;
-  const name = shortText(profile.name, compact ? 18 : 22).toUpperCase();
+  const name = shortText(profile.name || defaultProfileName(lang, index), compact ? 18 : 22).toUpperCase();
   const badgeLetter = (() => {
     const parts = String(profile.name || '').trim().split(/\s+/);
     if (parts.length && parts[parts.length - 1].length === 1 && parts[parts.length - 1] === parts[parts.length - 1].toUpperCase()) return parts[parts.length - 1];
@@ -801,22 +1460,22 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const labels = labelSet();
   const metricRows = compact
     ? [
-      ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
+      ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
+      ['height', fieldLabel('height', lang), `${formatDecimal(profile.altura_banco, 2, lang)} m`, 'height'],
       ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
       ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
       ['column', labels.column, `${formatDecimal(charge)} m`, 'column'],
     ]
     : [
-      ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
+      ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
+      ['height', fieldLabel('height', lang), `${formatDecimal(profile.altura_banco, 2, lang)} m`, 'height'],
       ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
       ['stemming', labels.stemming, `${formatDecimal(profile.stemming)} m`, 'stemming'],
       ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
       ['airdeck', labels.airdeck, `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
-      ['inclination', 'Inclinação', `${formatDecimal(profile.inclinacao, 1)}°`, 'inclination'],
-      ['azimuth', 'Azimute', `${formatDecimal(profile.azimute, 1)}°`, 'azimuth'],
-      ['density', 'Densidade', `${formatDecimal(profile.densidade, 2)} g/cm³`, 'density'],
+      ['inclination', fieldLabel('inclination', lang), `${formatDecimal(profile.inclinacao, 1, lang)}°`, 'inclination'],
+      ['azimuth', fieldLabel('azimuth', lang), `${formatDecimal(profile.azimute, 1, lang)}°`, 'azimuth'],
+      ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
     ];
 
   const rowHeight = compact ? 28 : 40;
@@ -839,9 +1498,9 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ? [
       [labels.blastbag, `${formatDecimal(bb)} m`],
       [labels.airdeck, `${formatDecimal(ad)} m`],
-      ['Incl.', `${formatDecimal(profile.inclinacao, 1)}°`],
-      ['Azim.', `${formatDecimal(profile.azimute, 1)}°`],
-      ['Dens.', `${formatDecimal(profile.densidade, 2)}`],
+      [copy.svg.shortLabels.inclination, `${formatDecimal(profile.inclinacao, 1, lang)}°`],
+      [copy.svg.shortLabels.azimuth, `${formatDecimal(profile.azimute, 1, lang)}°`],
+      [copy.svg.shortLabels.density, `${formatDecimal(profile.densidade, 2, lang)}`],
     ]
     : [
       [labels.stemming, `${formatDecimal(stem)} m`],
@@ -898,11 +1557,11 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <ellipse cx="${cx}" cy="${holeTop + 2}" rx="${cylW / 2}" ry="7" fill="#E9EEF4" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeBottom - 2}" rx="${cylW / 2}" ry="7" fill="#374151" stroke="${theme.title}" stroke-width="2"/>
     <line x1="${cylX1 + 5}" y1="${holeTop + 14}" x2="${cylX1 + 5}" y2="${holeBottom - 14}" stroke="rgba(255,255,255,0.75)" stroke-width="2"/>
-    <text x="${left + 4}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 9 : 10}" font-weight="700">${escapeXml(`BANCO ${formatDecimal(profile.altura_banco)} M`)}</text>
+    <text x="${left + 4}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 9 : 10}" font-weight="700">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>
 
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="16" fill="#FFFFFF" stroke="#E5E7EB"/>
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 6}" fill="${accent}" rx="3"/>
-    <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? 'DADOS' : 'DADOS TÉCNICOS'}</text>
+    <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
     ${rowsMarkup}
     ${chipMarkup.join('')}
     <rect x="${footerBar.x}" y="${footerBar.y}" width="${footerBar.w}" height="${footerBar.h}" rx="10" fill="${accent}"/>
@@ -911,6 +1570,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
 }
 
 function renderMeshPanel(theme, box) {
+  const copy = getCopy();
   const { x, y, w, h } = box;
   if (state.mesh?.dataUrl) {
     return `
@@ -919,10 +1579,10 @@ function renderMeshPanel(theme, box) {
       </g>
       <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="26" fill="none" stroke="#FFFFFF"/>
       <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="6" rx="3" fill="${theme.accent_red}"/>
-      <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">MALHA DE PERFURAÇÃO</text>
+      <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">${copy.svg.meshTitle}</text>
       <rect x="${x + 28}" y="${y + 60}" width="52" height="4" rx="2" fill="${theme.accent_red}"/>
       <rect x="${x + 28}" y="${y + 84}" width="140" height="28" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
-      <text x="${x + 40}" y="${y + 102}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">ARQUIVO ANEXADO</text>
+      <text x="${x + 40}" y="${y + 102}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">${copy.svg.meshAttached}</text>
       <rect x="${x + 32}" y="${y + 128}" width="${w - 64}" height="${h - 176}" rx="20" fill="#F9FAFB" stroke="#E5E7EB"/>
       <image href="${state.mesh.dataUrl}" x="${x + 44}" y="${y + 140}" width="${w - 88}" height="${h - 200}" preserveAspectRatio="xMidYMid meet"/>
     `;
@@ -942,7 +1602,7 @@ function renderMeshPanel(theme, box) {
     </g>
     <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="26" fill="none" stroke="#FFFFFF"/>
     <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="6" rx="3" fill="${theme.accent_red}"/>
-    <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">MALHA DE PERFURAÇÃO</text>
+    <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">${copy.svg.meshTitle}</text>
     <rect x="${x + 28}" y="${y + 60}" width="52" height="4" rx="2" fill="${theme.accent_red}"/>
     <text x="${x + 28}" y="${y + 78}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="14">${escapeXml(state.polygonName)}</text>
     <rect x="${x + 32}" y="${y + 104}" width="${w - 64}" height="${h - 194}" rx="20" fill="#F8FAFC" stroke="#E5E7EB" stroke-dasharray="8 8"/>
@@ -950,21 +1610,22 @@ function renderMeshPanel(theme, box) {
     <circle cx="${x + w / 2}" cy="${y + 200}" r="34" fill="#F9FAFB" stroke="#D1D5DB"/>
     <path d="M${x + w / 2} ${y + 188} V${y + 210}" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
     <path d="M${x + w / 2} ${y + 188} l-7 10 h14 Z" fill="#9CA3AF"/>
-    <text x="${x + w / 2}" y="${y + 250}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">Anexe a imagem da malha</text>
-    <text x="${x + w / 2}" y="${y + 276}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Sem anexo, este painel permanece como referência.</text>
+    <text x="${x + w / 2}" y="${y + 250}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">${copy.svg.meshPrompt}</text>
+    <text x="${x + w / 2}" y="${y + 276}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">${copy.svg.meshNoAttachment}</text>
     <rect x="${x + w / 2 - 62}" y="${y + h - 98}" width="124" height="28" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <text x="${x + w / 2}" y="${y + h - 78}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">MODO REFERÊNCIA</text>
-    <text x="${x + 36}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Somente imagem anexada, sem geração sintética da malha.</text>
+    <text x="${x + w / 2}" y="${y + h - 78}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">${copy.svg.referenceMode}</text>
+    <text x="${x + 36}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">${copy.svg.referenceModeDesc}</text>
   `;
 }
 
 function renderHeader(theme, box) {
+  const copy = getCopy();
   const { x, y, w, h } = box;
-  const title = 'PERFIL DE CARGA';
+  const title = copy.svg.headerTitle;
   const titleSize = fitFontSize(title, w - 560, 34, `'IBM Plex Sans', sans-serif`, 700, 24);
   const polygonSize = fitFontSize(state.polygonName, w - 560, 30, `'IBM Plex Sans', sans-serif`, 700, 20);
   const logoBox = { x: x + 36, y: y + 18, w: 200, h: 124 };
-  const rightBadgeText = String(state.profileType || 'PERFIS TÉCNICOS').toUpperCase();
+  const rightBadgeText = String(state.profileType || copy.defaults.profileType).toUpperCase();
   const badgeFont = 19;
   const badgeTextWidth = measureTextWidth(rightBadgeText, badgeFont, `'IBM Plex Sans', sans-serif`, 700);
   const badgeW = Math.max(210, badgeTextWidth + 52);
@@ -985,18 +1646,19 @@ function renderHeader(theme, box) {
     <text x="${x + 262}" y="${y + 36}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
     <text x="${x + 262}" y="${y + 82}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
     <rect x="${x + 262}" y="${y + 146}" width="182" height="24" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
-    <text x="${x + 276}" y="${y + 162}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700">Entrega técnica</text>
+    <text x="${x + 276}" y="${y + 162}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700">${copy.svg.headerBadge}</text>
     <rect x="${badgeX}" y="${y + 38}" width="${badgeW}" height="70" rx="20" fill="${theme.accent_red}"/>
     <text x="${badgeX + badgeW / 2}" y="${y + 74}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
   `;
 }
 
 function renderFooter(theme, box, showLegend = false) {
+  const copy = getCopy();
   const { x, y, w, h } = box;
   const legend = [
-    ['Produção', theme.accent_blue],
-    ['Amortecimento', theme.accent_orange],
-    ['Contorno', theme.accent_red],
+    [copy.svg.footerLegend.production, theme.accent_blue],
+    [copy.svg.footerLegend.cushioning, theme.accent_orange],
+    [copy.svg.footerLegend.contour, theme.accent_red],
   ];
 
   const legendMarkup = showLegend ? legend.map(([label, color], index) => {
@@ -1017,6 +1679,7 @@ function renderFooter(theme, box, showLegend = false) {
 }
 
 function renderLayout(currentConfig) {
+  const copy = getCopy();
   const theme = getTheme(state.templateName);
   const [viewW, viewH] = currentConfig.site?.preview_size || DEFAULT_PREVIEW_SIZE;
   const margin = 48;
@@ -1064,8 +1727,8 @@ function renderLayout(currentConfig) {
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">
-      <title id="svgTitle">Criador de Perfis de Carga</title>
-      <desc id="svgDesc">Perfil de carga editável com composição vetorial.</desc>
+      <title id="svgTitle">${copy.svg.title}</title>
+      <desc id="svgDesc">${copy.svg.desc}</desc>
       <defs>
         <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="${theme.bg}"/>
@@ -1083,34 +1746,35 @@ function renderLayout(currentConfig) {
 }
 
 function renderGlobalSection(currentConfig) {
+  const copy = getCopy();
   const templateOptions = Object.keys(currentConfig.templates).map((template) => `<option value="${escapeXml(template)}"${template === state.templateName ? ' selected' : ''}>${escapeXml(templateDisplayName(template))}</option>`).join('');
-  const logoName = state.logo?.name ? shortText(state.logo.name, 32) : 'Logo Enaex padrão';
-  const meshName = state.mesh?.name ? shortText(state.mesh.name, 32) : 'Nenhuma malha anexada';
+  const logoName = state.logo?.name ? shortText(state.logo.name, 32) : copy.fileChips.logoDefault;
+  const meshName = state.mesh?.name ? shortText(state.mesh.name, 32) : copy.fileChips.meshDefault;
   return `
     <div class="form-grid form-grid--two">
       <div class="field">
-        <label for="templateName">Modelo</label>
+        <label for="templateName">${copy.fieldLabels.template}</label>
         <select id="templateName" data-path="templateName">${templateOptions}</select>
       </div>
       <div class="field">
-        <label for="polygonName">Identificação da malha</label>
-        <input id="polygonName" data-path="polygonName" type="text" value="${escapeXml(state.polygonName)}" placeholder="Identificação da malha">
+        <label for="polygonName">${copy.fieldLabels.polygonName}</label>
+        <input id="polygonName" data-path="polygonName" type="text" value="${escapeXml(state.polygonName)}" placeholder="${escapeXml(copy.fieldLabels.polygonName)}">
       </div>
       <div class="field" style="grid-column: 1 / -1;">
-        <label for="observation">Observações</label>
-        <textarea id="observation" data-path="observation" placeholder="Observação opcional da exportação">${escapeXml(state.observation)}</textarea>
+        <label for="observation">${copy.fieldLabels.observation}</label>
+        <textarea id="observation" data-path="observation" placeholder="${escapeXml(copy.fieldPlaceholders.observation)}">${escapeXml(state.observation)}</textarea>
       </div>
     </div>
     <div class="image-upload-row" style="margin-top: 14px;">
       <div class="field" style="flex: 1 1 300px; min-width: 260px;">
-        <label for="logoFile">Logo do cabeçalho</label>
+        <label for="logoFile">${copy.fieldLabels.logo}</label>
         <input id="logoFile" data-role="logo-file" type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml">
       </div>
       <span class="file-chip" id="logoChip">${escapeXml(logoName)}</span>
     </div>
     <div class="image-upload-row" style="margin-top: 14px;">
       <div class="field" style="flex: 1 1 300px; min-width: 260px;">
-        <label for="meshFile">Imagem da malha</label>
+        <label for="meshFile">${copy.fieldLabels.mesh}</label>
         <input id="meshFile" data-role="mesh-file" type="file" accept="image/png,image/jpeg,image/jpg">
       </div>
       <span class="file-chip" id="meshChip">${escapeXml(meshName)}</span>
@@ -1118,13 +1782,14 @@ function renderGlobalSection(currentConfig) {
 }
 
 function renderLabelSection() {
+  const copy = getCopy();
   return `
     <div class="form-grid form-grid--three">
-      ${renderInput('Tampão', 'labels.stemming', state.labels.stemming)}
-      ${renderInput('Blastbag', 'labels.blastbag', state.labels.blastbag)}
-      ${renderInput('Deck de ar', 'labels.airdeck', state.labels.airdeck)}
-      ${renderInput('Coluna de carga', 'labels.column', state.labels.column)}
-      ${renderInput('Subperfuração', 'labels.subdrill', state.labels.subdrill)}
+      ${renderInput(copy.labels.stemming, 'labels.stemming', state.labels.stemming)}
+      ${renderInput(copy.labels.blastbag, 'labels.blastbag', state.labels.blastbag)}
+      ${renderInput(copy.labels.airdeck, 'labels.airdeck', state.labels.airdeck)}
+      ${renderInput(copy.labels.column, 'labels.column', state.labels.column)}
+      ${renderInput(copy.labels.subdrill, 'labels.subdrill', state.labels.subdrill)}
     </div>`;
 }
 
@@ -1147,6 +1812,7 @@ function renderInput(label, path, value, type = 'text', extra = {}) {
 }
 
 function renderProfileEditor(profile, index) {
+  const copy = getCopy();
   const letter = (() => {
     const parts = String(profile.name || '').trim().split(/\s+/);
     const last = parts[parts.length - 1];
@@ -1162,24 +1828,24 @@ function renderProfileEditor(profile, index) {
         <div class="profile-headline">
           <div class="profile-badge">${escapeXml(letter)}</div>
           <div>
-            <div class="profile-title">${escapeXml(shortText(profile.name || `Perfil ${index + 1}`, 28).toUpperCase())}</div>
+            <div class="profile-title">${escapeXml(shortText(profile.name || defaultProfileName(getActiveLanguage(), index), 28).toUpperCase())}</div>
             <div class="profile-subtitle">${escapeXml(`${kindLabel(profile.kind).toUpperCase()} • ${Math.round(profile.diametro_furo)} MM`)}</div>
           </div>
         </div>
         <span class="profile-chip" style="background:${accentSoft}; color:${accent};">${escapeXml(kindLabel(profile.kind))}</span>
       </div>
       <div class="profile-grid">
-        ${renderInput('Nome do perfil', `profiles.${index}.name`, profile.name)}
-        ${renderSelect('Categoria visual', `profiles.${index}.kind`, profile.kind, KIND_OPTIONS.map((key) => ({ value: key, label: KIND_LABELS[key] })), '')}
-        ${renderInput('Diâmetro do furo (mm)', `profiles.${index}.diametro_furo`, profile.diametro_furo, 'number', { step: 1, min: 0 })}
-        ${renderInput('Altura do banco (m)', `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Subperfuração (m)', `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Tampão (m)', `profiles.${index}.stemming`, profile.stemming, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Blastbag (m)', `profiles.${index}.blastbag`, profile.blastbag, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Deck de ar (m)', `profiles.${index}.air_deck`, profile.air_deck, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Inclinação (graus)', `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
-        ${renderInput('Azimute (graus)', `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
-        ${renderInput('Densidade (g/cm3)', `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
+        ${renderInput(copy.fieldLabels.profileName, `profiles.${index}.name`, profile.name)}
+        ${renderSelect(copy.fieldLabels.kind, `profiles.${index}.kind`, profile.kind, KIND_OPTIONS.map((key) => ({ value: key, label: kindLabel(key) })), '')}
+        ${renderInput(copy.fieldLabels.diameter, `profiles.${index}.diametro_furo`, profile.diametro_furo, 'number', { step: 1, min: 0 })}
+        ${renderInput(copy.fieldLabels.height, `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
+        ${renderInput(copy.fieldLabels.subdrill, `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
+        ${renderInput(copy.fieldLabels.stemming, `profiles.${index}.stemming`, profile.stemming, 'number', { step: 0.05, min: 0 })}
+        ${renderInput(copy.fieldLabels.blastbag, `profiles.${index}.blastbag`, profile.blastbag, 'number', { step: 0.05, min: 0 })}
+        ${renderInput(copy.fieldLabels.airdeck, `profiles.${index}.air_deck`, profile.air_deck, 'number', { step: 0.05, min: 0 })}
+        ${renderInput(copy.fieldLabels.inclination, `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
+        ${renderInput(copy.fieldLabels.azimuth, `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
+        ${renderInput(copy.fieldLabels.density, `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
       </div>
       <div class="profile-footer">
         <span class="summary-chip"><strong>H</strong> ${formatDecimal(profile.altura_banco)} m</span>
@@ -1199,35 +1865,39 @@ function renderSelect(label, path, value, options, helpText = '') {
 }
 
 function renderForms() {
+  const lang = getActiveLanguage();
   dom.globalFields.innerHTML = renderGlobalSection(config);
   dom.labelFields.innerHTML = renderLabelSection();
   dom.profilesFields.innerHTML = renderProfilesSection();
   dom.logoChip = document.getElementById('logoChip');
   dom.meshChip = document.getElementById('meshChip');
-  dom.profileCountLabel.textContent = `${state.profileCount} ${pluralProfiles(state.profileCount)}`;
+  if (dom.profileCountLabel) dom.profileCountLabel.textContent = profileCountText(state.profileCount, lang);
+  if (dom.profileSectionCount) dom.profileSectionCount.textContent = profileCountText(state.profileCount, lang);
+  if (dom.projectSeed) dom.projectSeed.textContent = getSeedSourceLabel(seedSource, lang);
   syncLogoChip();
   syncMeshChip();
 }
 
 function syncLogoChip() {
   if (!dom.logoChip) return;
-  dom.logoChip.textContent = state.logo?.name ? shortText(state.logo.name, 36) : 'Logo Enaex padrão';
+  dom.logoChip.textContent = state.logo?.name ? shortText(state.logo.name, 36) : getCopy().fileChips.logoDefault;
 }
 
 function syncMeshChip() {
   if (!dom.meshChip) return;
-  dom.meshChip.textContent = state.mesh?.name ? shortText(state.mesh.name, 36) : 'Nenhuma malha anexada';
+  dom.meshChip.textContent = state.mesh?.name ? shortText(state.mesh.name, 36) : getCopy().fileChips.meshDefault;
 }
 
 function adjustProfileCount(delta) {
   const next = clamp(state.profileCount + delta, config.validation.min_profiles, config.validation.max_profiles);
   if (next === state.profileCount) return;
   const defaultProfiles = config.defaults.profiles;
+  const lang = getActiveLanguage();
   if (next > state.profileCount) {
     for (let i = state.profileCount; i < next; i += 1) {
       const fallback = state.profiles[state.profiles.length - 1] || defaultProfiles[defaultProfiles.length - 1];
       const cloneProfile = clone(fallback);
-      cloneProfile.name = `Perfil ${i + 1}`;
+      cloneProfile.name = defaultProfileName(lang, i);
       if (!isNonEmptyString(cloneProfile.kind)) cloneProfile.kind = 'personalizado';
       state.profiles.push(cloneProfile);
     }
@@ -1240,7 +1910,7 @@ function adjustProfileCount(delta) {
 }
 
 function resetState(currentConfig) {
-  const defaults = createDefaultState(currentConfig);
+  const defaults = createDefaultState(currentConfig, getActiveLanguage());
   state = defaults;
   clearStateStorage(currentConfig);
   seedSource = 'default';
@@ -1354,7 +2024,7 @@ function handleClickEvent(event) {
       return;
     }
     saveStateToStorage(config, state);
-    setStatusMessage('Memória salva no navegador.');
+    setStatusMessage(getCopy().validation.saveSuccess);
   }
 
   const downloadType = target.getAttribute('data-download');
@@ -1367,7 +2037,8 @@ function scheduleUpdate(force = false) {
   if (updateTimer) window.clearTimeout(updateTimer);
   updateTimer = window.setTimeout(() => {
     updatePreview(force).catch((error) => {
-      dom.validation.innerHTML = `<div class="error">Falha ao gerar pré-visualização: ${escapeXml(error.message || String(error))}</div>`;
+      const copy = getCopy();
+      dom.validation.innerHTML = `<div class="error">${escapeXml(copy.validation.previewError(error.message || String(error)))}</div>`;
     });
   }, force ? 0 : 80);
 }
@@ -1398,9 +2069,11 @@ async function downloadArtifact(type) {
     return;
   }
 
+  const copy = getCopy();
+  const baseName = getDownloadBaseName();
   const svg = lastValidSvg || renderLayout(config);
   if (type === 'svg') {
-    downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), 'criador-perfis-carga.svg');
+    downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `${baseName}.svg`);
     return;
   }
 
@@ -1410,25 +2083,25 @@ async function downloadArtifact(type) {
 
   if (type === 'png') {
     const blob = await canvasToBlob(canvas, 'image/png');
-    downloadBlob(blob, 'criador-perfis-carga.png');
+    downloadBlob(blob, `${baseName}.png`);
     return;
   }
 
   if (type === 'jpg') {
     const blob = await canvasToBlob(canvas, 'image/jpeg', config.export?.jpg_quality ? config.export.jpg_quality / 100 : 0.96);
-    downloadBlob(blob, 'criador-perfis-carga.jpg');
+    downloadBlob(blob, `${baseName}.jpg`);
     return;
   }
 
   if (type === 'pdf') {
     const jsPDFCtor = window.jspdf?.jsPDF || window.jsPDF;
     if (!jsPDFCtor) {
-      showValidation(['Biblioteca PDF indisponível no momento.']);
+      showValidation([copy.validation.pdfUnavailable]);
       return;
     }
     const pdf = new jsPDFCtor({ orientation: 'landscape', unit: 'px', format: [exportW, exportH] });
     pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, exportW, exportH, undefined, 'FAST');
-    pdf.save('criador-perfis-carga.pdf');
+    pdf.save(`${baseName}.pdf`);
   }
 }
 
@@ -1472,13 +2145,126 @@ async function svgToCanvas(svgString, width, height) {
   }
 }
 
+function renderStaticChrome() {
+  const lang = getActiveLanguage();
+  const copy = getCopy(lang);
+  document.documentElement.lang = lang;
+  document.title = copy.meta.title;
+
+  const description = document.querySelector('meta[name="description"]');
+  if (description) description.setAttribute('content', copy.meta.description);
+
+  const brandLockup = document.querySelector('.brand-lockup');
+  if (brandLockup) brandLockup.setAttribute('aria-label', copy.brand.title);
+
+  const brandTitle = document.querySelector('.brand-text strong');
+  if (brandTitle) brandTitle.textContent = copy.brand.title;
+
+  const brandSubtitle = document.querySelector('.brand-text span');
+  if (brandSubtitle) brandSubtitle.textContent = copy.brand.subtitle;
+
+  const topbarMeta = document.querySelector('.topbar__meta-text');
+  if (topbarMeta) topbarMeta.textContent = copy.topbar.meta;
+
+  const topbarActions = document.querySelector('.topbar__actions');
+  if (topbarActions) topbarActions.setAttribute('aria-label', copy.topbar.formats);
+
+  const builderEyebrow = document.querySelector('.builder-panel .panel__head .eyebrow');
+  if (builderEyebrow) builderEyebrow.textContent = copy.builderPanel.eyebrow;
+
+  const builderTitle = document.querySelector('.builder-panel .panel__head h2');
+  if (builderTitle) builderTitle.textContent = copy.builderPanel.title;
+
+  const previewEyebrow = document.querySelector('.preview-panel .panel__head .eyebrow');
+  if (previewEyebrow) previewEyebrow.textContent = copy.preview.eyebrow;
+
+  const previewTitle = document.querySelector('.preview-panel .panel__head h2');
+  if (previewTitle) previewTitle.textContent = copy.preview.title;
+
+  const resetButton = document.getElementById('resetButton');
+  if (resetButton) resetButton.textContent = copy.buttons.reset;
+
+  const saveButton = document.getElementById('saveButton');
+  if (saveButton) saveButton.textContent = copy.buttons.save;
+
+  const profileMinus = document.getElementById('profileMinus');
+  if (profileMinus) profileMinus.setAttribute('aria-label', copy.buttons.removeProfile);
+
+  const profilePlus = document.getElementById('profilePlus');
+  if (profilePlus) profilePlus.setAttribute('aria-label', copy.buttons.addProfile);
+
+  const profileCountControl = document.querySelector('.segmented-control');
+  if (profileCountControl) profileCountControl.setAttribute('aria-label', copy.controls.profileCountAria);
+
+  const profileCountLabel = document.getElementById('profileCountLabel');
+  if (profileCountLabel) profileCountLabel.textContent = profileCountText(state.profileCount, lang);
+
+  const projectSeed = document.getElementById('projectSeed');
+  if (projectSeed) projectSeed.textContent = getSeedSourceLabel(seedSource, lang);
+
+  const heroEyebrow = document.querySelector('.hero .eyebrow');
+  if (heroEyebrow) heroEyebrow.textContent = copy.hero.eyebrow;
+
+  const heroTitle = document.querySelector('.hero h1');
+  if (heroTitle) heroTitle.textContent = copy.hero.title;
+
+  const heroSubtitle = document.querySelector('.hero__subtitle');
+  if (heroSubtitle) heroSubtitle.textContent = copy.hero.subtitle;
+
+  Array.from(document.querySelectorAll('.hero__badges .pill')).forEach((pill, index) => {
+    if (copy.hero.badges[index]) pill.textContent = copy.hero.badges[index];
+  });
+
+  const heroPanelEyebrow = document.querySelector('.panel--hero .panel__head .eyebrow');
+  if (heroPanelEyebrow) heroPanelEyebrow.textContent = copy.heroPanel.eyebrow;
+
+  const heroPanelTitle = document.querySelector('.panel--hero h2');
+  if (heroPanelTitle) heroPanelTitle.textContent = copy.heroPanel.title;
+
+  if (dom.memoryStatus) dom.memoryStatus.textContent = copy.heroPanel.loading;
+
+  Array.from(document.querySelectorAll('.hero__stats .stat span')).forEach((span, index) => {
+    const values = [copy.heroPanel.stats.rendering, copy.heroPanel.stats.export, copy.heroPanel.stats.storage];
+    if (values[index]) span.textContent = values[index];
+  });
+
+  Array.from(document.querySelectorAll('.hero__stats .stat strong')).forEach((strong, index) => {
+    const values = ['SVG', '3840x2160', copy.heroPanel.stats.storageValue];
+    if (values[index]) strong.textContent = values[index];
+  });
+
+  const languageSelect = document.getElementById('languageSelect');
+  if (languageSelect) {
+    const languages = getSupportedLanguages(config);
+    languageSelect.setAttribute('aria-label', copy.controls.language);
+    languageSelect.innerHTML = languages.map((code) => `<option value="${escapeXml(code)}"${code === lang ? ' selected' : ''}>${escapeXml(languageDisplayName(code, lang))}</option>`).join('');
+    languageSelect.value = lang;
+  }
+}
+
+function setLanguage(nextLanguage) {
+  const normalized = normalizeLanguage(nextLanguage);
+  const current = getActiveLanguage();
+  if (normalized !== current) {
+    translateStateDefaults(current, normalized);
+    state.language = normalized;
+    saveLanguagePreference(config, normalized);
+  }
+  renderStaticChrome();
+  renderShell(config);
+  renderForms();
+  updateMemoryStatus(getMemoryStatusText(seedSource, normalized));
+  scheduleUpdate(true);
+}
+
 function renderShell(currentConfig) {
+  const copy = getCopy();
   dom.builderForm.innerHTML = `
     <section class="section">
       <div class="section__head">
         <div>
-          <p class="section__title">Configuração</p>
-          <p class="section__subtitle">Documento, logo e arquivos da malha.</p>
+          <p class="section__title">${copy.sections.config.title}</p>
+          <p class="section__subtitle">${copy.sections.config.subtitle}</p>
         </div>
       </div>
       <div id="globalFields"></div>
@@ -1486,8 +2272,8 @@ function renderShell(currentConfig) {
     <section class="section">
       <div class="section__head">
         <div>
-          <p class="section__title">Rótulos</p>
-          <p class="section__subtitle">Terminologia usada na lâmina exportada.</p>
+          <p class="section__title">${copy.sections.labels.title}</p>
+          <p class="section__subtitle">${copy.sections.labels.subtitle}</p>
         </div>
       </div>
       <div id="labelFields"></div>
@@ -1495,10 +2281,10 @@ function renderShell(currentConfig) {
     <section class="section">
       <div class="section__head">
         <div>
-          <p class="section__title">Perfis</p>
-          <p class="section__subtitle">Até ${currentConfig.validation.max_profiles} perfis por lâmina.</p>
+          <p class="section__title">${copy.sections.profiles.title}</p>
+          <p class="section__subtitle">${copy.sections.profiles.subtitle(currentConfig.validation.max_profiles)}</p>
         </div>
-        <span class="helper-pill" id="profileSectionCount">${state.profileCount} ${pluralProfiles(state.profileCount)}</span>
+        <span class="helper-pill" id="profileSectionCount">${profileCountText(state.profileCount)}</span>
       </div>
       <div id="profilesFields"></div>
     </section>`;
@@ -1526,6 +2312,13 @@ async function init() {
   const stored = readStateFromStorage(config);
   const base = stored || seed || null;
   state = mergeLoadedState(config, base);
+  const preferredLanguage = readLanguagePreference(config);
+  const nextLanguage = normalizeLanguage(preferredLanguage || state.language || config.app.default_language || DEFAULT_LANGUAGE);
+  if (state.language !== nextLanguage) {
+    translateStateDefaults(state.language, nextLanguage);
+    state.language = nextLanguage;
+  }
+  saveLanguagePreference(config, state.language);
   seedSource = stored ? 'browser' : (seed ? 'project' : 'default');
 
   dom.builderForm = document.getElementById('builderForm');
@@ -1538,14 +2331,18 @@ async function init() {
   dom.meshChip = null;
   dom.downloadButtons = Array.from(document.querySelectorAll('[data-download]'));
 
+  renderStaticChrome();
   renderShell(config);
   logoDataUrl = await loadLogo(config.paths.logo_path || FALLBACK_CONFIG.paths.logo_path);
-  updateMemoryStatus(seedSource === 'browser' ? 'Memória local ativa' : seedSource === 'project' ? 'Memória do projeto carregada' : 'Configuração padrão');
-  if (dom.projectSeed) dom.projectSeed.textContent = seedSource === 'browser' ? 'Memória do navegador' : seedSource === 'project' ? 'Memória do projeto' : 'Configuração padrão';
+  updateMemoryStatus(getMemoryStatusText(seedSource, state.language));
+  if (dom.projectSeed) dom.projectSeed.textContent = getSeedSourceLabel(seedSource, state.language);
 
   document.getElementById('builderForm').addEventListener('input', handleInputEvent);
   document.getElementById('builderForm').addEventListener('change', handleInputEvent);
   document.addEventListener('click', handleClickEvent);
+  document.getElementById('languageSelect')?.addEventListener('change', (event) => {
+    if (event.target instanceof HTMLSelectElement) setLanguage(event.target.value);
+  });
 
   renderForms();
   await updatePreview(true);
