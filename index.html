@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="Blasthole Profile Creator. Editor estático para construção de perfil de carga com preview vetorial e exportação local.">
+  <meta name="description" content="Professional browser workspace for Enaex blasthole profile creation, validation and local export.">
   <title>Blasthole Profile Creator</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,31 +14,51 @@
   <script type="module" src="app.js"></script>
 </head>
 <body>
+  <div class="ambient-grid" aria-hidden="true"></div>
+  <div class="brand-ribbon brand-ribbon--top" aria-hidden="true"></div>
+  <div class="brand-ribbon brand-ribbon--bottom" aria-hidden="true"></div>
+
   <div class="page-shell">
+    <header class="topbar">
+      <div class="brand-lockup" aria-label="Enaex Brasil">
+        <span class="brand-mark"><img src="VISUAL/enaex-logo-official.svg" alt="Enaex Brasil"></span>
+        <span class="brand-text">
+          <strong>Profile Creator</strong>
+          <span>Mining Technical Solutions</span>
+        </span>
+      </div>
+      <div class="topbar__meta"><span class="live-dot"></span>Local browser engine</div>
+      <div class="topbar__actions" aria-label="Export formats">
+        <span>SVG</span>
+        <span>PNG</span>
+        <span>PDF</span>
+      </div>
+    </header>
+
     <header class="hero">
       <div class="hero__copy">
-        <p class="eyebrow">Editor técnico</p>
-        <h1>Blasthole Profile Creator</h1>
-        <p class="hero__subtitle">Editor vetorial para montar, validar e exportar perfis de carga no navegador.</p>
+        <p class="eyebrow">ENAEX MTS / BLAST DESIGN</p>
+        <h1>Professional blast profiles.</h1>
+        <p class="hero__subtitle">Build, validate and export clean blasthole profile sheets from a single browser workspace.</p>
         <div class="hero__badges">
-          <span class="pill">SVG nativo</span>
-          <span class="pill">PNG, PDF e JPG</span>
-          <span class="pill">Até 4 perfis</span>
-          <span class="pill pill--accent">Memória local</span>
+          <span class="pill">No install</span>
+          <span class="pill">Live SVG</span>
+          <span class="pill">4K export</span>
+          <span class="pill pill--accent">Enaex UI</span>
         </div>
       </div>
       <div class="hero__panel panel panel--hero">
         <div class="panel__head panel__head--compact">
           <div>
-            <p class="eyebrow">Estado do projeto</p>
-            <h2>Modo local</h2>
+            <p class="eyebrow">Run State</p>
+            <h2>Local Engine</h2>
           </div>
-          <span class="status-pill" id="memoryStatus">Carregando…</span>
+          <span class="status-pill" id="memoryStatus">Loading</span>
         </div>
         <div class="hero__stats">
           <div class="stat"><span>Render</span><strong>SVG</strong></div>
           <div class="stat"><span>Export</span><strong>3840x2160</strong></div>
-          <div class="stat"><span>Persistência</span><strong>localStorage</strong></div>
+          <div class="stat"><span>Storage</span><strong>Local</strong></div>
         </div>
       </div>
     </header>
@@ -47,21 +67,21 @@
       <section class="panel builder-panel">
         <div class="panel__head">
           <div>
-            <p class="eyebrow">Configuração</p>
-            <h2>Editor</h2>
+            <p class="eyebrow">Control Room</p>
+            <h2>Build</h2>
           </div>
           <div class="panel__meta">
-            <button class="ghost-button" type="button" id="resetButton">Restaurar padrão</button>
-            <button class="ghost-button" type="button" id="saveButton">Salvar memória</button>
+            <button class="ghost-button" type="button" id="resetButton">Reset</button>
+            <button class="ghost-button" type="button" id="saveButton">Save</button>
           </div>
         </div>
         <div class="builder-toolbar">
-          <div class="segmented-control" aria-label="Quantidade de perfis">
-            <button type="button" id="profileMinus" aria-label="Remover perfil">−</button>
-            <span id="profileCountLabel">2 perfis</span>
-            <button type="button" id="profilePlus" aria-label="Adicionar perfil">+</button>
+          <div class="segmented-control" aria-label="Profile count">
+            <button type="button" id="profileMinus" aria-label="Remove profile">-</button>
+            <span id="profileCountLabel">2 profiles</span>
+            <button type="button" id="profilePlus" aria-label="Add profile">+</button>
           </div>
-          <span class="helper-pill" id="projectSeed">Memória carregada do projeto</span>
+          <span class="helper-pill" id="projectSeed">Project memory</span>
         </div>
         <form id="builderForm" class="builder-form" autocomplete="off"></form>
       </section>
@@ -70,10 +90,10 @@
         <div class="panel__head">
           <div>
             <p class="eyebrow">Preview</p>
-            <h2>Lâmina vetorial</h2>
+            <h2>Live Sheet</h2>
           </div>
           <div class="download-group">
-            <button class="primary-button" type="button" data-download="svg">Baixar SVG</button>
+            <button class="primary-button" type="button" data-download="svg">SVG</button>
             <button class="primary-button" type="button" data-download="png">PNG</button>
             <button class="primary-button" type="button" data-download="jpg">JPG</button>
             <button class="primary-button" type="button" data-download="pdf">PDF</button>
@@ -88,7 +108,7 @@
   </div>
 
   <noscript>
-    <div class="noscript">Este site precisa de JavaScript para funcionar.</div>
+    <div class="noscript">This workspace requires JavaScript.</div>
   </noscript>
 </body>
 </html>
