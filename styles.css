@@ -1045,10 +1045,12 @@ h2 {
 
 html {
   background: var(--app-bg);
+  overflow-x: hidden;
 }
 
 body {
   min-height: 100vh;
+  overflow-x: hidden;
   color: var(--app-text);
   font-family: 'IBM Plex Sans', sans-serif;
   background:
@@ -1696,7 +1698,7 @@ h2 {
 
 @media (max-width: 980px) {
   .page-shell {
-    width: min(100vw - 14px, 1760px);
+    width: calc(100% - 14px);
     padding-top: 10px;
   }
 
@@ -1751,6 +1753,10 @@ h2 {
 }
 
 @media (max-width: 640px) {
+  .brand-ribbon {
+    display: none;
+  }
+
   .topbar__actions {
     width: 100%;
   }

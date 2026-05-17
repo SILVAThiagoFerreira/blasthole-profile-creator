@@ -1,8 +1,8 @@
 {
   "app": {
-    "title": "Blasthole Profile Creator",
-    "subtitle": "Professional blast profile sheets in the Enaex visual system.",
-    "default_profile_type": "Technical profiles"
+    "title": "Criador de Perfis de Carga",
+    "subtitle": "Geração de lâminas profissionais no padrão visual Enaex.",
+    "default_profile_type": "Perfis técnicos"
   },
   "paths": {
     "input_dir": "input",
@@ -31,7 +31,7 @@
     "write_pdf": true
   },
   "site": {
-    "storage_key": "enaex.profile-creator.web.state.v3",
+    "storage_key": "enaex.profile-creator.web.state.v4",
     "preview_size": [1920, 1080],
     "export_size": [3840, 2160]
   },
@@ -54,19 +54,19 @@
   "defaults": {
     "template_name": "Enaex clean",
     "polygon_name": "PP170526 (220-210)",
-    "observation": "Technical profile for operational reporting.",
-    "profile_type": "Technical profiles",
+    "observation": "Perfil técnico para reporte operacional.",
+    "profile_type": "Perfis técnicos",
     "profile_count": 2,
     "labels": {
-      "stemming": "Stemming",
+      "stemming": "Tampão",
       "blastbag": "Blastbag",
-      "airdeck": "Air deck",
-      "column": "Charge",
-      "subdrill": "Subdrill"
+      "airdeck": "Deck de ar",
+      "column": "Carga",
+      "subdrill": "Subperfuração"
     },
     "profiles": [
       {
-        "name": "Profile A",
+        "name": "Perfil A",
         "kind": "produção",
         "diametro_furo": 140.0,
         "altura_banco": 10.0,
@@ -79,7 +79,7 @@
         "densidade": 1.15
       },
       {
-        "name": "Profile B",
+        "name": "Perfil B",
         "kind": "amortecimento",
         "diametro_furo": 102.0,
         "altura_banco": 10.0,

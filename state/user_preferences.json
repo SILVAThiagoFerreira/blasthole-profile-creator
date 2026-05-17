@@ -1,16 +1,16 @@
 {
   "request": {
     "labels": {
-      "airdeck": "Air deck",
+      "airdeck": "Deck de ar",
       "blastbag": "Blastbag",
-      "column": "Charge",
-      "stemming": "Stemming",
-      "subdrill": "Subdrill"
+      "column": "Carga",
+      "stemming": "Tampão",
+      "subdrill": "Subperfuração"
     },
-    "observation": "Technical profile for operational reporting.",
+    "observation": "Perfil técnico para reporte operacional.",
     "polygon_name": "PP170526 (220-210)",
     "profile_count": 2,
-    "profile_type": "Technical profiles",
+    "profile_type": "Perfis técnicos",
     "profiles": [
       {
         "air_deck": 0.35,
@@ -20,8 +20,8 @@
         "densidade": 1.15,
         "diametro_furo": 140.0,
         "inclinacao": 0.0,
-        "kind": "Production",
-        "name": "Profile A",
+        "kind": "Produção",
+        "name": "Perfil A",
         "stemming": 2.3,
         "subperfuracao": 0.6
       },
@@ -33,8 +33,8 @@
         "densidade": 1.05,
         "diametro_furo": 102.0,
         "inclinacao": 0.0,
-        "kind": "Cushion",
-        "name": "Profile B",
+        "kind": "Amortecimento",
+        "name": "Perfil B",
         "stemming": 3.5,
         "subperfuracao": 0.0
       }

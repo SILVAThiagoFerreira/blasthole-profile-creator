@@ -1,8 +1,8 @@
 const FALLBACK_CONFIG = {
   app: {
-    title: 'Blasthole Profile Creator',
-    subtitle: 'Professional blast profile sheets in the Enaex visual system.',
-    default_profile_type: 'Technical profiles',
+    title: 'Criador de Perfis de Carga',
+    subtitle: 'Geração de lâminas profissionais no padrão visual Enaex.',
+    default_profile_type: 'Perfis técnicos',
   },
   paths: {
     output_dir: 'output',
@@ -30,7 +30,7 @@ const FALLBACK_CONFIG = {
     write_pdf: true,
   },
   site: {
-    storage_key: 'enaex.profile-creator.web.state.v3',
+    storage_key: 'enaex.profile-creator.web.state.v4',
     preview_size: [1920, 1080],
     export_size: [3840, 2160],
   },
@@ -42,19 +42,19 @@ const FALLBACK_CONFIG = {
   defaults: {
     template_name: 'Enaex clean',
     polygon_name: 'PP170526 (220-210)',
-    observation: 'Technical profile for operational reporting.',
-    profile_type: 'Technical profiles',
+    observation: 'Perfil técnico para reporte operacional.',
+    profile_type: 'Perfis técnicos',
     profile_count: 2,
     labels: {
-      stemming: 'Stemming',
+      stemming: 'Tampão',
       blastbag: 'Blastbag',
-      airdeck: 'Air deck',
-      column: 'Charge',
-      subdrill: 'Subdrill',
+      airdeck: 'Deck de ar',
+      column: 'Carga',
+      subdrill: 'Subperfuração',
     },
     profiles: [
       {
-        name: 'Profile A',
+        name: 'Perfil A',
         kind: 'produção',
         diametro_furo: 140.0,
         altura_banco: 10.0,
@@ -67,7 +67,7 @@ const FALLBACK_CONFIG = {
         densidade: 1.15,
       },
       {
-        name: 'Profile B',
+        name: 'Perfil B',
         kind: 'amortecimento',
         diametro_furo: 102.0,
         altura_banco: 10.0,
@@ -129,16 +129,16 @@ const FALLBACK_CONFIG = {
 
 const KIND_OPTIONS = ['produção', 'amortecimento', 'contorno', 'personalizado'];
 const KIND_LABELS = {
-  produção: 'Production',
-  amortecimento: 'Cushion',
-  contorno: 'Contour',
-  personalizado: 'Custom',
+  produção: 'Produção',
+  amortecimento: 'Amortecimento',
+  contorno: 'Contorno',
+  personalizado: 'Personalizado',
 };
 const KIND_ACCENTS = {
-  produção: { accent: '#1D6FB8', soft: '#E9F2FB', title: 'Production' },
-  amortecimento: { accent: '#F28C28', soft: '#FFF1E2', title: 'Cushion' },
-  contorno: { accent: '#D71920', soft: '#FFE3E5', title: 'Contour' },
-  personalizado: { accent: '#223A8D', soft: '#E8ECFA', title: 'Custom' },
+  produção: { accent: '#1D6FB8', soft: '#E9F2FB', title: 'Produção' },
+  amortecimento: { accent: '#F28C28', soft: '#FFF1E2', title: 'Amortecimento' },
+  contorno: { accent: '#D71920', soft: '#FFE3E5', title: 'Contorno' },
+  personalizado: { accent: '#223A8D', soft: '#E8ECFA', title: 'Personalizado' },
 };
 
 const PROFILE_FIELDS = [
@@ -155,7 +155,7 @@ const PROFILE_FIELDS = [
   'densidade',
 ];
 
-const DEFAULT_STORAGE_KEY = 'enaex.profile-creator.web.state.v3';
+const DEFAULT_STORAGE_KEY = 'enaex.profile-creator.web.state.v4';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
 const DEFAULT_PREVIEW_SIZE = [1920, 1080];
 
@@ -232,7 +232,7 @@ function shortText(text, max = 18) {
 }
 
 function pluralProfiles(count) {
-  return count === 1 ? 'profile' : 'profiles';
+  return count === 1 ? 'perfil' : 'perfis';
 }
 
 function kindLabel(kind) {
@@ -299,7 +299,7 @@ function normalizeProfile(source, fallback, index, defaultCount) {
     }
   }
 
-  profile.name = isNonEmptyString(profile.name) ? String(profile.name).trim() : `Profile ${index + 1}`;
+  profile.name = isNonEmptyString(profile.name) ? String(profile.name).trim() : `Perfil ${index + 1}`;
   profile.kind = normalizeKind(profile.kind);
   profile.diametro_furo = normalizeNumber(profile.diametro_furo, fallback.diametro_furo);
   profile.altura_banco = normalizeNumber(profile.altura_banco, fallback.altura_banco);
@@ -312,7 +312,7 @@ function normalizeProfile(source, fallback, index, defaultCount) {
   profile.densidade = normalizeNumber(profile.densidade, fallback.densidade);
 
   if (index >= defaultCount && !isNonEmptyString(source?.name)) {
-    profile.name = `Profile ${index + 1}`;
+    profile.name = `Perfil ${index + 1}`;
   }
 
   return profile;
@@ -381,22 +381,22 @@ function validateState(appState, currentConfig) {
 
   for (const field of validation.required_text_fields) {
     if (!isNonEmptyString(appState[fieldToStateKey(field)] ?? appState[field])) {
-      issues.push(`${stateLabel(field)} is required.`);
+      issues.push(`${stateLabel(field)} é obrigatório.`);
     }
   }
 
   if (!isNonEmptyString(appState.templateName) || !currentConfig.templates[appState.templateName]) {
-    issues.push('Visual template is invalid.');
+    issues.push('Modelo visual inválido.');
   }
 
   if (!Number.isInteger(appState.profileCount)) {
-    issues.push('Profile count is invalid.');
+    issues.push('Quantidade de perfis inválida.');
   } else if (appState.profileCount < validation.min_profiles || appState.profileCount > validation.max_profiles) {
-    issues.push(`Profile count must be between ${validation.min_profiles} and ${validation.max_profiles}.`);
+    issues.push(`Quantidade de perfis deve ficar entre ${validation.min_profiles} e ${validation.max_profiles}.`);
   }
 
   if (!Array.isArray(appState.profiles) || appState.profiles.length !== appState.profileCount) {
-    issues.push('Profiles do not match the selected count.');
+    issues.push('Perfis não correspondem à quantidade selecionada.');
   }
 
   const numericFields = [
@@ -412,13 +412,13 @@ function validateState(appState, currentConfig) {
   ];
 
   appState.profiles?.forEach((profile, index) => {
-    if (!isNonEmptyString(profile.name)) issues.push(`Profile ${index + 1} name is required.`);
+    if (!isNonEmptyString(profile.name)) issues.push(`Nome do perfil ${index + 1} é obrigatório.`);
     for (const field of numericFields) {
       const value = profile[field];
       if (!Number.isFinite(value)) {
-        issues.push(`${fieldLabel(field)} for profile ${index + 1} must be numeric.`);
+        issues.push(`${fieldLabel(field)} do perfil ${index + 1} deve ser numérico.`);
       } else if (value < 0) {
-        issues.push(`${fieldLabel(field)} for profile ${index + 1} must be zero or greater.`);
+        issues.push(`${fieldLabel(field)} do perfil ${index + 1} deve ser maior ou igual a zero.`);
       }
     }
   });
@@ -437,28 +437,35 @@ function fieldToStateKey(field) {
 
 function stateLabel(field) {
   const map = {
-    polygon_name: 'Pattern ID',
-    template_name: 'Template',
-    profile_type: 'Profile type',
+    polygon_name: 'Identificação da malha',
+    template_name: 'Modelo',
+    profile_type: 'Tipo de perfil',
   };
   return map[field] || fieldLabel(field);
 }
 
 function fieldLabel(field) {
   const map = {
-    name: 'Name',
-    kind: 'Visual type',
-    diametro_furo: 'Hole diameter',
-    altura_banco: 'Bench height',
-    subperfuracao: 'Subdrill',
-    stemming: 'Stemming',
+    name: 'Nome',
+    kind: 'Categoria visual',
+    diametro_furo: 'Diâmetro do furo',
+    altura_banco: 'Altura do banco',
+    subperfuracao: 'Subperfuração',
+    stemming: 'Tampão',
     blastbag: 'Blastbag',
-    air_deck: 'Air deck',
-    inclinacao: 'Inclination',
-    azimute: 'Azimuth',
-    densidade: 'Density',
+    air_deck: 'Deck de ar',
+    inclinacao: 'Inclinação',
+    azimute: 'Azimute',
+    densidade: 'Densidade',
   };
   return map[field] || field;
+}
+
+function templateDisplayName(templateName) {
+  const map = {
+    'Enaex clean': 'Enaex limpo',
+  };
+  return map[templateName] || templateName;
 }
 
 function serializeForStorage(appState) {
@@ -484,9 +491,9 @@ function saveStateToStorage(currentConfig, appState) {
   try {
     localStorage.setItem(storageKey, JSON.stringify(payload));
     seedSource = 'browser';
-    updateMemoryStatus('Local memory active');
+    updateMemoryStatus('Memória local ativa');
   } catch (error) {
-    showValidation(['Could not save local memory.']);
+    showValidation(['Não foi possível salvar a memória local.']);
   }
 }
 
@@ -516,17 +523,17 @@ function updateMemoryStatus(text) {
 function showValidation(issues, persist = false) {
   if (!dom.validation) return;
   if (!issues.length) {
-    dom.validation.innerHTML = '<div class="success">Ready to export. Preview validated.</div>';
+    dom.validation.innerHTML = '<div class="success">Pronto para exportar. Pré-visualização validada.</div>';
     toggleDownloads(true);
     if (persist && lastValidState) {
-      updateMemoryStatus(seedSource === 'browser' ? 'Local memory active' : 'Project memory loaded');
+      updateMemoryStatus(seedSource === 'browser' ? 'Memória local ativa' : 'Memória do projeto carregada');
     }
     return;
   }
 
   toggleDownloads(false);
   const messages = issues.map((issue) => (typeof issue === 'string' ? issue : issue?.message || issue?.text || String(issue)));
-  dom.validation.innerHTML = `<div class="error"><strong>Fix before export:</strong><ul>${messages.map((issue) => `<li>${escapeXml(issue)}</li>`).join('')}</ul></div>`;
+  dom.validation.innerHTML = `<div class="error"><strong>Corrija antes de exportar:</strong><ul>${messages.map((issue) => `<li>${escapeXml(issue)}</li>`).join('')}</ul></div>`;
 }
 
 function toggleDownloads(enabled) {
@@ -794,22 +801,22 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const labels = labelSet();
   const metricRows = compact
     ? [
-      ['diameter', 'Hole diameter', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', 'Bench height', `${formatDecimal(profile.altura_banco)} m`, 'height'],
+      ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
+      ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
       ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
       ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
       ['column', labels.column, `${formatDecimal(charge)} m`, 'column'],
     ]
     : [
-      ['diameter', 'Hole diameter', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', 'Bench height', `${formatDecimal(profile.altura_banco)} m`, 'height'],
+      ['diameter', 'Diâmetro do furo', `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
+      ['height', 'Altura do banco', `${formatDecimal(profile.altura_banco)} m`, 'height'],
       ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
       ['stemming', labels.stemming, `${formatDecimal(profile.stemming)} m`, 'stemming'],
       ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
       ['airdeck', labels.airdeck, `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
-      ['inclination', 'Inclination', `${formatDecimal(profile.inclinacao, 1)}°`, 'inclination'],
-      ['azimuth', 'Azimuth', `${formatDecimal(profile.azimute, 1)}°`, 'azimuth'],
-      ['density', 'Density', `${formatDecimal(profile.densidade, 2)} g/cm³`, 'density'],
+      ['inclination', 'Inclinação', `${formatDecimal(profile.inclinacao, 1)}°`, 'inclination'],
+      ['azimuth', 'Azimute', `${formatDecimal(profile.azimute, 1)}°`, 'azimuth'],
+      ['density', 'Densidade', `${formatDecimal(profile.densidade, 2)} g/cm³`, 'density'],
     ];
 
   const rowHeight = compact ? 28 : 40;
@@ -891,11 +898,11 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <ellipse cx="${cx}" cy="${holeTop + 2}" rx="${cylW / 2}" ry="7" fill="#E9EEF4" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeBottom - 2}" rx="${cylW / 2}" ry="7" fill="#374151" stroke="${theme.title}" stroke-width="2"/>
     <line x1="${cylX1 + 5}" y1="${holeTop + 14}" x2="${cylX1 + 5}" y2="${holeBottom - 14}" stroke="rgba(255,255,255,0.75)" stroke-width="2"/>
-    <text x="${left + 4}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 9 : 10}" font-weight="700">${escapeXml(`BENCH ${formatDecimal(profile.altura_banco)} M`)}</text>
+    <text x="${left + 4}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 9 : 10}" font-weight="700">${escapeXml(`BANCO ${formatDecimal(profile.altura_banco)} M`)}</text>
 
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="16" fill="#FFFFFF" stroke="#E5E7EB"/>
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 6}" fill="${accent}" rx="3"/>
-    <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? 'DATA' : 'TECHNICAL DATA'}</text>
+    <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? 'DADOS' : 'DADOS TÉCNICOS'}</text>
     ${rowsMarkup}
     ${chipMarkup.join('')}
     <rect x="${footerBar.x}" y="${footerBar.y}" width="${footerBar.w}" height="${footerBar.h}" rx="10" fill="${accent}"/>
@@ -912,10 +919,10 @@ function renderMeshPanel(theme, box) {
       </g>
       <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="26" fill="none" stroke="#FFFFFF"/>
       <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="6" rx="3" fill="${theme.accent_red}"/>
-      <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">DRILLING PATTERN</text>
+      <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">MALHA DE PERFURAÇÃO</text>
       <rect x="${x + 28}" y="${y + 60}" width="52" height="4" rx="2" fill="${theme.accent_red}"/>
       <rect x="${x + 28}" y="${y + 84}" width="140" height="28" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
-      <text x="${x + 40}" y="${y + 102}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">ATTACHED FILE</text>
+      <text x="${x + 40}" y="${y + 102}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">ARQUIVO ANEXADO</text>
       <rect x="${x + 32}" y="${y + 128}" width="${w - 64}" height="${h - 176}" rx="20" fill="#F9FAFB" stroke="#E5E7EB"/>
       <image href="${state.mesh.dataUrl}" x="${x + 44}" y="${y + 140}" width="${w - 88}" height="${h - 200}" preserveAspectRatio="xMidYMid meet"/>
     `;
@@ -935,7 +942,7 @@ function renderMeshPanel(theme, box) {
     </g>
     <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="26" fill="none" stroke="#FFFFFF"/>
     <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="6" rx="3" fill="${theme.accent_red}"/>
-    <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">DRILLING PATTERN</text>
+    <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">MALHA DE PERFURAÇÃO</text>
     <rect x="${x + 28}" y="${y + 60}" width="52" height="4" rx="2" fill="${theme.accent_red}"/>
     <text x="${x + 28}" y="${y + 78}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="14">${escapeXml(state.polygonName)}</text>
     <rect x="${x + 32}" y="${y + 104}" width="${w - 64}" height="${h - 194}" rx="20" fill="#F8FAFC" stroke="#E5E7EB" stroke-dasharray="8 8"/>
@@ -943,21 +950,21 @@ function renderMeshPanel(theme, box) {
     <circle cx="${x + w / 2}" cy="${y + 200}" r="34" fill="#F9FAFB" stroke="#D1D5DB"/>
     <path d="M${x + w / 2} ${y + 188} V${y + 210}" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
     <path d="M${x + w / 2} ${y + 188} l-7 10 h14 Z" fill="#9CA3AF"/>
-    <text x="${x + w / 2}" y="${y + 250}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">Attach pattern image</text>
-    <text x="${x + w / 2}" y="${y + 276}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Without an upload, this panel stays as a reference frame.</text>
+    <text x="${x + w / 2}" y="${y + 250}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">Anexe a imagem da malha</text>
+    <text x="${x + w / 2}" y="${y + 276}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Sem anexo, este painel permanece como referência.</text>
     <rect x="${x + w / 2 - 62}" y="${y + h - 98}" width="124" height="28" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <text x="${x + w / 2}" y="${y + h - 78}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">REFERENCE MODE</text>
-    <text x="${x + 36}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Attached images only. No synthetic drilling pattern generated.</text>
+    <text x="${x + w / 2}" y="${y + h - 78}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">MODO REFERÊNCIA</text>
+    <text x="${x + 36}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">Somente imagem anexada, sem geração sintética da malha.</text>
   `;
 }
 
 function renderHeader(theme, box) {
   const { x, y, w, h } = box;
-  const title = 'BLASTHOLE PROFILE';
+  const title = 'PERFIL DE CARGA';
   const titleSize = fitFontSize(title, w - 560, 34, `'IBM Plex Sans', sans-serif`, 700, 24);
   const polygonSize = fitFontSize(state.polygonName, w - 560, 30, `'IBM Plex Sans', sans-serif`, 700, 20);
   const logoBox = { x: x + 36, y: y + 18, w: 200, h: 124 };
-  const rightBadgeText = String(state.profileType || 'TECHNICAL PROFILES').toUpperCase();
+  const rightBadgeText = String(state.profileType || 'PERFIS TÉCNICOS').toUpperCase();
   const badgeFont = 19;
   const badgeTextWidth = measureTextWidth(rightBadgeText, badgeFont, `'IBM Plex Sans', sans-serif`, 700);
   const badgeW = Math.max(210, badgeTextWidth + 52);
@@ -987,9 +994,9 @@ function renderHeader(theme, box) {
 function renderFooter(theme, box, showLegend = false) {
   const { x, y, w, h } = box;
   const legend = [
-    ['Production', theme.accent_blue],
-    ['Cushion', theme.accent_orange],
-    ['Contour', theme.accent_red],
+    ['Produção', theme.accent_blue],
+    ['Amortecimento', theme.accent_orange],
+    ['Contorno', theme.accent_red],
   ];
 
   const legendMarkup = showLegend ? legend.map(([label, color], index) => {
@@ -1057,8 +1064,8 @@ function renderLayout(currentConfig) {
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">
-      <title id="svgTitle">Blasthole Profile Creator</title>
-      <desc id="svgDesc">Editable blasthole profile sheet with vector composition.</desc>
+      <title id="svgTitle">Criador de Perfis de Carga</title>
+      <desc id="svgDesc">Perfil de carga editável com composição vetorial.</desc>
       <defs>
         <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stop-color="${theme.bg}"/>
@@ -1076,34 +1083,34 @@ function renderLayout(currentConfig) {
 }
 
 function renderGlobalSection(currentConfig) {
-  const templateOptions = Object.keys(currentConfig.templates).map((template) => `<option value="${escapeXml(template)}"${template === state.templateName ? ' selected' : ''}>${escapeXml(template)}</option>`).join('');
-  const logoName = state.logo?.name ? shortText(state.logo.name, 32) : 'Default Enaex logo';
-  const meshName = state.mesh?.name ? shortText(state.mesh.name, 32) : 'No pattern attached';
+  const templateOptions = Object.keys(currentConfig.templates).map((template) => `<option value="${escapeXml(template)}"${template === state.templateName ? ' selected' : ''}>${escapeXml(templateDisplayName(template))}</option>`).join('');
+  const logoName = state.logo?.name ? shortText(state.logo.name, 32) : 'Logo Enaex padrão';
+  const meshName = state.mesh?.name ? shortText(state.mesh.name, 32) : 'Nenhuma malha anexada';
   return `
     <div class="form-grid form-grid--two">
       <div class="field">
-        <label for="templateName">Template</label>
+        <label for="templateName">Modelo</label>
         <select id="templateName" data-path="templateName">${templateOptions}</select>
       </div>
       <div class="field">
-        <label for="polygonName">Pattern ID</label>
-        <input id="polygonName" data-path="polygonName" type="text" value="${escapeXml(state.polygonName)}" placeholder="Pattern ID">
+        <label for="polygonName">Identificação da malha</label>
+        <input id="polygonName" data-path="polygonName" type="text" value="${escapeXml(state.polygonName)}" placeholder="Identificação da malha">
       </div>
       <div class="field" style="grid-column: 1 / -1;">
-        <label for="observation">Notes</label>
-        <textarea id="observation" data-path="observation" placeholder="Optional export note">${escapeXml(state.observation)}</textarea>
+        <label for="observation">Observações</label>
+        <textarea id="observation" data-path="observation" placeholder="Observação opcional da exportação">${escapeXml(state.observation)}</textarea>
       </div>
     </div>
     <div class="image-upload-row" style="margin-top: 14px;">
       <div class="field" style="flex: 1 1 300px; min-width: 260px;">
-        <label for="logoFile">Header logo</label>
+        <label for="logoFile">Logo do cabeçalho</label>
         <input id="logoFile" data-role="logo-file" type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml">
       </div>
       <span class="file-chip" id="logoChip">${escapeXml(logoName)}</span>
     </div>
     <div class="image-upload-row" style="margin-top: 14px;">
       <div class="field" style="flex: 1 1 300px; min-width: 260px;">
-        <label for="meshFile">Pattern image</label>
+        <label for="meshFile">Imagem da malha</label>
         <input id="meshFile" data-role="mesh-file" type="file" accept="image/png,image/jpeg,image/jpg">
       </div>
       <span class="file-chip" id="meshChip">${escapeXml(meshName)}</span>
@@ -1113,11 +1120,11 @@ function renderGlobalSection(currentConfig) {
 function renderLabelSection() {
   return `
     <div class="form-grid form-grid--three">
-      ${renderInput('Stemming', 'labels.stemming', state.labels.stemming)}
+      ${renderInput('Tampão', 'labels.stemming', state.labels.stemming)}
       ${renderInput('Blastbag', 'labels.blastbag', state.labels.blastbag)}
-      ${renderInput('Air deck', 'labels.airdeck', state.labels.airdeck)}
-      ${renderInput('Charge column', 'labels.column', state.labels.column)}
-      ${renderInput('Subdrill', 'labels.subdrill', state.labels.subdrill)}
+      ${renderInput('Deck de ar', 'labels.airdeck', state.labels.airdeck)}
+      ${renderInput('Coluna de carga', 'labels.column', state.labels.column)}
+      ${renderInput('Subperfuração', 'labels.subdrill', state.labels.subdrill)}
     </div>`;
 }
 
@@ -1155,24 +1162,24 @@ function renderProfileEditor(profile, index) {
         <div class="profile-headline">
           <div class="profile-badge">${escapeXml(letter)}</div>
           <div>
-            <div class="profile-title">${escapeXml(shortText(profile.name || `Profile ${index + 1}`, 28).toUpperCase())}</div>
+            <div class="profile-title">${escapeXml(shortText(profile.name || `Perfil ${index + 1}`, 28).toUpperCase())}</div>
             <div class="profile-subtitle">${escapeXml(`${kindLabel(profile.kind).toUpperCase()} • ${Math.round(profile.diametro_furo)} MM`)}</div>
           </div>
         </div>
         <span class="profile-chip" style="background:${accentSoft}; color:${accent};">${escapeXml(kindLabel(profile.kind))}</span>
       </div>
       <div class="profile-grid">
-        ${renderInput('Profile name', `profiles.${index}.name`, profile.name)}
-        ${renderSelect('Visual type', `profiles.${index}.kind`, profile.kind, KIND_OPTIONS.map((key) => ({ value: key, label: KIND_LABELS[key] })), '')}
-        ${renderInput('Hole diameter (mm)', `profiles.${index}.diametro_furo`, profile.diametro_furo, 'number', { step: 1, min: 0 })}
-        ${renderInput('Bench height (m)', `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Subdrill (m)', `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Stemming (m)', `profiles.${index}.stemming`, profile.stemming, 'number', { step: 0.05, min: 0 })}
+        ${renderInput('Nome do perfil', `profiles.${index}.name`, profile.name)}
+        ${renderSelect('Categoria visual', `profiles.${index}.kind`, profile.kind, KIND_OPTIONS.map((key) => ({ value: key, label: KIND_LABELS[key] })), '')}
+        ${renderInput('Diâmetro do furo (mm)', `profiles.${index}.diametro_furo`, profile.diametro_furo, 'number', { step: 1, min: 0 })}
+        ${renderInput('Altura do banco (m)', `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
+        ${renderInput('Subperfuração (m)', `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
+        ${renderInput('Tampão (m)', `profiles.${index}.stemming`, profile.stemming, 'number', { step: 0.05, min: 0 })}
         ${renderInput('Blastbag (m)', `profiles.${index}.blastbag`, profile.blastbag, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Air deck (m)', `profiles.${index}.air_deck`, profile.air_deck, 'number', { step: 0.05, min: 0 })}
-        ${renderInput('Inclination (deg)', `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
-        ${renderInput('Azimuth (deg)', `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
-        ${renderInput('Density (g/cm3)', `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
+        ${renderInput('Deck de ar (m)', `profiles.${index}.air_deck`, profile.air_deck, 'number', { step: 0.05, min: 0 })}
+        ${renderInput('Inclinação (graus)', `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
+        ${renderInput('Azimute (graus)', `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
+        ${renderInput('Densidade (g/cm3)', `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
       </div>
       <div class="profile-footer">
         <span class="summary-chip"><strong>H</strong> ${formatDecimal(profile.altura_banco)} m</span>
@@ -1204,12 +1211,12 @@ function renderForms() {
 
 function syncLogoChip() {
   if (!dom.logoChip) return;
-  dom.logoChip.textContent = state.logo?.name ? shortText(state.logo.name, 36) : 'Default Enaex logo';
+  dom.logoChip.textContent = state.logo?.name ? shortText(state.logo.name, 36) : 'Logo Enaex padrão';
 }
 
 function syncMeshChip() {
   if (!dom.meshChip) return;
-  dom.meshChip.textContent = state.mesh?.name ? shortText(state.mesh.name, 36) : 'No pattern attached';
+  dom.meshChip.textContent = state.mesh?.name ? shortText(state.mesh.name, 36) : 'Nenhuma malha anexada';
 }
 
 function adjustProfileCount(delta) {
@@ -1220,7 +1227,7 @@ function adjustProfileCount(delta) {
     for (let i = state.profileCount; i < next; i += 1) {
       const fallback = state.profiles[state.profiles.length - 1] || defaultProfiles[defaultProfiles.length - 1];
       const cloneProfile = clone(fallback);
-      cloneProfile.name = `Profile ${i + 1}`;
+      cloneProfile.name = `Perfil ${i + 1}`;
       if (!isNonEmptyString(cloneProfile.kind)) cloneProfile.kind = 'personalizado';
       state.profiles.push(cloneProfile);
     }
@@ -1347,7 +1354,7 @@ function handleClickEvent(event) {
       return;
     }
     saveStateToStorage(config, state);
-    setStatusMessage('Browser memory saved.');
+    setStatusMessage('Memória salva no navegador.');
   }
 
   const downloadType = target.getAttribute('data-download');
@@ -1360,7 +1367,7 @@ function scheduleUpdate(force = false) {
   if (updateTimer) window.clearTimeout(updateTimer);
   updateTimer = window.setTimeout(() => {
     updatePreview(force).catch((error) => {
-      dom.validation.innerHTML = `<div class="error">Preview failed: ${escapeXml(error.message || String(error))}</div>`;
+      dom.validation.innerHTML = `<div class="error">Falha ao gerar pré-visualização: ${escapeXml(error.message || String(error))}</div>`;
     });
   }, force ? 0 : 80);
 }
@@ -1393,7 +1400,7 @@ async function downloadArtifact(type) {
 
   const svg = lastValidSvg || renderLayout(config);
   if (type === 'svg') {
-    downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), 'blasthole-profile-creator.svg');
+    downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), 'criador-perfis-carga.svg');
     return;
   }
 
@@ -1403,13 +1410,13 @@ async function downloadArtifact(type) {
 
   if (type === 'png') {
     const blob = await canvasToBlob(canvas, 'image/png');
-    downloadBlob(blob, 'blasthole-profile-creator.png');
+    downloadBlob(blob, 'criador-perfis-carga.png');
     return;
   }
 
   if (type === 'jpg') {
     const blob = await canvasToBlob(canvas, 'image/jpeg', config.export?.jpg_quality ? config.export.jpg_quality / 100 : 0.96);
-    downloadBlob(blob, 'blasthole-profile-creator.jpg');
+    downloadBlob(blob, 'criador-perfis-carga.jpg');
     return;
   }
 
@@ -1421,7 +1428,7 @@ async function downloadArtifact(type) {
     }
     const pdf = new jsPDFCtor({ orientation: 'landscape', unit: 'px', format: [exportW, exportH] });
     pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, exportW, exportH, undefined, 'FAST');
-    pdf.save('blasthole-profile-creator.pdf');
+    pdf.save('criador-perfis-carga.pdf');
   }
 }
 
@@ -1470,8 +1477,8 @@ function renderShell(currentConfig) {
     <section class="section">
       <div class="section__head">
         <div>
-          <p class="section__title">Setup</p>
-          <p class="section__subtitle">Document, logo and pattern assets.</p>
+          <p class="section__title">Configuração</p>
+          <p class="section__subtitle">Documento, logo e arquivos da malha.</p>
         </div>
       </div>
       <div id="globalFields"></div>
@@ -1479,8 +1486,8 @@ function renderShell(currentConfig) {
     <section class="section">
       <div class="section__head">
         <div>
-          <p class="section__title">Labels</p>
-          <p class="section__subtitle">Export sheet terminology.</p>
+          <p class="section__title">Rótulos</p>
+          <p class="section__subtitle">Terminologia usada na lâmina exportada.</p>
         </div>
       </div>
       <div id="labelFields"></div>
@@ -1488,8 +1495,8 @@ function renderShell(currentConfig) {
     <section class="section">
       <div class="section__head">
         <div>
-          <p class="section__title">Profiles</p>
-          <p class="section__subtitle">Up to ${currentConfig.validation.max_profiles} profiles per sheet.</p>
+          <p class="section__title">Perfis</p>
+          <p class="section__subtitle">Até ${currentConfig.validation.max_profiles} perfis por lâmina.</p>
         </div>
         <span class="helper-pill" id="profileSectionCount">${state.profileCount} ${pluralProfiles(state.profileCount)}</span>
       </div>
@@ -1533,8 +1540,8 @@ async function init() {
 
   renderShell(config);
   logoDataUrl = await loadLogo(config.paths.logo_path || FALLBACK_CONFIG.paths.logo_path);
-  updateMemoryStatus(seedSource === 'browser' ? 'Local memory active' : seedSource === 'project' ? 'Project memory loaded' : 'Default setup');
-  if (dom.projectSeed) dom.projectSeed.textContent = seedSource === 'browser' ? 'Browser memory' : seedSource === 'project' ? 'Project memory' : 'Default setup';
+  updateMemoryStatus(seedSource === 'browser' ? 'Memória local ativa' : seedSource === 'project' ? 'Memória do projeto carregada' : 'Configuração padrão');
+  if (dom.projectSeed) dom.projectSeed.textContent = seedSource === 'browser' ? 'Memória do navegador' : seedSource === 'project' ? 'Memória do projeto' : 'Configuração padrão';
 
   document.getElementById('builderForm').addEventListener('input', handleInputEvent);
   document.getElementById('builderForm').addEventListener('change', handleInputEvent);

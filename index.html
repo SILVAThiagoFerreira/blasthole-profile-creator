@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <meta name="description" content="Professional browser workspace for Enaex blasthole profile creation, validation and local export.">
-  <title>Blasthole Profile Creator</title>
+  <meta name="description" content="Interface profissional para criação, validação e exportação local de perfis de carga Enaex.">
+  <title>Criador de Perfis de Carga</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -23,12 +23,12 @@
       <div class="brand-lockup" aria-label="Enaex Brasil">
         <span class="brand-mark"><img src="VISUAL/enaex-logo-official.svg" alt="Enaex Brasil"></span>
         <span class="brand-text">
-          <strong>Profile Creator</strong>
-          <span>Mining Technical Solutions</span>
+          <strong>Criador de Perfis</strong>
+          <span>Soluções Técnicas em Mineração</span>
         </span>
       </div>
-      <div class="topbar__meta"><span class="live-dot"></span>Local browser engine</div>
-      <div class="topbar__actions" aria-label="Export formats">
+      <div class="topbar__meta"><span class="live-dot"></span>Motor local no navegador</div>
+      <div class="topbar__actions" aria-label="Formatos de exportação">
         <span>SVG</span>
         <span>PNG</span>
         <span>PDF</span>
@@ -37,28 +37,28 @@
 
     <header class="hero">
       <div class="hero__copy">
-        <p class="eyebrow">ENAEX MTS / BLAST DESIGN</p>
-        <h1>Professional blast profiles.</h1>
-        <p class="hero__subtitle">Build, validate and export clean blasthole profile sheets from a single browser workspace.</p>
+        <p class="eyebrow">ENAEX MTS / PERFIS DE CARGA</p>
+        <h1>Perfis de carga profissionais.</h1>
+        <p class="hero__subtitle">Crie, valide e exporte lâminas técnicas de perfis de carga em uma única interface no navegador.</p>
         <div class="hero__badges">
-          <span class="pill">No install</span>
-          <span class="pill">Live SVG</span>
-          <span class="pill">4K export</span>
-          <span class="pill pill--accent">Enaex UI</span>
+          <span class="pill">Sem instalação</span>
+          <span class="pill">SVG ao vivo</span>
+          <span class="pill">Exportação 4K</span>
+          <span class="pill pill--accent">Interface Enaex</span>
         </div>
       </div>
       <div class="hero__panel panel panel--hero">
         <div class="panel__head panel__head--compact">
           <div>
-            <p class="eyebrow">Run State</p>
-            <h2>Local Engine</h2>
+            <p class="eyebrow">Estado</p>
+            <h2>Motor Local</h2>
           </div>
-          <span class="status-pill" id="memoryStatus">Loading</span>
+          <span class="status-pill" id="memoryStatus">Carregando</span>
         </div>
         <div class="hero__stats">
-          <div class="stat"><span>Render</span><strong>SVG</strong></div>
-          <div class="stat"><span>Export</span><strong>3840x2160</strong></div>
-          <div class="stat"><span>Storage</span><strong>Local</strong></div>
+          <div class="stat"><span>Renderização</span><strong>SVG</strong></div>
+          <div class="stat"><span>Exportação</span><strong>3840x2160</strong></div>
+          <div class="stat"><span>Armazenamento</span><strong>Local</strong></div>
         </div>
       </div>
     </header>
@@ -67,21 +67,21 @@
       <section class="panel builder-panel">
         <div class="panel__head">
           <div>
-            <p class="eyebrow">Control Room</p>
-            <h2>Build</h2>
+            <p class="eyebrow">Painel de Controle</p>
+            <h2>Editor</h2>
           </div>
           <div class="panel__meta">
-            <button class="ghost-button" type="button" id="resetButton">Reset</button>
-            <button class="ghost-button" type="button" id="saveButton">Save</button>
+            <button class="ghost-button" type="button" id="resetButton">Restaurar</button>
+            <button class="ghost-button" type="button" id="saveButton">Salvar</button>
           </div>
         </div>
         <div class="builder-toolbar">
-          <div class="segmented-control" aria-label="Profile count">
-            <button type="button" id="profileMinus" aria-label="Remove profile">-</button>
-            <span id="profileCountLabel">2 profiles</span>
-            <button type="button" id="profilePlus" aria-label="Add profile">+</button>
+          <div class="segmented-control" aria-label="Quantidade de perfis">
+            <button type="button" id="profileMinus" aria-label="Remover perfil">-</button>
+            <span id="profileCountLabel">2 perfis</span>
+            <button type="button" id="profilePlus" aria-label="Adicionar perfil">+</button>
           </div>
-          <span class="helper-pill" id="projectSeed">Project memory</span>
+          <span class="helper-pill" id="projectSeed">Memória do projeto</span>
         </div>
         <form id="builderForm" class="builder-form" autocomplete="off"></form>
       </section>
@@ -89,8 +89,8 @@
       <section class="panel preview-panel">
         <div class="panel__head">
           <div>
-            <p class="eyebrow">Preview</p>
-            <h2>Live Sheet</h2>
+            <p class="eyebrow">Pré-visualização</p>
+            <h2>Lâmina ao vivo</h2>
           </div>
           <div class="download-group">
             <button class="primary-button" type="button" data-download="svg">SVG</button>
@@ -108,7 +108,7 @@
   </div>
 
   <noscript>
-    <div class="noscript">This workspace requires JavaScript.</div>
+    <div class="noscript">Esta interface precisa de JavaScript para funcionar.</div>
   </noscript>
 </body>
 </html>
