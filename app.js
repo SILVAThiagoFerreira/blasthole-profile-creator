@@ -33,7 +33,7 @@ const FALLBACK_CONFIG = {
   site: {
     storage_key: 'enaex.profile-creator.web.state.v4',
     language_storage_key: 'enaex.profile-creator.web.language.v1',
-    supported_languages: ['pt-BR', 'en', 'zh-CN'],
+    supported_languages: ['pt-BR', 'es', 'en', 'zh-CN'],
     preview_size: [1920, 1080],
     export_size: [3840, 2160],
   },
@@ -148,7 +148,7 @@ const FALLBACK_CONFIG = {
 
 const DEFAULT_LANGUAGE = 'pt-BR';
 const DEFAULT_LANGUAGE_STORAGE_KEY = 'enaex.profile-creator.web.language.v1';
-const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'en', 'zh-CN'];
+const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'es', 'en', 'zh-CN'];
 
 const COPY = {
   'pt-BR': {
@@ -344,6 +344,7 @@ const COPY = {
     },
     languageNames: {
       'pt-BR': 'Português (Brasil)',
+      es: 'Español',
       en: 'English',
       'zh-CN': '中文',
     },
@@ -544,11 +545,213 @@ const COPY = {
     },
     languageNames: {
       'pt-BR': 'Portuguese (Brazil)',
+      es: 'Spanish',
       en: 'English',
       'zh-CN': 'Chinese',
     },
     downloads: {
       baseName: 'charge-profile-creator',
+    },
+  },
+  es: {
+    meta: {
+      title: 'Creador de Perfiles de Carga',
+      description: 'Interfaz profesional para crear, validar y exportar perfiles de carga Enaex localmente.',
+    },
+    brand: {
+      title: 'Creador de Perfiles',
+      subtitle: 'Soluciones Técnicas en Minería',
+    },
+    topbar: {
+      meta: '',
+      formats: 'Formatos de exportación',
+    },
+    hero: {
+      eyebrow: '',
+      title: 'Creador de Perfiles de Carga',
+      subtitle: 'Cree, valide y exporte láminas técnicas de perfiles de carga en una única interfaz del navegador.',
+      badges: [],
+    },
+    heroPanel: {
+      eyebrow: 'Estado',
+      title: 'Motor Local',
+      loading: 'Cargando',
+      stats: {
+        rendering: 'Renderizado',
+        export: 'Exportación',
+        storage: 'Almacenamiento',
+        storageValue: 'Local',
+      },
+    },
+    controls: {
+      language: 'Idioma',
+      profileCountWord: { one: 'perfil', many: 'perfiles' },
+      profileCountAria: 'Cantidad de perfiles',
+      projectSeed: 'Memoria del proyecto',
+      browserMemory: '',
+      projectMemory: 'Memoria del proyecto',
+      defaultConfig: 'Configuración predeterminada',
+    },
+    buttons: {
+      reset: 'Restaurar',
+      save: 'Guardar',
+      removeProfile: 'Eliminar perfil',
+      addProfile: 'Agregar perfil',
+    },
+    preview: {
+      eyebrow: 'Vista previa',
+      title: 'Lámina en vivo',
+    },
+    builderPanel: {
+      eyebrow: 'Panel de Control',
+      title: 'Editor',
+    },
+    sections: {
+      config: {
+        title: 'Configuración',
+        subtitle: 'Documento, logo y archivos de la malla.',
+      },
+      labels: {
+        title: 'Rótulos',
+        subtitle: 'Terminología usada en la lámina exportada.',
+      },
+      profiles: {
+        title: 'Perfiles',
+        subtitle: (max) => `Hasta ${max} perfiles por lámina.`,
+      },
+    },
+    stateLabels: {
+      templateName: 'Modelo',
+      polygonName: 'Identificación de la malla',
+      profileType: 'Tipo de perfil',
+    },
+    fieldLabels: {
+      template: 'Modelo',
+      polygonName: 'Identificación de la malla',
+      observation: 'Observaciones',
+      logo: 'Logo del encabezado',
+      mesh: 'Imagen de la malla',
+      profileName: 'Nombre del perfil',
+      kind: 'Categoría visual',
+      diameter: 'Diámetro del barreno (mm)',
+      height: 'Altura del banco (m)',
+      subdrill: 'Subperforación (m)',
+      stemming: 'Taco (m)',
+      blastbag: 'Blastbag (m)',
+      blastbagPosition: 'Posición blastbag',
+      blastbags: 'Blastbags',
+      addBlastbag: 'Agregar blastbag',
+      airdeck: 'Deck de aire (m)',
+      airdeckPosition: 'Posición deck de aire',
+      airdecks: 'Decks de aire',
+      addAirdeck: 'Agregar deck de aire',
+      chargeSequence: 'Secuencia del barreno',
+      segmentType: 'Tipo',
+      segmentHeight: 'Altura (m)',
+      addSegment: 'Agregar segmento',
+      inclination: 'Inclinación (grados)',
+      azimuth: 'Azimut (grados)',
+      density: 'Densidad (g/cm3)',
+    },
+    deckPositions: {
+      above_stemming: 'Encima del taco',
+      below_stemming: 'Debajo del taco',
+      mid_charge: 'Medio de la carga',
+      mid_stemming: 'Medio del taco',
+      lower_charge: 'Fondo de la carga',
+    },
+    segmentTypes: {
+      stemming: 'Taco',
+      column: 'Carga',
+      blastbag: 'Blastbag',
+      airdeck: 'Deck de aire',
+    },
+    fieldPlaceholders: {
+      observation: 'Observación opcional de la exportación.',
+    },
+    labels: {
+      stemming: 'Taco',
+      blastbag: 'Blastbag',
+      airdeck: 'Deck de aire',
+      column: 'Columna de carga',
+      subdrill: 'Subperforación',
+    },
+    defaults: {
+      profileType: 'Perfiles técnicos',
+      observation: 'Perfil técnico para reporte operacional.',
+      profileNames: ['Perfil A', 'Perfil B'],
+      profileNamePrefix: 'Perfil',
+    },
+    fileChips: {
+      logoDefault: 'Logo Enaex predeterminado',
+      meshDefault: 'Ninguna malla adjunta',
+    },
+    memory: {
+      browserActive: 'Memoria local activa',
+      projectLoaded: 'Memoria del proyecto cargada',
+      defaultConfig: 'Configuración predeterminada',
+    },
+    validation: {
+      ready: 'Listo para exportar. Vista previa validada.',
+      fixBefore: 'Corrija antes de exportar:',
+      required: (label) => `${label} es obligatorio.`,
+      modelInvalid: 'Modelo visual inválido.',
+      countInvalid: 'Cantidad de perfiles inválida.',
+      countRange: (min, max) => `La cantidad de perfiles debe estar entre ${min} y ${max}.`,
+      profilesMismatch: 'Los perfiles no corresponden a la cantidad seleccionada.',
+      profileNameRequired: (index) => `El nombre del perfil ${index} es obligatorio.`,
+      numericRequired: (field, index) => `${field} del perfil ${index} debe ser numérico.`,
+      nonNegative: (field, index) => `${field} del perfil ${index} debe ser mayor o igual a cero.`,
+      previewError: (message) => `Error al generar la vista previa: ${message}`,
+      pdfUnavailable: 'La biblioteca PDF no está disponible en este momento.',
+      saveSuccess: 'Memoria guardada en el navegador.',
+      saveFailure: 'No fue posible guardar la memoria local.',
+    },
+    svg: {
+      title: 'Creador de Perfiles de Carga',
+      desc: 'Perfil de carga editable con composición vectorial.',
+      headerTitle: 'PERFIL DE CARGA',
+      headerBadge: 'Entrega técnica',
+      meshTitle: 'MALLA DE PERFORACIÓN',
+      meshAttached: 'ARCHIVO ADJUNTO',
+      meshPrompt: 'Adjunte la imagen de la malla',
+      meshNoAttachment: 'Sin adjunto, este panel permanece como referencia.',
+      referenceMode: 'MODO REFERENCIA',
+      referenceModeDesc: 'Solo imagen adjunta, sin generación sintética de malla.',
+      dataTitle: 'DATOS TÉCNICOS',
+      dataTitleCompact: 'DATOS',
+      bench: 'BANCO',
+      benchUnit: 'M',
+      footerLegend: {
+        production: 'Producción',
+        cushioning: 'Amortiguación',
+        contour: 'Contorno',
+      },
+      shortLabels: {
+        inclination: 'Incl.',
+        azimuth: 'Azim.',
+        density: 'Dens.',
+      },
+    },
+    kinds: {
+      'produção': 'Producción',
+      'amortecimento': 'Amortiguación',
+      'contorno': 'Contorno',
+      'personalizado': 'Personalizado',
+    },
+    templates: {
+      'Enaex clean': 'Enaex limpio',
+      'Técnico minimalista': 'Técnico minimalista',
+      'Relatório executivo': 'Reporte ejecutivo',
+    },
+    languageNames: {
+      'pt-BR': 'Portugués (Brasil)',
+      es: 'Español',
+      en: 'Inglés',
+      'zh-CN': 'Chino',
+    },
+    downloads: {
+      baseName: 'creador-perfiles-carga',
     },
   },
   'zh-CN': {
@@ -744,6 +947,7 @@ const COPY = {
     },
     languageNames: {
       'pt-BR': '葡萄牙语（巴西）',
+      es: '西班牙语',
       en: '英语',
       'zh-CN': '中文',
     },
@@ -766,6 +970,7 @@ function normalizeLanguage(value) {
   if (!raw) return DEFAULT_LANGUAGE;
   const normalized = raw.replace('_', '-').toLowerCase();
   if (normalized.startsWith('pt')) return 'pt-BR';
+  if (normalized.startsWith('es')) return 'es';
   if (normalized.startsWith('zh')) return 'zh-CN';
   if (normalized.startsWith('en')) return 'en';
   return DEFAULT_LANGUAGE;

@@ -34,7 +34,7 @@
   "site": {
     "storage_key": "enaex.profile-creator.web.state.v4",
     "language_storage_key": "enaex.profile-creator.web.language.v1",
-    "supported_languages": ["pt-BR", "en", "zh-CN"],
+    "supported_languages": ["pt-BR", "es", "en", "zh-CN"],
     "preview_size": [1920, 1080],
     "export_size": [3840, 2160]
   },
