@@ -4,6 +4,9 @@ from dataclasses import dataclass
 from typing import Any
 
 
+DECK_POSITIONS = {"above_stemming", "below_stemming", "mid_charge", "lower_charge"}
+
+
 class ValidationError(ValueError):
     pass
 
@@ -34,7 +37,9 @@ def validate_profile(profile: dict[str, Any]) -> None:
         "subperfuracao",
         "stemming",
         "air_deck",
+        "air_deck_count",
         "blastbag",
+        "blastbag_count",
         "inclinacao",
         "azimute",
         "densidade",
@@ -44,6 +49,10 @@ def validate_profile(profile: dict[str, Any]) -> None:
         _require_text(profile.get(field), field)
     for field in required_numeric:
         _require_non_negative_number(profile.get(field), field)
+
+    for field in ("air_deck_position", "blastbag_position"):
+        if profile.get(field) not in DECK_POSITIONS:
+            raise ValidationError(f"{field} must be one of {sorted(DECK_POSITIONS)}")
 
 
 def validate_run_request(request: dict[str, Any], limits: dict[str, Any]) -> None:

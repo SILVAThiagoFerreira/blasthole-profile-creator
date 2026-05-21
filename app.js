@@ -64,7 +64,11 @@ const FALLBACK_CONFIG = {
         subperfuracao: 0.6,
         stemming: 2.3,
         air_deck: 0.35,
+        air_deck_count: 1,
+        air_deck_position: 'mid_charge',
         blastbag: 0.15,
+        blastbag_count: 1,
+        blastbag_position: 'below_stemming',
         inclinacao: 0.0,
         azimute: 0.0,
         densidade: 1.15,
@@ -77,7 +81,11 @@ const FALLBACK_CONFIG = {
         subperfuracao: 0.0,
         stemming: 3.5,
         air_deck: 0.2,
+        air_deck_count: 1,
+        air_deck_position: 'mid_charge',
         blastbag: 0.1,
+        blastbag_count: 1,
+        blastbag_position: 'below_stemming',
         inclinacao: 0.0,
         azimute: 0.0,
         densidade: 1.05,
@@ -220,10 +228,20 @@ const COPY = {
       subdrill: 'Subperfuração (m)',
       stemming: 'Tampão (m)',
       blastbag: 'Blastbag (m)',
+      blastbagCount: 'Qtd. blastbags',
+      blastbagPosition: 'Posição blastbag',
       airdeck: 'Deck de ar (m)',
+      airdeckCount: 'Qtd. decks de ar',
+      airdeckPosition: 'Posição deck de ar',
       inclination: 'Inclinação (graus)',
       azimuth: 'Azimute (graus)',
       density: 'Densidade (g/cm3)',
+    },
+    deckPositions: {
+      above_stemming: 'Acima do tampão',
+      below_stemming: 'Abaixo do tampão',
+      mid_charge: 'Meio da carga',
+      lower_charge: 'Fundo da carga',
     },
     fieldPlaceholders: {
       observation: 'Observação opcional da exportação.',
@@ -397,10 +415,20 @@ const COPY = {
       subdrill: 'Subdrilling (m)',
       stemming: 'Stemming (m)',
       blastbag: 'Blastbag (m)',
+      blastbagCount: 'Blastbags',
+      blastbagPosition: 'Blastbag position',
       airdeck: 'Air deck (m)',
+      airdeckCount: 'Air decks',
+      airdeckPosition: 'Air deck position',
       inclination: 'Inclination (degrees)',
       azimuth: 'Azimuth (degrees)',
       density: 'Density (g/cm3)',
+    },
+    deckPositions: {
+      above_stemming: 'Above stemming',
+      below_stemming: 'Below stemming',
+      mid_charge: 'Middle of charge',
+      lower_charge: 'Bottom of charge',
     },
     fieldPlaceholders: {
       observation: 'Optional note for the export.',
@@ -574,10 +602,20 @@ const COPY = {
       subdrill: '超深 (m)',
       stemming: '堵塞 (m)',
       blastbag: '缓冲袋 (m)',
+      blastbagCount: '缓冲袋数量',
+      blastbagPosition: '缓冲袋位置',
       airdeck: '空气间隔 (m)',
+      airdeckCount: '空气间隔数量',
+      airdeckPosition: '空气间隔位置',
       inclination: '倾角 (度)',
       azimuth: '方位角 (度)',
       density: '密度 (g/cm3)',
+    },
+    deckPositions: {
+      above_stemming: '堵塞上方',
+      below_stemming: '堵塞下方',
+      mid_charge: '装药中部',
+      lower_charge: '装药底部',
     },
     fieldPlaceholders: {
       observation: '导出时的可选备注。',
@@ -820,11 +858,17 @@ const PROFILE_FIELDS = [
   'subperfuracao',
   'stemming',
   'blastbag',
+  'blastbag_count',
+  'blastbag_position',
   'air_deck',
+  'air_deck_count',
+  'air_deck_position',
   'inclinacao',
   'azimute',
   'densidade',
 ];
+
+const DECK_POSITIONS = ['above_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
 
 const DEFAULT_STORAGE_KEY = 'enaex.profile-creator.web.state.v4';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
@@ -860,6 +904,14 @@ function escapeXml(value) {
 function normalizeNumber(value, fallback = 0) {
   const num = typeof value === 'number' ? value : Number(value);
   return Number.isFinite(num) ? num : fallback;
+}
+
+function normalizeDeckCount(value, fallback = 1) {
+  return clamp(Math.round(normalizeNumber(value, fallback)), 0, 8);
+}
+
+function normalizeDeckPosition(value, fallback = 'below_stemming') {
+  return DECK_POSITIONS.includes(value) ? value : fallback;
 }
 
 function clamp(value, min, max) {
@@ -989,7 +1041,11 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.subperfuracao = normalizeNumber(profile.subperfuracao, fallback.subperfuracao);
   profile.stemming = normalizeNumber(profile.stemming, fallback.stemming);
   profile.blastbag = normalizeNumber(profile.blastbag ?? 0, fallback.blastbag ?? 0);
+  profile.blastbag_count = normalizeDeckCount(profile.blastbag_count ?? (profile.blastbag > 0 ? 1 : 0), fallback.blastbag_count ?? 1);
+  profile.blastbag_position = normalizeDeckPosition(profile.blastbag_position, fallback.blastbag_position || 'below_stemming');
   profile.air_deck = normalizeNumber(profile.air_deck ?? 0, fallback.air_deck ?? 0);
+  profile.air_deck_count = normalizeDeckCount(profile.air_deck_count ?? (profile.air_deck > 0 ? 1 : 0), fallback.air_deck_count ?? 1);
+  profile.air_deck_position = normalizeDeckPosition(profile.air_deck_position, fallback.air_deck_position || 'mid_charge');
   profile.inclinacao = normalizeNumber(profile.inclinacao, fallback.inclinacao);
   profile.azimute = normalizeNumber(profile.azimute, fallback.azimute);
   profile.densidade = normalizeNumber(profile.densidade, fallback.densidade);
@@ -1092,7 +1148,9 @@ function validateState(appState, currentConfig) {
     'subperfuracao',
     'stemming',
     'air_deck',
+    'air_deck_count',
     'blastbag',
+    'blastbag_count',
     'inclinacao',
     'azimute',
     'densidade',
@@ -1107,6 +1165,9 @@ function validateState(appState, currentConfig) {
       } else if (value < 0) {
         issues.push(copy.validation.nonNegative(fieldLabel(field, lang), index + 1));
       }
+    }
+    for (const field of ['air_deck_position', 'blastbag_position']) {
+      if (!DECK_POSITIONS.includes(profile[field])) issues.push(copy.validation.numericRequired(fieldLabel(field, lang), index + 1));
     }
   });
 
@@ -1364,6 +1425,58 @@ function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alterna
     </g>`;
 }
 
+function makeRepeatedDeckSegments(type, totalHeight, count, position, color) {
+  const qty = normalizeDeckCount(count, totalHeight > 0 ? 1 : 0);
+  if (totalHeight <= 0 || qty <= 0) return [];
+  const unitHeight = totalHeight / qty;
+  return Array.from({ length: qty }, (_, itemIndex) => ({
+    key: `${type}-${position}-${itemIndex}`,
+    type,
+    position,
+    value: unitHeight,
+    color,
+  }));
+}
+
+function buildChargeSegments(profile, accent) {
+  const stem = clamp(profile.stemming, 0, profile.altura_banco);
+  const sub = Math.max(profile.subperfuracao, 0);
+  const bb = Math.max(profile.blastbag, 0);
+  const ad = Math.max(profile.air_deck, 0);
+  const occupied = stem + bb + ad;
+  const charge = Math.max(profile.altura_banco - occupied, 0);
+  const segments = [];
+  const pools = {
+    above_stemming: [],
+    below_stemming: [],
+    mid_charge: [],
+    lower_charge: [],
+  };
+
+  for (const segment of makeRepeatedDeckSegments('blastbag', bb, profile.blastbag_count, profile.blastbag_position, '#1F2937')) {
+    pools[segment.position].push(segment);
+  }
+  for (const segment of makeRepeatedDeckSegments('airdeck', ad, profile.air_deck_count, profile.air_deck_position, accent)) {
+    pools[segment.position].push(segment);
+  }
+
+  segments.push(...pools.above_stemming);
+  if (stem > 0) segments.push({ key: 'stemming', type: 'stemming', value: stem, color: '#C8CDD5' });
+  segments.push(...pools.below_stemming);
+
+  const midCharge = charge * 0.5;
+  const lowerCharge = charge * 0.25;
+  const upperCharge = Math.max(charge - midCharge - lowerCharge, 0);
+  if (upperCharge > 0) segments.push({ key: 'column-upper', type: 'column', value: upperCharge, color: accent });
+  segments.push(...pools.mid_charge);
+  if (midCharge > 0) segments.push({ key: 'column-mid', type: 'column', value: midCharge, color: accent });
+  segments.push(...pools.lower_charge);
+  if (lowerCharge > 0) segments.push({ key: 'column-lower', type: 'column', value: lowerCharge, color: accent });
+  if (sub > 0) segments.push({ key: 'subdrill', type: 'subdrill', value: sub, color: '#4B5563' });
+
+  return { segments, stem, sub, bb, ad, charge };
+}
+
 function renderProfileCard(profile, theme, box, compact, index) {
   const lang = getActiveLanguage();
   const copy = getCopy(lang);
@@ -1407,38 +1520,27 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const holeBottom = bottom - (compact ? 20 : 28);
   const holeH = holeBottom - holeTop;
   const total = Math.max(profile.altura_banco + profile.subperfuracao, 0.01);
-  const stem = clamp(profile.stemming, 0, profile.altura_banco);
-  const sub = Math.max(profile.subperfuracao, 0);
-  const bb = Math.max(profile.blastbag, 0);
-  const ad = Math.max(profile.air_deck, 0);
-  const charge = Math.max(profile.altura_banco - stem - bb - ad, 0);
-
-  const segmentData = [
-    ['stemming', stem, '#C8CDD5'],
-    ['blastbag', bb, '#1F2937'],
-    ['airdeck', ad, null],
-    ['column', charge, accent],
-    ['subdrill', sub, '#4B5563'],
-  ];
+  const { segments: segmentData, stem, sub, bb, ad, charge } = buildChargeSegments(profile, accent);
 
   let yCur = holeTop;
   const segmentMarkup = [];
-  for (const [key, segVal, segColor] of segmentData) {
+  for (const segment of segmentData) {
+    const { key, type, value: segVal, color: segColor } = segment;
     if (segVal <= 0) continue;
     const segH = Math.max(1, holeH * (segVal / total));
-    const y2 = key === 'subdrill' ? holeBottom : yCur + segH;
+    const y2 = type === 'subdrill' ? holeBottom : yCur + segH;
     const midY = (yCur + y2) / 2;
-    if (key === 'airdeck') {
+    if (type === 'airdeck') {
       let hatch = '';
       for (let yy = yCur + (compact ? 2 : 3); yy < y2; yy += compact ? 5 : 6) {
-        hatch += `<line x1="${cylX1 + (compact ? 2 : 3)}" y1="${yy}" x2="${cylX2 - (compact ? 2 : 3)}" y2="${yy}" stroke="${accent}" stroke-width="1"/>`;
+        hatch += `<line x1="${cylX1 + (compact ? 2 : 3)}" y1="${yy}" x2="${cylX2 - (compact ? 2 : 3)}" y2="${yy}" stroke="${segColor}" stroke-width="1"/>`;
       }
       segmentMarkup.push(`<rect x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#FFFFFF"/>${hatch}`);
-    } else if (key === 'blastbag') {
+    } else if (type === 'blastbag') {
       const darker = mixHex(segColor, '#000000', 0.1);
       const lighter = mixHex(segColor, '#FFFFFF', 0.18);
       segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${lighter}"/><stop offset="100%" stop-color="${darker}"/></linearGradient></defs><rect x="${cylX1 + 2}" y="${yCur}" width="${cylW - 4}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
-    } else if (key === 'column') {
+    } else if (type === 'column') {
       const light = mixHex(segColor, '#FFFFFF', 0.36);
       const dark = mixHex(segColor, '#1b2430', 0.12);
       segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="18%" stop-color="${segColor}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
@@ -1842,7 +1944,11 @@ function renderProfileEditor(profile, index) {
         ${renderInput(copy.fieldLabels.subdrill, `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
         ${renderInput(copy.fieldLabels.stemming, `profiles.${index}.stemming`, profile.stemming, 'number', { step: 0.05, min: 0 })}
         ${renderInput(copy.fieldLabels.blastbag, `profiles.${index}.blastbag`, profile.blastbag, 'number', { step: 0.05, min: 0 })}
+        ${renderInput(copy.fieldLabels.blastbagCount, `profiles.${index}.blastbag_count`, profile.blastbag_count, 'number', { step: 1, min: 0, max: 8 })}
+        ${renderSelect(copy.fieldLabels.blastbagPosition, `profiles.${index}.blastbag_position`, profile.blastbag_position, deckPositionOptions(), '')}
         ${renderInput(copy.fieldLabels.airdeck, `profiles.${index}.air_deck`, profile.air_deck, 'number', { step: 0.05, min: 0 })}
+        ${renderInput(copy.fieldLabels.airdeckCount, `profiles.${index}.air_deck_count`, profile.air_deck_count, 'number', { step: 1, min: 0, max: 8 })}
+        ${renderSelect(copy.fieldLabels.airdeckPosition, `profiles.${index}.air_deck_position`, profile.air_deck_position, deckPositionOptions(), '')}
         ${renderInput(copy.fieldLabels.inclination, `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
         ${renderInput(copy.fieldLabels.azimuth, `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
         ${renderInput(copy.fieldLabels.density, `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
@@ -1862,6 +1968,11 @@ function renderSelect(label, path, value, options, helpText = '') {
       <select data-path="${escapeXml(path)}">${options.map((option) => `<option value="${escapeXml(option.value)}"${option.value === value ? ' selected' : ''}>${escapeXml(option.label)}</option>`).join('')}</select>
       ${helpText ? `<span class="hint">${escapeXml(helpText)}</span>` : ''}
     </div>`;
+}
+
+function deckPositionOptions() {
+  const positions = getCopy().deckPositions;
+  return DECK_POSITIONS.map((value) => ({ value, label: positions[value] || value }));
 }
 
 function renderForms() {
@@ -1926,7 +2037,7 @@ function setNestedValue(path, rawValue, target) {
     cursor = key.match(/^\d+$/) ? cursor[Number(key)] : cursor[key];
   }
   const last = parts[parts.length - 1];
-  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'inclinacao', 'azimute', 'densidade'].some((field) => path.endsWith(field));
+  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'blastbag_count', 'air_deck', 'air_deck_count', 'inclinacao', 'azimute', 'densidade'].some((field) => path.endsWith(field));
   const value = isNumberField ? (rawValue === '' ? Number.NaN : Number(rawValue)) : rawValue;
 
   if (parts.length === 1) {
