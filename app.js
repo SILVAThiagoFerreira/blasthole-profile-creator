@@ -64,11 +64,9 @@ const FALLBACK_CONFIG = {
         subperfuracao: 0.6,
         stemming: 2.3,
         air_deck: 0.35,
-        air_deck_count: 1,
-        air_deck_position: 'mid_charge',
+        air_decks: [{ height: 0.35, position: 'mid_charge' }],
         blastbag: 0.15,
-        blastbag_count: 1,
-        blastbag_position: 'below_stemming',
+        blastbags: [{ height: 0.15, position: 'below_stemming' }],
         inclinacao: 0.0,
         azimute: 0.0,
         densidade: 1.15,
@@ -81,11 +79,9 @@ const FALLBACK_CONFIG = {
         subperfuracao: 0.0,
         stemming: 3.5,
         air_deck: 0.2,
-        air_deck_count: 1,
-        air_deck_position: 'mid_charge',
+        air_decks: [{ height: 0.2, position: 'mid_charge' }],
         blastbag: 0.1,
-        blastbag_count: 1,
-        blastbag_position: 'below_stemming',
+        blastbags: [{ height: 0.1, position: 'below_stemming' }],
         inclinacao: 0.0,
         azimute: 0.0,
         densidade: 1.05,
@@ -228,11 +224,13 @@ const COPY = {
       subdrill: 'Subperfuração (m)',
       stemming: 'Tampão (m)',
       blastbag: 'Blastbag (m)',
-      blastbagCount: 'Qtd. blastbags',
       blastbagPosition: 'Posição blastbag',
+      blastbags: 'Blastbags',
+      addBlastbag: 'Adicionar blastbag',
       airdeck: 'Deck de ar (m)',
-      airdeckCount: 'Qtd. decks de ar',
       airdeckPosition: 'Posição deck de ar',
+      airdecks: 'Decks de ar',
+      addAirdeck: 'Adicionar deck de ar',
       inclination: 'Inclinação (graus)',
       azimuth: 'Azimute (graus)',
       density: 'Densidade (g/cm3)',
@@ -241,6 +239,7 @@ const COPY = {
       above_stemming: 'Acima do tampão',
       below_stemming: 'Abaixo do tampão',
       mid_charge: 'Meio da carga',
+      mid_stemming: 'Meio do tampão',
       lower_charge: 'Fundo da carga',
     },
     fieldPlaceholders: {
@@ -415,11 +414,13 @@ const COPY = {
       subdrill: 'Subdrilling (m)',
       stemming: 'Stemming (m)',
       blastbag: 'Blastbag (m)',
-      blastbagCount: 'Blastbags',
       blastbagPosition: 'Blastbag position',
+      blastbags: 'Blastbags',
+      addBlastbag: 'Add blastbag',
       airdeck: 'Air deck (m)',
-      airdeckCount: 'Air decks',
       airdeckPosition: 'Air deck position',
+      airdecks: 'Air decks',
+      addAirdeck: 'Add air deck',
       inclination: 'Inclination (degrees)',
       azimuth: 'Azimuth (degrees)',
       density: 'Density (g/cm3)',
@@ -428,6 +429,7 @@ const COPY = {
       above_stemming: 'Above stemming',
       below_stemming: 'Below stemming',
       mid_charge: 'Middle of charge',
+      mid_stemming: 'Middle of stemming',
       lower_charge: 'Bottom of charge',
     },
     fieldPlaceholders: {
@@ -602,11 +604,13 @@ const COPY = {
       subdrill: '超深 (m)',
       stemming: '堵塞 (m)',
       blastbag: '缓冲袋 (m)',
-      blastbagCount: '缓冲袋数量',
       blastbagPosition: '缓冲袋位置',
+      blastbags: '缓冲袋',
+      addBlastbag: '添加缓冲袋',
       airdeck: '空气间隔 (m)',
-      airdeckCount: '空气间隔数量',
       airdeckPosition: '空气间隔位置',
+      airdecks: '空气间隔',
+      addAirdeck: '添加空气间隔',
       inclination: '倾角 (度)',
       azimuth: '方位角 (度)',
       density: '密度 (g/cm3)',
@@ -615,6 +619,7 @@ const COPY = {
       above_stemming: '堵塞上方',
       below_stemming: '堵塞下方',
       mid_charge: '装药中部',
+      mid_stemming: '堵塞中部',
       lower_charge: '装药底部',
     },
     fieldPlaceholders: {
@@ -858,17 +863,15 @@ const PROFILE_FIELDS = [
   'subperfuracao',
   'stemming',
   'blastbag',
-  'blastbag_count',
-  'blastbag_position',
+  'blastbags',
   'air_deck',
-  'air_deck_count',
-  'air_deck_position',
+  'air_decks',
   'inclinacao',
   'azimute',
   'densidade',
 ];
 
-const DECK_POSITIONS = ['above_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
+const DECK_POSITIONS = ['above_stemming', 'mid_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
 
 const DEFAULT_STORAGE_KEY = 'enaex.profile-creator.web.state.v4';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
@@ -912,6 +915,32 @@ function normalizeDeckCount(value, fallback = 1) {
 
 function normalizeDeckPosition(value, fallback = 'below_stemming') {
   return DECK_POSITIONS.includes(value) ? value : fallback;
+}
+
+function normalizeDeckItems(items, legacyTotal, legacyCount, legacyPosition, fallbackItems, fallbackPosition) {
+  const fromArray = Array.isArray(items) ? items : null;
+  const source = fromArray || (() => {
+    const total = Math.max(normalizeNumber(legacyTotal, 0), 0);
+    const count = normalizeDeckCount(legacyCount ?? (total > 0 ? 1 : 0), total > 0 ? 1 : 0);
+    if (total <= 0 || count <= 0) return [];
+    return Array.from({ length: count }, () => ({
+      height: total / count,
+      position: normalizeDeckPosition(legacyPosition, fallbackPosition),
+    }));
+  })();
+  const fallback = Array.isArray(fallbackItems) ? fallbackItems : [];
+  const normalized = source.map((item, index) => {
+    const fallbackItem = fallback[index] || fallback[0] || {};
+    return {
+      height: Math.max(normalizeNumber(item?.height, fallbackItem.height ?? 0), 0),
+      position: normalizeDeckPosition(item?.position, fallbackItem.position || fallbackPosition),
+    };
+  }).filter((item) => item.height > 0);
+  return normalized.slice(0, 8);
+}
+
+function sumDeckItems(items) {
+  return Array.isArray(items) ? items.reduce((total, item) => total + Math.max(normalizeNumber(item?.height, 0), 0), 0) : 0;
 }
 
 function clamp(value, min, max) {
@@ -1040,12 +1069,10 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.altura_banco = normalizeNumber(profile.altura_banco, fallback.altura_banco);
   profile.subperfuracao = normalizeNumber(profile.subperfuracao, fallback.subperfuracao);
   profile.stemming = normalizeNumber(profile.stemming, fallback.stemming);
-  profile.blastbag = normalizeNumber(profile.blastbag ?? 0, fallback.blastbag ?? 0);
-  profile.blastbag_count = normalizeDeckCount(profile.blastbag_count ?? (profile.blastbag > 0 ? 1 : 0), fallback.blastbag_count ?? 1);
-  profile.blastbag_position = normalizeDeckPosition(profile.blastbag_position, fallback.blastbag_position || 'below_stemming');
-  profile.air_deck = normalizeNumber(profile.air_deck ?? 0, fallback.air_deck ?? 0);
-  profile.air_deck_count = normalizeDeckCount(profile.air_deck_count ?? (profile.air_deck > 0 ? 1 : 0), fallback.air_deck_count ?? 1);
-  profile.air_deck_position = normalizeDeckPosition(profile.air_deck_position, fallback.air_deck_position || 'mid_charge');
+  profile.blastbags = normalizeDeckItems(profile.blastbags, profile.blastbag, source?.blastbag_count, source?.blastbag_position, fallback.blastbags, 'below_stemming');
+  profile.air_decks = normalizeDeckItems(profile.air_decks, profile.air_deck, source?.air_deck_count, source?.air_deck_position, fallback.air_decks, 'mid_charge');
+  profile.blastbag = sumDeckItems(profile.blastbags);
+  profile.air_deck = sumDeckItems(profile.air_decks);
   profile.inclinacao = normalizeNumber(profile.inclinacao, fallback.inclinacao);
   profile.azimute = normalizeNumber(profile.azimute, fallback.azimute);
   profile.densidade = normalizeNumber(profile.densidade, fallback.densidade);
@@ -1148,9 +1175,7 @@ function validateState(appState, currentConfig) {
     'subperfuracao',
     'stemming',
     'air_deck',
-    'air_deck_count',
     'blastbag',
-    'blastbag_count',
     'inclinacao',
     'azimute',
     'densidade',
@@ -1166,8 +1191,15 @@ function validateState(appState, currentConfig) {
         issues.push(copy.validation.nonNegative(fieldLabel(field, lang), index + 1));
       }
     }
-    for (const field of ['air_deck_position', 'blastbag_position']) {
-      if (!DECK_POSITIONS.includes(profile[field])) issues.push(copy.validation.numericRequired(fieldLabel(field, lang), index + 1));
+    for (const [collection, heightLabel, positionLabel] of [
+      ['air_decks', copy.fieldLabels.airdeck, copy.fieldLabels.airdeckPosition],
+      ['blastbags', copy.fieldLabels.blastbag, copy.fieldLabels.blastbagPosition],
+    ]) {
+      if (!Array.isArray(profile[collection])) continue;
+      profile[collection].forEach((item, itemIndex) => {
+        if (!Number.isFinite(item?.height) || item.height < 0) issues.push(copy.validation.nonNegative(`${heightLabel} ${itemIndex + 1}`, index + 1));
+        if (!DECK_POSITIONS.includes(item?.position)) issues.push(copy.validation.required(`${positionLabel} ${itemIndex + 1}`));
+      });
     }
   });
 
@@ -1425,43 +1457,37 @@ function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alterna
     </g>`;
 }
 
-function makeRepeatedDeckSegments(type, totalHeight, count, position, color) {
-  const qty = normalizeDeckCount(count, totalHeight > 0 ? 1 : 0);
-  if (totalHeight <= 0 || qty <= 0) return [];
-  const unitHeight = totalHeight / qty;
-  return Array.from({ length: qty }, (_, itemIndex) => ({
-    key: `${type}-${position}-${itemIndex}`,
-    type,
-    position,
-    value: unitHeight,
-    color,
-  }));
-}
-
 function buildChargeSegments(profile, accent) {
   const stem = clamp(profile.stemming, 0, profile.altura_banco);
   const sub = Math.max(profile.subperfuracao, 0);
-  const bb = Math.max(profile.blastbag, 0);
-  const ad = Math.max(profile.air_deck, 0);
+  const bb = sumDeckItems(profile.blastbags);
+  const ad = sumDeckItems(profile.air_decks);
   const occupied = stem + bb + ad;
   const charge = Math.max(profile.altura_banco - occupied, 0);
   const segments = [];
   const pools = {
     above_stemming: [],
+    mid_stemming: [],
     below_stemming: [],
     mid_charge: [],
     lower_charge: [],
   };
 
-  for (const segment of makeRepeatedDeckSegments('blastbag', bb, profile.blastbag_count, profile.blastbag_position, '#1F2937')) {
-    pools[segment.position].push(segment);
+  for (const [itemIndex, item] of (profile.blastbags || []).entries()) {
+    const position = normalizeDeckPosition(item.position, 'below_stemming');
+    pools[position].push({ key: `blastbag-${position}-${itemIndex}`, type: 'blastbag', position, value: Math.max(item.height, 0), color: '#1F2937' });
   }
-  for (const segment of makeRepeatedDeckSegments('airdeck', ad, profile.air_deck_count, profile.air_deck_position, accent)) {
-    pools[segment.position].push(segment);
+  for (const [itemIndex, item] of (profile.air_decks || []).entries()) {
+    const position = normalizeDeckPosition(item.position, 'mid_charge');
+    pools[position].push({ key: `airdeck-${position}-${itemIndex}`, type: 'airdeck', position, value: Math.max(item.height, 0), color: accent });
   }
 
   segments.push(...pools.above_stemming);
-  if (stem > 0) segments.push({ key: 'stemming', type: 'stemming', value: stem, color: '#C8CDD5' });
+  const upperStem = stem * 0.5;
+  const lowerStem = Math.max(stem - upperStem, 0);
+  if (upperStem > 0) segments.push({ key: 'stemming-upper', type: 'stemming', value: upperStem, color: '#C8CDD5' });
+  segments.push(...pools.mid_stemming);
+  if (lowerStem > 0) segments.push({ key: 'stemming-lower', type: 'stemming', value: lowerStem, color: '#C8CDD5' });
   segments.push(...pools.below_stemming);
 
   const midCharge = charge * 0.5;
@@ -1913,6 +1939,23 @@ function renderInput(label, path, value, type = 'text', extra = {}) {
     </div>`;
 }
 
+function renderDeckItems(title, addLabel, profileIndex, collection, heightLabel, positionLabel, items) {
+  const rows = (items || []).map((item, itemIndex) => `
+    <div class="deck-item">
+      ${renderInput(`${heightLabel} ${itemIndex + 1}`, `profiles.${profileIndex}.${collection}.${itemIndex}.height`, item.height, 'number', { step: 0.05, min: 0 })}
+      ${renderSelect(`${positionLabel} ${itemIndex + 1}`, `profiles.${profileIndex}.${collection}.${itemIndex}.position`, item.position, deckPositionOptions(), '')}
+      <button class="ghost-button deck-item__remove" type="button" data-action="remove-deck-item" data-profile-index="${profileIndex}" data-collection="${collection}" data-item-index="${itemIndex}">Remover</button>
+    </div>`).join('');
+  return `
+    <div class="deck-editor">
+      <div class="deck-editor__head">
+        <strong>${escapeXml(title)}</strong>
+        <button class="ghost-button" type="button" data-action="add-deck-item" data-profile-index="${profileIndex}" data-collection="${collection}">${escapeXml(addLabel)}</button>
+      </div>
+      <div class="deck-editor__rows">${rows || `<span class="hint">Nenhum item configurado.</span>`}</div>
+    </div>`;
+}
+
 function renderProfileEditor(profile, index) {
   const copy = getCopy();
   const letter = (() => {
@@ -1943,19 +1986,15 @@ function renderProfileEditor(profile, index) {
         ${renderInput(copy.fieldLabels.height, `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
         ${renderInput(copy.fieldLabels.subdrill, `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
         ${renderInput(copy.fieldLabels.stemming, `profiles.${index}.stemming`, profile.stemming, 'number', { step: 0.05, min: 0 })}
-        ${renderInput(copy.fieldLabels.blastbag, `profiles.${index}.blastbag`, profile.blastbag, 'number', { step: 0.05, min: 0 })}
-        ${renderInput(copy.fieldLabels.blastbagCount, `profiles.${index}.blastbag_count`, profile.blastbag_count, 'number', { step: 1, min: 0, max: 8 })}
-        ${renderSelect(copy.fieldLabels.blastbagPosition, `profiles.${index}.blastbag_position`, profile.blastbag_position, deckPositionOptions(), '')}
-        ${renderInput(copy.fieldLabels.airdeck, `profiles.${index}.air_deck`, profile.air_deck, 'number', { step: 0.05, min: 0 })}
-        ${renderInput(copy.fieldLabels.airdeckCount, `profiles.${index}.air_deck_count`, profile.air_deck_count, 'number', { step: 1, min: 0, max: 8 })}
-        ${renderSelect(copy.fieldLabels.airdeckPosition, `profiles.${index}.air_deck_position`, profile.air_deck_position, deckPositionOptions(), '')}
         ${renderInput(copy.fieldLabels.inclination, `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
         ${renderInput(copy.fieldLabels.azimuth, `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
         ${renderInput(copy.fieldLabels.density, `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
       </div>
+      ${renderDeckItems(copy.fieldLabels.blastbags, copy.fieldLabels.addBlastbag, index, 'blastbags', copy.fieldLabels.blastbag, copy.fieldLabels.blastbagPosition, profile.blastbags)}
+      ${renderDeckItems(copy.fieldLabels.airdecks, copy.fieldLabels.addAirdeck, index, 'air_decks', copy.fieldLabels.airdeck, copy.fieldLabels.airdeckPosition, profile.air_decks)}
       <div class="profile-footer">
         <span class="summary-chip"><strong>H</strong> ${formatDecimal(profile.altura_banco)} m</span>
-        <span class="summary-chip"><strong>C</strong> ${formatDecimal(Math.max(profile.altura_banco - profile.stemming - profile.blastbag - profile.air_deck, 0))} m</span>
+        <span class="summary-chip"><strong>C</strong> ${formatDecimal(Math.max(profile.altura_banco - profile.stemming - sumDeckItems(profile.blastbags) - sumDeckItems(profile.air_decks), 0))} m</span>
         <span class="summary-chip"><strong>S</strong> ${formatDecimal(profile.subperfuracao)} m</span>
       </div>
     </article>`;
@@ -2037,7 +2076,7 @@ function setNestedValue(path, rawValue, target) {
     cursor = key.match(/^\d+$/) ? cursor[Number(key)] : cursor[key];
   }
   const last = parts[parts.length - 1];
-  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'blastbag_count', 'air_deck', 'air_deck_count', 'inclinacao', 'azimute', 'densidade'].some((field) => path.endsWith(field));
+  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade'].some((field) => path.endsWith(field));
   const value = isNumberField ? (rawValue === '' ? Number.NaN : Number(rawValue)) : rawValue;
 
   if (parts.length === 1) {
@@ -2062,12 +2101,20 @@ function handleInputEvent(event) {
 
     const value = target.tagName === 'SELECT' ? target.value : target.value;
     if (path.startsWith('profiles.')) {
-      const [, index, field] = path.split('.');
+      const [, index, field, itemIndex, itemField] = path.split('.');
       if (!state.profiles[Number(index)]) return;
       const currentProfile = state.profiles[Number(index)];
-      currentProfile[field] = target.type === 'number'
-        ? (target.value === '' ? Number.NaN : Number(target.value))
-        : value;
+      if ((field === 'blastbags' || field === 'air_decks') && currentProfile[field]?.[Number(itemIndex)]) {
+        currentProfile[field][Number(itemIndex)][itemField] = target.type === 'number'
+          ? (target.value === '' ? Number.NaN : Number(target.value))
+          : value;
+        currentProfile.blastbag = sumDeckItems(currentProfile.blastbags);
+        currentProfile.air_deck = sumDeckItems(currentProfile.air_decks);
+      } else {
+        currentProfile[field] = target.type === 'number'
+          ? (target.value === '' ? Number.NaN : Number(target.value))
+          : value;
+      }
     } else if (path.startsWith('labels.')) {
       const [, key] = path.split('.');
       state.labels[key] = value;
@@ -2125,6 +2172,24 @@ function handleInputEvent(event) {
 function handleClickEvent(event) {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
+  const deckAction = target.getAttribute('data-action');
+  if (deckAction === 'add-deck-item' || deckAction === 'remove-deck-item') {
+    const profileIndex = Number(target.getAttribute('data-profile-index'));
+    const collection = target.getAttribute('data-collection');
+    const profile = state.profiles[profileIndex];
+    if (!profile || (collection !== 'blastbags' && collection !== 'air_decks')) return;
+    if (!Array.isArray(profile[collection])) profile[collection] = [];
+    if (deckAction === 'add-deck-item') {
+      profile[collection].push({ height: 0.1, position: collection === 'blastbags' ? 'below_stemming' : 'mid_charge' });
+    } else {
+      profile[collection].splice(Number(target.getAttribute('data-item-index')), 1);
+    }
+    profile.blastbag = sumDeckItems(profile.blastbags);
+    profile.air_deck = sumDeckItems(profile.air_decks);
+    renderForms();
+    scheduleUpdate();
+    return;
+  }
   if (target.id === 'profilePlus') adjustProfileCount(1);
   if (target.id === 'profileMinus') adjustProfileCount(-1);
   if (target.id === 'resetButton') resetState(config);

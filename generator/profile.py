@@ -28,10 +28,8 @@ class ProfileInput:
     inclinacao: float
     azimute: float
     densidade: float
-    air_deck_count: int = 1
-    air_deck_position: str = "mid_charge"
-    blastbag_count: int = 1
-    blastbag_position: str = "below_stemming"
+    air_decks: list[dict] | None = None
+    blastbags: list[dict] | None = None
 
 
 def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:

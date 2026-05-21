@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from typing import Any
 
 
-DECK_POSITIONS = {"above_stemming", "below_stemming", "mid_charge", "lower_charge"}
+DECK_POSITIONS = {"above_stemming", "mid_stemming", "below_stemming", "mid_charge", "lower_charge"}
 
 
 class ValidationError(ValueError):
@@ -37,9 +37,7 @@ def validate_profile(profile: dict[str, Any]) -> None:
         "subperfuracao",
         "stemming",
         "air_deck",
-        "air_deck_count",
         "blastbag",
-        "blastbag_count",
         "inclinacao",
         "azimute",
         "densidade",
@@ -51,8 +49,21 @@ def validate_profile(profile: dict[str, Any]) -> None:
         _require_non_negative_number(profile.get(field), field)
 
     for field in ("air_deck_position", "blastbag_position"):
-        if profile.get(field) not in DECK_POSITIONS:
+        if field in profile and profile.get(field) not in DECK_POSITIONS:
             raise ValidationError(f"{field} must be one of {sorted(DECK_POSITIONS)}")
+
+    for field in ("air_decks", "blastbags"):
+        items = profile.get(field, [])
+        if items is None:
+            continue
+        if not isinstance(items, list):
+            raise ValidationError(f"{field} must be a list")
+        for item in items:
+            if not isinstance(item, dict):
+                raise ValidationError(f"{field} items must be objects")
+            _require_non_negative_number(item.get("height"), f"{field}.height")
+            if item.get("position") not in DECK_POSITIONS:
+                raise ValidationError(f"{field}.position must be one of {sorted(DECK_POSITIONS)}")
 
 
 def validate_run_request(request: dict[str, Any], limits: dict[str, Any]) -> None:

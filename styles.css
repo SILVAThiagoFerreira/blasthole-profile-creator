@@ -1632,6 +1632,46 @@ h2 {
   gap: 10px;
 }
 
+.deck-editor {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--app-line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.deck-editor__head,
+.deck-item {
+  display: flex;
+  gap: 10px;
+  align-items: end;
+}
+
+.deck-editor__head {
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.deck-editor__head strong {
+  color: #fff;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+}
+
+.deck-editor__rows {
+  display: grid;
+  gap: 10px;
+}
+
+.deck-item .field {
+  flex: 1 1 180px;
+}
+
+.deck-item__remove {
+  flex: 0 0 auto;
+  margin-bottom: 1px;
+}
+
 .summary-chip {
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--app-line);

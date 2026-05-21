@@ -76,11 +76,19 @@
         "subperfuracao": 0.6,
         "stemming": 2.3,
         "air_deck": 0.35,
-        "air_deck_count": 1,
-        "air_deck_position": "mid_charge",
+        "air_decks": [
+          {
+            "height": 0.35,
+            "position": "mid_charge"
+          }
+        ],
         "blastbag": 0.15,
-        "blastbag_count": 1,
-        "blastbag_position": "below_stemming",
+        "blastbags": [
+          {
+            "height": 0.15,
+            "position": "below_stemming"
+          }
+        ],
         "inclinacao": 0.0,
         "azimute": 0.0,
         "densidade": 1.15
@@ -93,11 +101,19 @@
         "subperfuracao": 0.0,
         "stemming": 3.5,
         "air_deck": 0.2,
-        "air_deck_count": 1,
-        "air_deck_position": "mid_charge",
+        "air_decks": [
+          {
+            "height": 0.2,
+            "position": "mid_charge"
+          }
+        ],
         "blastbag": 0.1,
-        "blastbag_count": 1,
-        "blastbag_position": "below_stemming",
+        "blastbags": [
+          {
+            "height": 0.1,
+            "position": "below_stemming"
+          }
+        ],
         "inclinacao": 0.0,
         "azimute": 0.0,
         "densidade": 1.05
