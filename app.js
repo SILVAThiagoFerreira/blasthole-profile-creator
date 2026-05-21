@@ -161,14 +161,14 @@ const COPY = {
       subtitle: 'Soluções Técnicas em Mineração',
     },
     topbar: {
-      meta: 'Motor local no navegador',
+      meta: '',
       formats: 'Formatos de exportação',
     },
     hero: {
-      eyebrow: 'ENAEX MTS / PERFIS DE CARGA',
-      title: 'Perfis de carga profissionais.',
+      eyebrow: '',
+      title: 'Criador de Perfis de Carga',
       subtitle: 'Crie, valide e exporte lâminas técnicas de perfis de carga em uma única interface no navegador.',
-      badges: ['Sem instalação', 'SVG ao vivo', 'Exportação 4K', 'Interface Enaex'],
+      badges: [],
     },
     heroPanel: {
       eyebrow: 'Estado',
@@ -186,7 +186,7 @@ const COPY = {
       profileCountWord: { one: 'perfil', many: 'perfis' },
       profileCountAria: 'Quantidade de perfis',
       projectSeed: 'Memória do projeto',
-      browserMemory: 'Memória do navegador',
+      browserMemory: '',
       projectMemory: 'Memória do projeto',
       defaultConfig: 'Configuração padrão',
     },
@@ -2525,9 +2525,8 @@ function renderStaticChrome() {
   const heroSubtitle = document.querySelector('.hero__subtitle');
   if (heroSubtitle) heroSubtitle.textContent = copy.hero.subtitle;
 
-  Array.from(document.querySelectorAll('.hero__badges .pill')).forEach((pill, index) => {
-    if (copy.hero.badges[index]) pill.textContent = copy.hero.badges[index];
-  });
+  const heroBadges = document.querySelector('.hero__badges');
+  if (heroBadges) heroBadges.remove();
 
   const heroPanelEyebrow = document.querySelector('.panel--hero .panel__head .eyebrow');
   if (heroPanelEyebrow) heroPanelEyebrow.textContent = copy.heroPanel.eyebrow;
