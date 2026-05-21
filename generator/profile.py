@@ -81,6 +81,24 @@ def _kind_palette(kind: str, theme) -> tuple[str, str]:
     return theme.accent_blue, "#e9f2fb"
 
 
+def _segment_label(seg_key: str, labels: dict[str, str], compact: bool = False) -> str:
+    if compact:
+        return {
+            "stemming": "Tamp.",
+            "column": "Carga",
+            "blastbag": "BB",
+            "airdeck": "Deck",
+            "subdrill": "Sub.",
+        }.get(seg_key, seg_key)
+    return {
+        "stemming": labels.get("stemming", "Tampão"),
+        "column": labels.get("column", "Carga"),
+        "blastbag": labels.get("blastbag", "Blastbag"),
+        "airdeck": labels.get("airdeck", "Deck de ar"),
+        "subdrill": labels.get("subdrill", "Subperfuração"),
+    }.get(seg_key, seg_key)
+
+
 def _extract_badge_letter(name: str) -> str:
     parts = name.split()
     if parts and len(parts[-1]) == 1 and parts[-1].isupper():
@@ -271,8 +289,10 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
                 _draw_gradient_segment(draw, cyl_x1, y_cur, cyl_x2, y2, seg_color, highlight=0.32)
 
             mid_y = int((y_cur + y2) // 2)
-            draw.line((cyl_x2 + _s(4), mid_y, cyl_x2 + _s(10), mid_y), fill=theme.muted, width=_s(1))
-            draw.text((cyl_x2 + _s(14), mid_y - _s(6)), f"{seg_val:.2f}m".replace(".", ","), font=_font(_s(9)), fill=theme.muted)
+            if y2 - y_cur >= _s(10):
+                draw.line((cyl_x2 + _s(3), mid_y, cyl_x2 + _s(9), mid_y), fill=theme.muted, width=_s(1))
+                label = f"{_segment_label(seg_key, labels, compact=True)} {seg_val:.2f}m".replace(".", ",")
+                draw.text((cyl_x2 + _s(11), mid_y - _s(5)), label, font=_font(_s(7), bold=True), fill=theme.muted)
             y_cur = y2
 
         draw.rounded_rectangle((cyl_x1, hole_top, cyl_x2, hole_bottom), radius=_s(16), outline=theme.title, width=_s(2))
@@ -392,13 +412,13 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
         else:
             _draw_gradient_segment(draw, cyl_x1, y_cur, cyl_x2, y2, seg_color, highlight=0.40)
 
-        # Lateral label with dashed line
         mid_y = int((y_cur + y2) // 2)
-        dash_x = label_x + _s(4)
-        for dx in range(0, _s(10), _s(4)):
-            draw.line((dash_x + dx, mid_y, dash_x + dx + _s(2), mid_y), fill=theme.muted, width=_s(1))
-        draw.text((label_x + _s(16), mid_y - _s(7)), f"{seg_val:.2f}m".replace(".", ","),
-                  font=label_font, fill=theme.muted)
+        if y2 - y_cur >= _s(14):
+            dash_x = label_x + _s(4)
+            for dx in range(0, _s(10), _s(4)):
+                draw.line((dash_x + dx, mid_y, dash_x + dx + _s(2), mid_y), fill=theme.muted, width=_s(1))
+            label = f"{_segment_label(seg_key, labels)} {seg_val:.2f}m".replace(".", ",")
+            draw.text((label_x + _s(16), mid_y - _s(7)), label, font=label_font, fill=theme.muted)
 
         y_cur = y2
 

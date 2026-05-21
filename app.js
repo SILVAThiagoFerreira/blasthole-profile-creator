@@ -1565,6 +1565,26 @@ function buildChargeSegments(profile, accent) {
   return { segments, stem, sub, bb, ad, charge };
 }
 
+function segmentDisplayLabel(type, lang = getActiveLanguage(), short = false) {
+  const copy = getCopy(lang);
+  const labels = {
+    stemming: copy.labels.stemming,
+    column: copy.labels.column,
+    blastbag: copy.labels.blastbag,
+    airdeck: copy.labels.airdeck,
+    subdrill: copy.labels.subdrill,
+  };
+  if (!short) return labels[type] || type;
+  const shortLabels = {
+    stemming: 'Tamp.',
+    column: 'Carga',
+    blastbag: 'BB',
+    airdeck: 'Deck',
+    subdrill: 'Sub.',
+  };
+  return shortLabels[type] || labels[type] || type;
+}
+
 function renderProfileCard(profile, theme, box, compact, index) {
   const lang = getActiveLanguage();
   const copy = getCopy(lang);
@@ -1641,12 +1661,13 @@ function renderProfileCard(profile, theme, box, compact, index) {
       segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
     }
 
-    if (!compact && y2 - yCur >= 14) {
-      const labelX = cylX2 + 8;
-      const labelSize = 10;
-      const labelValue = `${formatDecimal(segVal)}m`;
-      segmentMarkup.push(`<line x1="${cylX2 + 4}" y1="${midY}" x2="${cylX2 + 10}" y2="${midY}" stroke="${theme.muted}" stroke-width="1" stroke-dasharray="4 4"/>`);
-      segmentMarkup.push(`<text x="${labelX + 10}" y="${midY - 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="400">${escapeXml(labelValue)}</text>`);
+    if (y2 - yCur >= (compact ? 10 : 14)) {
+      const labelX = cylX2 + (compact ? 4 : 8);
+      const labelSize = compact ? 7 : 10;
+      const labelValue = `${segmentDisplayLabel(type, lang, compact)} ${formatDecimal(segVal)}m`;
+      const safeLabel = shortText(labelValue, compact ? 13 : 22);
+      segmentMarkup.push(`<line x1="${cylX2 + 2}" y1="${midY}" x2="${labelX + (compact ? 2 : 8)}" y2="${midY}" stroke="${theme.muted}" stroke-width="1" stroke-dasharray="3 3"/>`);
+      segmentMarkup.push(`<text x="${labelX + (compact ? 4 : 10)}" y="${midY - 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="${compact ? 700 : 500}">${escapeXml(safeLabel)}</text>`);
     }
     yCur = y2;
   }
