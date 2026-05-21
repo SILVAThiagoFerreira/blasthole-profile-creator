@@ -30,6 +30,7 @@ class ProfileInput:
     densidade: float
     air_decks: list[dict] | None = None
     blastbags: list[dict] | None = None
+    segments: list[dict] | None = None
 
 
 def _font(size: int, bold: bool = False) -> ImageFont.FreeTypeFont:

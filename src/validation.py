@@ -5,6 +5,7 @@ from typing import Any
 
 
 DECK_POSITIONS = {"above_stemming", "mid_stemming", "below_stemming", "mid_charge", "lower_charge"}
+SEGMENT_TYPES = {"stemming", "column", "blastbag", "airdeck"}
 
 
 class ValidationError(ValueError):
@@ -64,6 +65,17 @@ def validate_profile(profile: dict[str, Any]) -> None:
             _require_non_negative_number(item.get("height"), f"{field}.height")
             if item.get("position") not in DECK_POSITIONS:
                 raise ValidationError(f"{field}.position must be one of {sorted(DECK_POSITIONS)}")
+
+    segments = profile.get("segments")
+    if segments is not None:
+        if not isinstance(segments, list) or not segments:
+            raise ValidationError("segments must be a non-empty list")
+        for item in segments:
+            if not isinstance(item, dict):
+                raise ValidationError("segments items must be objects")
+            if item.get("type") not in SEGMENT_TYPES:
+                raise ValidationError(f"segments.type must be one of {sorted(SEGMENT_TYPES)}")
+            _require_non_negative_number(item.get("height"), "segments.height")
 
 
 def validate_run_request(request: dict[str, Any], limits: dict[str, Any]) -> None:

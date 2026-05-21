@@ -89,6 +89,24 @@
             "position": "below_stemming"
           }
         ],
+        "segments": [
+          {
+            "type": "stemming",
+            "height": 2.3
+          },
+          {
+            "type": "blastbag",
+            "height": 0.15
+          },
+          {
+            "type": "column",
+            "height": 7.2
+          },
+          {
+            "type": "airdeck",
+            "height": 0.35
+          }
+        ],
         "inclinacao": 0.0,
         "azimute": 0.0,
         "densidade": 1.15
@@ -112,6 +130,24 @@
           {
             "height": 0.1,
             "position": "below_stemming"
+          }
+        ],
+        "segments": [
+          {
+            "type": "stemming",
+            "height": 3.5
+          },
+          {
+            "type": "column",
+            "height": 6.2
+          },
+          {
+            "type": "blastbag",
+            "height": 0.1
+          },
+          {
+            "type": "airdeck",
+            "height": 0.2
           }
         ],
         "inclinacao": 0.0,

@@ -21,6 +21,7 @@ PROFILE_FIELDS = (
     "blastbags",
     "air_deck",
     "air_decks",
+    "segments",
     "inclinacao",
     "azimute",
     "densidade",

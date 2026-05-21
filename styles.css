@@ -620,7 +620,7 @@ h2 {
   line-height: 1.55;
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 980px) {
   .workspace,
   .hero {
     grid-template-columns: 1fr;
@@ -1764,7 +1764,7 @@ h2 {
   border-color: var(--app-line);
 }
 
-@media (max-width: 1280px) {
+@media (max-width: 980px) {
   .topbar,
   .workspace,
   .hero {
