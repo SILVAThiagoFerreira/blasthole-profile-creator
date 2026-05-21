@@ -1587,21 +1587,21 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const badgeCy = y + (compact ? 46 : 50);
   const tagText = kindLabel(profile.kind).toUpperCase();
   const tagWidth = measureTextWidth(tagText, tagSize, `'IBM Plex Sans', sans-serif`, 700);
-  const tagX = x + (compact ? 320 : 380) - tagWidth / 2 - 8;
+  const tagX = Math.min(x + w - tagWidth - 34, x + (compact ? 320 : 380) - tagWidth / 2 - 8);
   const tagY = y + (compact ? 22 : 24);
   const tagHeight = compact ? 22 : 24;
   const drawingBox = compact
-    ? { x: x + 18, y: y + 96, w: 132, h: h - 186 }
+    ? { x: x + 18, y: y + 94, w: 96, h: h - 178 }
     : { x: x + 34, y: y + 108, w: 144, h: h - 218 };
   const infoBox = compact
-    ? { x: x + 178, y: y + 96, w: w - 202, h: h - 186 }
+    ? { x: x + 132, y: y + 94, w: w - 156, h: h - 178 }
     : { x: x + 190, y: y + 108, w: w - 218, h: h - 218 };
   const left = drawingBox.x;
   const top = drawingBox.y;
   const right = drawingBox.x + drawingBox.w;
   const bottom = drawingBox.y + drawingBox.h;
   const cx = left + drawingBox.w / 2;
-  const cylW = compact ? 46 : 52;
+  const cylW = compact ? 34 : 52;
   const cylX1 = cx - cylW / 2;
   const cylX2 = cx + cylW / 2;
   const holeTop = top + (compact ? 20 : 28);
@@ -1639,11 +1639,13 @@ function renderProfileCard(profile, theme, box, compact, index) {
       segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
     }
 
-    const labelX = cylX2 + (compact ? 8 : 8);
-    const labelSize = compact ? 9 : 10;
-    const labelValue = `${formatDecimal(segVal)}m`;
-    segmentMarkup.push(`<line x1="${cylX2 + 4}" y1="${midY}" x2="${cylX2 + 10}" y2="${midY}" stroke="${theme.muted}" stroke-width="1" stroke-dasharray="4 4"/>`);
-    segmentMarkup.push(`<text x="${labelX + 10}" y="${midY - 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="400">${escapeXml(labelValue)}</text>`);
+    if (!compact && y2 - yCur >= 14) {
+      const labelX = cylX2 + 8;
+      const labelSize = 10;
+      const labelValue = `${formatDecimal(segVal)}m`;
+      segmentMarkup.push(`<line x1="${cylX2 + 4}" y1="${midY}" x2="${cylX2 + 10}" y2="${midY}" stroke="${theme.muted}" stroke-width="1" stroke-dasharray="4 4"/>`);
+      segmentMarkup.push(`<text x="${labelX + 10}" y="${midY - 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="400">${escapeXml(labelValue)}</text>`);
+    }
     yCur = y2;
   }
 
@@ -1879,7 +1881,7 @@ function renderLayout(currentConfig) {
   const meshW = currentConfig.layout?.mesh_panel_width || 500;
   const cardH = viewH - top - bottom;
   const profileAreaW = viewW - (margin * 2) - meshW - panelGap;
-  const compact = state.profileCount > 3;
+  const compact = state.profileCount >= 3;
   const cards = [];
 
   cards.push({ type: 'mesh', x: margin, y: top + 8, w: meshW, h: cardH });
