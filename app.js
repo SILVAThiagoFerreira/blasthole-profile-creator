@@ -1718,14 +1718,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
     chipX += chipW + 8;
   }
 
-  const footerBar = {
-    x: infoBox.x + 10,
-    y: infoBox.y + infoBox.h - (compact ? 28 : 28),
-    w: infoBox.w - 20,
-    h: 24,
-  };
-  const footerText = `${shortText(profile.name, compact ? 18 : 20)} | ${kindLabel(profile.kind)}`;
-
   return `
     <g filter="url(#shadow)">
       <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
@@ -1756,8 +1748,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
     ${rowsMarkup}
     ${chipMarkup.join('')}
-    <rect x="${footerBar.x}" y="${footerBar.y}" width="${footerBar.w}" height="${footerBar.h}" rx="10" fill="${accent}"/>
-    <text x="${footerBar.x + 12}" y="${footerBar.y + 16}" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 10 : 11}" font-weight="700">${escapeXml(footerText)}</text>
   `;
 }
 
