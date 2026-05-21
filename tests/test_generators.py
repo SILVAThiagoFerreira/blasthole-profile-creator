@@ -158,13 +158,14 @@ class ProfileCardTests(unittest.TestCase):
         self.assertLess(px[0], 255, "alternating row should not be pure white")
         self.assertGreater(px[0], 240, "alternating row fill should be near-white (#F9FAFB)")
 
-    def test_footer_bar_is_blue_for_producao(self) -> None:
-        """Footer bar for 'produção' should be blue accent (#1D6FB8)."""
+    def test_duplicate_footer_bar_is_removed(self) -> None:
+        """Profile name/category footer is already shown in the card header."""
         img = self._render(name="Perfil A", kind="produção")
         ratio = img.size[0] / 1080
         px = img.getpixel((int(600 * ratio), int(1260 * ratio)))
-        # Blue accent #1D6FB8 = (29, 111, 184): blue channel > red channel significantly
-        self.assertGreater(px[2], px[0] + 50, "footer bar should be noticeably blue for produção kind")
+        self.assertGreater(px[0], 240, "removed footer area should remain a clean light surface")
+        self.assertGreater(px[1], 240, "removed footer area should remain a clean light surface")
+        self.assertGreater(px[2], 240, "removed footer area should remain a clean light surface")
 
 
 class FourProfileLayoutTests(unittest.TestCase):

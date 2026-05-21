@@ -300,32 +300,6 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
             _draw_metric_row(draw, (ix1 + _s(8), y_row, ix2 - _s(8), y_row + metric_h), label_r, value_r, accent, theme, icon_kind, alternate=(idx % 2 == 1))
             y_row += metric_h
 
-        chips = [
-            (labels.get("blastbag", "Blastbag"), f"{_fmt(bb_v)} m"),
-            (labels.get("airdeck", "Deck de ar"), f"{_fmt(ad_v)} m"),
-            ("Incl.", f"{_fmt(profile.inclinacao, 1)}°"),
-            ("Azim.", f"{_fmt(profile.azimute, 1)}°"),
-            ("Dens.", f"{_fmt(profile.densidade, 2)}"),
-        ]
-
-        chip_x = ix1 + _s(10)
-        chip_y = iy2 - _s(62)
-        chip_font = _font(_s(9), bold=True)
-        for chip_label, chip_val in chips:
-            text = f"{chip_label}: {chip_val}"
-            tw = int(draw.textlength(text, font=chip_font))
-            chip_w = tw + _s(16)
-            if chip_x + chip_w > ix2 - _s(10):
-                chip_x = ix1 + _s(10)
-                chip_y += _s(30)
-            draw.rounded_rectangle((chip_x, chip_y, chip_x + chip_w, chip_y + _s(24)), radius=_s(8), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
-            draw.text((chip_x + _s(8), chip_y + _s(5)), text, font=chip_font, fill=theme.title)
-            chip_x += chip_w + _s(6)
-
-        footer_bar = (ix1 + _s(10), iy2 - _s(26), ix2 - _s(10), iy2 - _s(4))
-        draw.rounded_rectangle(footer_bar, radius=_s(10), fill=accent)
-        fb_font = _font(_s(10), bold=True)
-        draw.text((footer_bar[0] + _s(10), footer_bar[1] + _s(5)), f"{_short(profile.name, 18)} | {kind_label}", font=fb_font, fill="#FFFFFF")
         return img
 
     # ── Card background ───────────────────────────────────────────────────
@@ -501,10 +475,4 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
         draw.text((chip_x + _s(10), chips_y + _s(6)), text, font=chip_font, fill=theme.title)
         chip_x += chip_w + _s(8)
 
-    # ── Footer bar ────────────────────────────────────────────────────────
-    footer_bar = (ix1 + _s(12), iy2 - _s(28), ix2 - _s(12), iy2 - _s(4))
-    draw.rounded_rectangle(footer_bar, radius=_s(10), fill=accent)
-    fb_font = _font(_s(11), bold=True)
-    fb_text = f"{_short(profile.name, 20)} | {kind_label}"
-    draw.text((footer_bar[0] + _s(14), footer_bar[1] + _s(6)), fb_text, font=fb_font, fill="#FFFFFF")
     return img

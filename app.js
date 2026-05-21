@@ -1581,7 +1581,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
   const titleSize = compact ? 17 : 18;
   const subSize = compact ? 10 : 11;
-  const tagSize = compact ? 9 : 10;
+  const tagSize = compact ? 8 : 10;
   const badgeR = compact ? 20 : 22;
   const badgeCx = x + (compact ? 44 : 46);
   const badgeCy = y + (compact ? 46 : 50);
@@ -1590,11 +1590,13 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const tagX = Math.min(x + w - tagWidth - 34, x + (compact ? 320 : 380) - tagWidth / 2 - 8);
   const tagY = y + (compact ? 22 : 24);
   const tagHeight = compact ? 22 : 24;
+  const contentTop = compact ? y + 86 : y + 108;
+  const contentBottomPad = compact ? 22 : 36;
   const drawingBox = compact
-    ? { x: x + 18, y: y + 94, w: 96, h: h - 178 }
+    ? { x: x + 18, y: contentTop, w: 92, h: h - (contentTop - y) - contentBottomPad }
     : { x: x + 34, y: y + 108, w: 144, h: h - 218 };
   const infoBox = compact
-    ? { x: x + 132, y: y + 94, w: w - 156, h: h - 178 }
+    ? { x: x + 126, y: contentTop, w: w - 150, h: h - (contentTop - y) - contentBottomPad }
     : { x: x + 190, y: y + 108, w: w - 218, h: h - 218 };
   const left = drawingBox.x;
   const top = drawingBox.y;
@@ -1687,13 +1689,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
   })).join('');
 
   const chips = compact
-    ? [
-      [labels.blastbag, `${formatDecimal(bb)} m`],
-      [labels.airdeck, `${formatDecimal(ad)} m`],
-      [copy.svg.shortLabels.inclination, `${formatDecimal(profile.inclinacao, 1, lang)}°`],
-      [copy.svg.shortLabels.azimuth, `${formatDecimal(profile.azimute, 1, lang)}°`],
-      [copy.svg.shortLabels.density, `${formatDecimal(profile.densidade, 2, lang)}`],
-    ]
+    ? []
     : [
       [labels.stemming, `${formatDecimal(stem)} m`],
       [labels.column, `${formatDecimal(charge)} m`],
@@ -1702,7 +1698,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ];
 
   const chipFont = compact ? 9 : 11;
-  const chipY = infoBox.y + infoBox.h - (compact ? 62 : 64);
+  const chipY = infoBox.y + infoBox.h - 42;
   let chipX = infoBox.x + 12;
   const chipMarkup = [];
   for (const [chipLabel, chipVal] of chips) {
@@ -1730,8 +1726,8 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
     <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 36 : 30)}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
     <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 58 : 58)}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM`)}</text>
-    <rect x="${tagX}" y="${tagY}" width="${tagWidth + 16}" height="${tagHeight}" rx="10" fill="${accentSoft}"/>
-    <text x="${tagX + 8}" y="${tagY + (compact ? 14 : 16)}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${tagSize}" font-weight="700">${escapeXml(tagText)}</text>
+    ${compact ? '' : `<rect x="${tagX}" y="${tagY}" width="${tagWidth + 16}" height="${tagHeight}" rx="10" fill="${accentSoft}"/>
+    <text x="${tagX + 8}" y="${tagY + 16}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${tagSize}" font-weight="700">${escapeXml(tagText)}</text>`}
 
     <rect x="${x + 18}" y="${y + (compact ? 80 : 88)}" width="${w - 36}" height="4" rx="2" fill="${accent}"/>
 
@@ -1804,19 +1800,19 @@ function renderHeader(theme, box) {
   const copy = getCopy();
   const { x, y, w, h } = box;
   const title = copy.svg.headerTitle;
-  const titleSize = fitFontSize(title, w - 560, 34, `'IBM Plex Sans', sans-serif`, 700, 24);
-  const polygonSize = fitFontSize(state.polygonName, w - 560, 30, `'IBM Plex Sans', sans-serif`, 700, 20);
-  const logoBox = { x: x + 36, y: y + 18, w: 200, h: 124 };
+  const titleSize = fitFontSize(title, w - 560, 32, `'IBM Plex Sans', sans-serif`, 700, 24);
+  const polygonSize = fitFontSize(state.polygonName, w - 560, 27, `'IBM Plex Sans', sans-serif`, 700, 19);
+  const logoBox = { x: x + 40, y: y + 18, w: 184, h: 92 };
   const rightBadgeText = String(state.profileType || copy.defaults.profileType).toUpperCase();
   const badgeFont = 19;
   const badgeTextWidth = measureTextWidth(rightBadgeText, badgeFont, `'IBM Plex Sans', sans-serif`, 700);
   const badgeW = Math.max(210, badgeTextWidth + 52);
-  const badgeX = x + w - badgeW - 36;
+  const badgeX = x + w - badgeW - 40;
 
   return `
     <rect x="0" y="0" width="${w}" height="${h}" fill="#FFFFFF"/>
     <rect x="0" y="0" width="${w}" height="6" fill="${theme.accent_red}"/>
-    <line x1="${x + 36}" y1="${y + 154}" x2="${x + w - 36}" y2="${y + 154}" stroke="#EEF2F7" stroke-width="1"/>
+    <line x1="${x + 40}" y1="${y + h - 1}" x2="${x + w - 40}" y2="${y + h - 1}" stroke="#EEF2F7" stroke-width="1"/>
     <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="${logoBox.h}" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
     <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="6" rx="3" fill="${theme.accent_red}"/>
     ${(() => {
@@ -1825,12 +1821,12 @@ function renderHeader(theme, box) {
         ? `<image href="${logoUrl}" x="${logoBox.x + 14}" y="${logoBox.y + 16}" width="${logoBox.w - 28}" height="${logoBox.h - 26}" preserveAspectRatio="xMidYMid meet"/>`
         : `<text x="${logoBox.x + 20}" y="${logoBox.y + 64}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="28" font-weight="700">ENAEX</text>`;
     })()}
-    <text x="${x + 262}" y="${y + 36}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
-    <text x="${x + 262}" y="${y + 82}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
-    <rect x="${x + 262}" y="${y + 146}" width="182" height="24" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
-    <text x="${x + 276}" y="${y + 162}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700">${copy.svg.headerBadge}</text>
-    <rect x="${badgeX}" y="${y + 38}" width="${badgeW}" height="70" rx="20" fill="${theme.accent_red}"/>
-    <text x="${badgeX + badgeW / 2}" y="${y + 74}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
+    <text x="${x + 256}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
+    <text x="${x + 256}" y="${y + 80}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
+    <rect x="${x + 256}" y="${y + 100}" width="182" height="24" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
+    <text x="${x + 270}" y="${y + 116}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700">${copy.svg.headerBadge}</text>
+    <rect x="${badgeX}" y="${y + 34}" width="${badgeW}" height="60" rx="18" fill="${theme.accent_red}"/>
+    <text x="${badgeX + badgeW / 2}" y="${y + 69}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
   `;
 }
 
@@ -1860,40 +1856,59 @@ function renderFooter(theme, box, showLegend = false) {
   `;
 }
 
+function renderObservationPanel(theme, box) {
+  const copy = getCopy();
+  const { x, y, w, h } = box;
+  const lines = wrapText(state.observation || copy.defaults.observation, w - 52, 15, `'IBM Plex Sans', sans-serif`, 400).slice(0, 4);
+  return `
+    <g filter="url(#shadow)">
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FFFFFF" stroke="${theme.panel_border}"/>
+    </g>
+    <rect x="${x + 18}" y="${y + 16}" width="42" height="4" rx="2" fill="${theme.accent_red}"/>
+    <text x="${x + 22}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700">${escapeXml(copy.fieldLabels.observation)}</text>
+    ${textBlock(x + 22, y + 68, lines, { size: 14, weight: 400, fill: theme.muted, lineHeight: 1.35 })}
+  `;
+}
+
 function renderLayout(currentConfig) {
   const copy = getCopy();
   const theme = getTheme(state.templateName);
   const [viewW, viewH] = currentConfig.site?.preview_size || DEFAULT_PREVIEW_SIZE;
-  const margin = 48;
-  const top = currentConfig.layout?.header_height || 168;
-  const bottom = currentConfig.layout?.bottom_margin || 92;
-  const panelGap = currentConfig.layout?.panel_gap || 24;
-  const meshW = currentConfig.layout?.mesh_panel_width || 500;
-  const cardH = viewH - top - bottom;
+  const margin = 40;
+  const headerH = 136;
+  const mainTop = headerH + 24;
+  const bottom = 36;
+  const panelGap = 28;
+  const meshW = 500;
+  const mainH = viewH - mainTop - bottom;
   const profileAreaW = viewW - (margin * 2) - meshW - panelGap;
   const compact = state.profileCount >= 3;
   const cards = [];
 
-  cards.push({ type: 'mesh', x: margin, y: top + 8, w: meshW, h: cardH });
+  const meshH = compact ? Math.round(mainH * 0.72) : mainH;
+  cards.push({ type: 'mesh', x: margin, y: mainTop, w: meshW, h: meshH });
+  if (compact) {
+    cards.push({ type: 'observation', x: margin, y: mainTop + meshH + panelGap, w: meshW, h: mainH - meshH - panelGap });
+  }
   if (!compact) {
     const count = Math.max(state.profileCount, 1);
     const gap = count > 1 ? 16 : 0;
     const cardW = (profileAreaW - gap * (count - 1)) / count;
     let x = margin + meshW + panelGap;
     for (let i = 0; i < state.profileCount; i += 1) {
-      cards.push({ type: 'profile', x, y: top + 8, w: cardW, h: cardH, index: i });
+      cards.push({ type: 'profile', x, y: mainTop, w: cardW, h: mainH, index: i });
       x += cardW + gap;
     }
   } else {
     const cols = 2;
     const rows = 2;
     const cardW = (profileAreaW - panelGap) / cols;
-    const cardH2 = (cardH - panelGap) / rows;
+    const cardH2 = (mainH - panelGap) / rows;
     let index = 0;
     for (let row = 0; row < rows; row += 1) {
       for (let col = 0; col < cols; col += 1) {
         if (index >= state.profileCount) break;
-        cards.push({ type: 'profile', x: margin + meshW + panelGap + col * (cardW + panelGap), y: top + 8 + row * (cardH2 + panelGap), w: cardW, h: cardH2, index });
+        cards.push({ type: 'profile', x: margin + meshW + panelGap + col * (cardW + panelGap), y: mainTop + row * (cardH2 + panelGap), w: cardW, h: cardH2, index });
         index += 1;
       }
     }
@@ -1901,11 +1916,12 @@ function renderLayout(currentConfig) {
 
   const content = cards.map((card) => {
     if (card.type === 'mesh') return renderMeshPanel(theme, card);
+    if (card.type === 'observation') return renderObservationPanel(theme, card);
     return renderProfileCard(state.profiles[card.index], theme, card, compact, card.index);
   }).join('');
 
-  const header = renderHeader(theme, { x: 0, y: 0, w: viewW, h: 168 });
-  const footer = renderFooter(theme, { x: 0, y: viewH - bottom, w: viewW, h: bottom }, Boolean(state.mesh?.dataUrl));
+  const header = renderHeader(theme, { x: 0, y: 0, w: viewW, h: headerH });
+  const footer = compact ? '' : renderFooter(theme, { x: 0, y: viewH - bottom, w: viewW, h: bottom }, Boolean(state.mesh?.dataUrl));
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">

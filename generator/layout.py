@@ -295,7 +295,7 @@ def _draw_layout(canvas: Image.Image, theme: TemplateTheme, mesh_panel: Image.Im
     profile_count = max(len(profile_panels), 1)
     cards = [(margin, top, mesh_w, card_h, mesh_panel)]
 
-    if profile_count <= 3:
+    if profile_count <= 2:
         profile_gap = _s(16) if profile_count > 1 else 0
         profile_w = (profile_area_w - profile_gap * (profile_count - 1)) // profile_count
         x_cursor = margin + mesh_w + gap
@@ -349,7 +349,7 @@ def build_final_image(
     _draw_background(canvas, theme)
     _draw_header(canvas, theme, polygon_name, profile_type, logo_bytes)
     mesh_panel = render_mesh_panel(mesh_input, theme, size=(540, 760))
-    compact = len(profiles) > 3
+    compact = len(profiles) >= 3
     profile_size = (540, 520) if compact else (540, 760)
     profile_panels = [render_profile_panel(profile, theme, labels=labels, size=profile_size, compact=compact) for profile in profiles]
     _draw_layout(canvas, theme, mesh_panel, profile_panels, compact=compact)
