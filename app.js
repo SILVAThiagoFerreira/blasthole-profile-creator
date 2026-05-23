@@ -1821,7 +1821,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ? { x: x + 18, y: contentTop, w: 92, h: h - (contentTop - y) - contentBottomPad }
     : { x: x + 34, y: y + 108, w: 144, h: h - 218 };
   const infoBox = compact
-    ? { x: x + 126, y: contentTop, w: w - 150, h: h - (contentTop - y) - contentBottomPad }
+    ? { x: x + 160, y: contentTop, w: w - 184, h: h - (contentTop - y) - contentBottomPad }
     : { x: x + 190, y: y + 108, w: w - 218, h: h - 218 };
   const left = drawingBox.x;
   const top = drawingBox.y;
@@ -2110,13 +2110,12 @@ function renderLayout(currentConfig) {
   const mainH = viewH - mainTop - bottom;
   const profileAreaW = viewW - (margin * 2) - meshW - panelGap;
   const compact = state.profileCount >= 3;
+  const observationH = 176;
+  const meshH = mainH - observationH - panelGap;
   const cards = [];
 
-  const meshH = compact ? Math.round(mainH * 0.72) : mainH;
   cards.push({ type: 'mesh', x: margin, y: mainTop, w: meshW, h: meshH });
-  if (compact) {
-    cards.push({ type: 'observation', x: margin, y: mainTop + meshH + panelGap, w: meshW, h: mainH - meshH - panelGap });
-  }
+  cards.push({ type: 'observation', x: margin, y: mainTop + meshH + panelGap, w: meshW, h: observationH });
   if (!compact) {
     const count = Math.max(state.profileCount, 1);
     const gap = count > 1 ? 16 : 0;
