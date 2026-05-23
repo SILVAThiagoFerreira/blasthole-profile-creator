@@ -1885,6 +1885,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
       ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
       ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
       ['column', labels.column, `${formatDecimal(charge)} m`, 'column'],
+      ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
     ]
     : [
       ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
