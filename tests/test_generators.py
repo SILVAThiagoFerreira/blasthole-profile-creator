@@ -167,6 +167,21 @@ class ProfileCardTests(unittest.TestCase):
         self.assertGreater(px[1], 240, "removed footer area should remain a clean light surface")
         self.assertGreater(px[2], 240, "removed footer area should remain a clean light surface")
 
+    def test_cylinder_labels_are_not_hidden_by_metrics_box(self) -> None:
+        img = self._render()
+        width, height = img.size
+        x0 = int(width * 0.40)
+        y0 = int(height * 0.24)
+        samples = [
+            img.getpixel((x0 + dx, y0 + dy))
+            for dx in (0, 20, 40, 60, 80)
+            for dy in (0, 8, 16)
+        ]
+        self.assertTrue(
+            any(pixel[:3] != (255, 255, 255) for pixel in samples),
+            "the label area beside the cylinder should stay visible",
+        )
+
 
 class FourProfileLayoutTests(unittest.TestCase):
     def test_four_profiles_render_on_canvas(self) -> None:

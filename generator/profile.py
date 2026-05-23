@@ -356,7 +356,7 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
 
     # ── Cylinder zone ─────────────────────────────────────────────────────
     drawing_box = (_s(34), _s(108), _s(178), h - _s(110))
-    info_box    = (_s(190), _s(108), w - _s(28), h - _s(110))
+    info_box    = (_s(274), _s(108), w - _s(28), h - _s(110))
 
     # White background for cylinder zone
     draw.rounded_rectangle(drawing_box, radius=_s(16), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
@@ -488,7 +488,7 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
         text = f"{chip_label}: {chip_val}"
         tw = int(draw.textlength(text, font=chip_font))
         chip_w = tw + _s(20)
-        if chip_x + chip_w > ix2 - _s(12):
+        if chip_x + chip_w > ix2 - _s(6):
             break
         draw.rounded_rectangle((chip_x, chips_y, chip_x + chip_w, chips_y + _s(28)),
                                 radius=_s(10), fill=chip_fill, outline="#E5E7EB", width=_s(1))

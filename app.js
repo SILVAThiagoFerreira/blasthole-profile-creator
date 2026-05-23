@@ -1822,7 +1822,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     : { x: x + 34, y: y + 108, w: 144, h: h - 218 };
   const infoBox = compact
     ? { x: x + 160, y: contentTop, w: w - 184, h: h - (contentTop - y) - contentBottomPad }
-    : { x: x + 190, y: y + 108, w: w - 218, h: h - 218 };
+    : { x: x + 274, y: y + 108, w: w - 302, h: h - 218 };
   const left = drawingBox.x;
   const top = drawingBox.y;
   const right = drawingBox.x + drawingBox.w;
@@ -1932,7 +1932,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     const text = `${chipLabel}: ${chipVal}`;
     const textWidth = measureTextWidth(text, chipFont, `'IBM Plex Sans', sans-serif`, 700);
     const chipW = textWidth + (compact ? 18 : 20);
-    if (chipX + chipW > infoBox.x + infoBox.w - 12) break;
+    if (chipX + chipW > infoBox.x + infoBox.w - 8) break;
     chipMarkup.push(`
       <g>
         <rect x="${chipX}" y="${chipY}" width="${chipW}" height="${compact ? 24 : 28}" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
