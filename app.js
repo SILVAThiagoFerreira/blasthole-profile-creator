@@ -100,51 +100,51 @@ const FALLBACK_CONFIG = {
       },
     ],
   },
-  templates: {
-    'Enaex clean': {
-      bg: '#FFFFFF',
-      panel_bg: '#FFFFFF',
-      panel_alt: '#F9FAFB',
-      panel_border: '#E5E7EB',
-      title: '#111827',
-      text: '#1F2937',
-      muted: '#6B7280',
-      accent_red: '#D71920',
-      accent_blue: '#1D6FB8',
-      accent_orange: '#F28C28',
-      accent_dark: '#223A8D',
-      shadow: [17, 24, 39, 45],
+    templates: {
+      'Enaex clean': {
+        bg: '#F4F6F8',
+        panel_bg: '#FFFFFF',
+        panel_alt: '#F8FAFC',
+        panel_border: '#D8DEE5',
+        title: '#111827',
+        text: '#1F2937',
+        muted: '#4B5563',
+        accent_red: '#E20613',
+        accent_blue: '#5B6470',
+        accent_orange: '#8B95A0',
+        accent_dark: '#3E434D',
+        shadow: [17, 24, 39, 18],
+      },
+      'Técnico minimalista': {
+        bg: '#F5F7F9',
+        panel_bg: '#FFFFFF',
+        panel_alt: '#F8FAFC',
+        panel_border: '#D4DAE2',
+        title: '#0F172A',
+        text: '#1E293B',
+        muted: '#5B6470',
+        accent_red: '#E20613',
+        accent_blue: '#56616D',
+        accent_orange: '#93A0AC',
+        accent_dark: '#374151',
+        shadow: [15, 23, 42, 16],
+      },
+      'Relatório executivo': {
+        bg: '#F5F6F8',
+        panel_bg: '#FFFFFF',
+        panel_alt: '#F7F9FB',
+        panel_border: '#CED5DD',
+        title: '#0F2040',
+        text: '#1B2430',
+        muted: '#5B6470',
+        accent_red: '#E20613',
+        accent_blue: '#52606B',
+        accent_orange: '#909AA4',
+        accent_dark: '#2F343B',
+        shadow: [15, 30, 50, 14],
+      },
     },
-    'Técnico minimalista': {
-      bg: '#FFFFFF',
-      panel_bg: '#FFFFFF',
-      panel_alt: '#F9FAFB',
-      panel_border: '#E2E8F0',
-      title: '#0F172A',
-      text: '#1E293B',
-      muted: '#64748B',
-      accent_red: '#C81D25',
-      accent_blue: '#2563EB',
-      accent_orange: '#D97706',
-      accent_dark: '#1837B8',
-      shadow: [15, 23, 42, 35],
-    },
-    'Relatório executivo': {
-      bg: '#FFFFFF',
-      panel_bg: '#FFFFFF',
-      panel_alt: '#F8FAFC',
-      panel_border: '#CBD5E1',
-      title: '#0F2040',
-      text: '#1B2B40',
-      muted: '#607080',
-      accent_red: '#BD1E24',
-      accent_blue: '#2D6CDF',
-      accent_orange: '#DB7A11',
-      accent_dark: '#1C3DB6',
-      shadow: [15, 30, 50, 50],
-    },
-  },
-};
+  };
 
 const DEFAULT_LANGUAGE = 'pt-BR';
 const DEFAULT_LANGUAGE_STORAGE_KEY = 'enaex.profile-creator.web.language.v1';
@@ -959,10 +959,10 @@ const COPY = {
 
 const KIND_OPTIONS = ['produção', 'amortecimento', 'contorno', 'personalizado'];
 const KIND_ACCENTS = {
-  produção: { accent: '#1D6FB8', soft: '#E9F2FB', title: 'Produção' },
-  amortecimento: { accent: '#F28C28', soft: '#FFF1E2', title: 'Amortecimento' },
-  contorno: { accent: '#D71920', soft: '#FFE3E5', title: 'Contorno' },
-  personalizado: { accent: '#223A8D', soft: '#E8ECFA', title: 'Personalizado' },
+  produção: { accent: '#5B6470', soft: '#EEF1F4', title: 'Produção' },
+  amortecimento: { accent: '#8B95A0', soft: '#F3F5F7', title: 'Amortecimento' },
+  contorno: { accent: '#E20613', soft: '#FDE9EA', title: 'Contorno' },
+  personalizado: { accent: '#3E434D', soft: '#ECEFF2', title: 'Personalizado' },
 };
 
 function normalizeLanguage(value) {
@@ -1601,9 +1601,9 @@ function getLogoFallbackSvg() {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 72">
       <rect width="260" height="72" rx="16" fill="#FFFFFF"/>
-      <rect x="12" y="12" width="236" height="4" rx="2" fill="#D71920"/>
-      <text x="22" y="45" fill="#D71920" font-family="IBM Plex Sans, sans-serif" font-size="26" font-weight="700">ENAEX</text>
-      <text x="120" y="45" fill="#66707e" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600">BRASIL</text>
+      <rect x="12" y="12" width="236" height="4" rx="2" fill="#E20613"/>
+      <text x="22" y="45" fill="#E20613" font-family="IBM Plex Sans, sans-serif" font-size="26" font-weight="700">ENAEX</text>
+      <text x="120" y="45" fill="#3E434D" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600">BRASIL</text>
     </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
@@ -1995,10 +1995,10 @@ function renderMeshPanel(theme, box) {
 
   const grid = [];
   for (let gx = x + 16; gx <= x + w - 16; gx += 18) {
-    grid.push(`<line x1="${gx}" y1="${y + 18}" x2="${gx}" y2="${y + h - 16}" stroke="rgba(29,111,184,0.10)" stroke-width="1"/>`);
+    grid.push(`<line x1="${gx}" y1="${y + 18}" x2="${gx}" y2="${y + h - 16}" stroke="rgba(62,67,77,0.08)" stroke-width="1"/>`);
   }
   for (let gy = y + 18; gy <= y + h - 16; gy += 18) {
-    grid.push(`<line x1="${x + 16}" y1="${gy}" x2="${x + w - 16}" y2="${gy}" stroke="rgba(29,111,184,0.08)" stroke-width="1"/>`);
+    grid.push(`<line x1="${x + 16}" y1="${gy}" x2="${x + w - 16}" y2="${gy}" stroke="rgba(62,67,77,0.06)" stroke-width="1"/>`);
   }
 
   return `

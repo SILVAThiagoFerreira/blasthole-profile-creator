@@ -103,6 +103,159 @@ def _download_artifact(label: str, path: str, file_name: str, mime: str) -> None
         st.download_button(label, data=file_path.read_bytes(), file_name=file_name, mime=mime, use_container_width=True)
 
 
+def _inject_theme() -> None:
+    st.markdown(
+        """
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap');
+
+          :root {
+            --enaex-red: #e20613;
+            --enaex-charcoal: #3e434d;
+            --surface: #ffffff;
+            --surface-soft: #f8fafc;
+            --text: #111827;
+            --muted: #4b5563;
+            --border: rgba(62, 67, 77, 0.14);
+            --shadow: 0 18px 40px rgba(17, 24, 39, 0.06);
+          }
+
+          html, body, [data-testid="stAppViewContainer"] {
+            background: linear-gradient(180deg, #f5f7fa 0%, #edf1f5 48%, #f8fafc 100%);
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+          }
+
+          [data-testid="stHeader"], [data-testid="stToolbar"], footer, #MainMenu {
+            display: none !important;
+          }
+
+          .block-container {
+            padding-top: 1.3rem;
+            padding-bottom: 2.2rem;
+            max-width: 1480px;
+          }
+
+          [data-testid="stSidebar"] {
+            background: #ffffff;
+            border-right: 1px solid var(--border);
+          }
+
+          [data-testid="stSidebar"] .block-container {
+            padding-top: 1.2rem;
+          }
+
+          h1, h2, h3, h4, h5, h6 {
+            font-family: 'IBM Plex Sans', sans-serif;
+            letter-spacing: -0.03em;
+          }
+
+          .stButton > button,
+          .stDownloadButton > button {
+            min-height: 44px;
+            border-radius: 999px;
+            border: 1px solid rgba(62, 67, 77, 0.14);
+            background: #ffffff;
+            color: var(--text);
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: none;
+          }
+
+          .stButton > button[kind="primary"] {
+            background: var(--enaex-red);
+            color: #ffffff;
+            border-color: rgba(226, 6, 19, 0.26);
+            box-shadow: 0 12px 24px rgba(226, 6, 19, 0.18);
+          }
+
+          .stButton > button:hover,
+          .stDownloadButton > button:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+          }
+
+          .stButton > button[kind="primary"]:hover {
+            background: #c80f1c;
+          }
+
+          [data-baseweb="tab-list"] {
+            gap: 8px;
+            background: rgba(62, 67, 77, 0.04);
+            padding: 6px;
+            border-radius: 999px;
+          }
+
+          [data-baseweb="tab"] {
+            border-radius: 999px;
+            padding: 0.55rem 1rem;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-weight: 700;
+            color: var(--muted);
+          }
+
+          [aria-selected="true"] {
+            background: #ffffff;
+            color: var(--text);
+          }
+
+          [data-testid="stMetric"] {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: linear-gradient(180deg, #ffffff, #f8fafc);
+            box-shadow: var(--shadow);
+            padding: 1rem 1rem 0.9rem;
+          }
+
+          [data-testid="stMetric"] label,
+          [data-testid="stMetric"] div {
+            color: var(--text);
+          }
+
+          [data-testid="stExpander"] {
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            background: #ffffff;
+            box-shadow: var(--shadow);
+          }
+
+          .stTextInput input,
+          .stTextArea textarea,
+          .stNumberInput input,
+          .stSelectbox div[data-baseweb="select"] > div,
+          .stFileUploader {
+            border-radius: 14px;
+            border: 1px solid rgba(62, 67, 77, 0.14);
+          }
+
+          .stTextInput input:focus,
+          .stTextArea textarea:focus,
+          .stNumberInput input:focus {
+            border-color: rgba(226, 6, 19, 0.48);
+            box-shadow: 0 0 0 4px rgba(226, 6, 19, 0.12);
+          }
+
+          [data-testid="stSidebar"] .stButton > button,
+          [data-testid="stSidebar"] .stDownloadButton > button {
+            width: 100%;
+          }
+
+          .enaex-hero {
+            padding: 1.35rem 1.5rem 1.2rem;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+          }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+
 def _build_request(config: dict[str, Any], sidebar: dict[str, Any], profile_inputs: list[dict[str, Any]], profile_count: int) -> dict[str, Any]:
     return {
         "polygon_name": sidebar["polygon_name"],
@@ -119,10 +272,10 @@ def _build_request(config: dict[str, Any], sidebar: dict[str, Any], profile_inpu
 def _render_hero(config: dict) -> None:
     st.markdown(
         f"""
-        <div style="padding: 1.2rem 0 0.4rem 0;">
-          <div style="font-size: 0.9rem; font-weight: 700; letter-spacing: 0.08em; color: #D71920; text-transform: uppercase;">SaaS industrial</div>
-          <h1 style="margin: 0.2rem 0 0 0; font-size: 2.3rem; line-height: 1.05;">{config['app']['title']}</h1>
-          <p style="max-width: 840px; font-size: 1.02rem; color: #475467; margin-top: 0.65rem;">{config['app']['subtitle']} Agora em formato web, pronto para uso remoto, geração auditável e download imediato.</p>
+        <div class="enaex-hero">
+          <div style="font-size: 0.82rem; font-weight: 700; letter-spacing: 0.12em; color: #E20613; text-transform: uppercase;">Interface Enaex</div>
+          <h1 style="margin: 0.35rem 0 0 0; font-size: 2.3rem; line-height: 1.05; color: #111827;">{config['app']['title']}</h1>
+          <p style="max-width: 840px; font-size: 1rem; color: #4B5563; margin-top: 0.65rem; line-height: 1.6;">{config['app']['subtitle']} Agora em formato web, pronto para uso remoto, geração auditável e download imediato.</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -212,6 +365,7 @@ def run_app() -> None:
     preferences = load_ui_preferences(config)
     pipeline = RenderingPipeline(config)
     st.set_page_config(page_title=config["app"]["title"], layout="wide", initial_sidebar_state="expanded")
+    _inject_theme()
     _init_state(preferences)
     _render_hero(config)
 
