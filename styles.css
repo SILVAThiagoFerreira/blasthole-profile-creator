@@ -75,7 +75,7 @@ body::before {
 
 .topbar {
   display: grid;
-  grid-template-columns: minmax(260px, 1fr) auto auto auto;
+  grid-template-columns: minmax(260px, 1fr) auto auto;
   gap: 12px;
   align-items: center;
   padding: 10px 12px;

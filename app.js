@@ -161,7 +161,7 @@ const COPY = {
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: 'Workspace local',
+      meta: '',
       formats: 'Formatos de exportação',
     },
     hero: {
@@ -172,7 +172,7 @@ const COPY = {
     },
     heroPanel: {
       eyebrow: 'Resumo',
-      title: 'Execução local',
+      title: 'Resumo técnico',
       loading: 'Carregando',
       stats: {
         rendering: 'Renderização',
@@ -285,8 +285,8 @@ const COPY = {
       meshDefault: 'Nenhuma malha anexada',
     },
     memory: {
-      browserActive: 'Memória local ativa',
-      projectLoaded: 'Memória do projeto carregada',
+      browserActive: 'Dados salvos',
+      projectLoaded: 'Configuração carregada',
       defaultConfig: 'Configuração padrão',
     },
     validation: {
@@ -362,7 +362,7 @@ const COPY = {
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: 'Local workspace',
+      meta: '',
       formats: 'Export formats',
     },
     hero: {
@@ -373,7 +373,7 @@ const COPY = {
     },
     heroPanel: {
       eyebrow: 'Summary',
-      title: 'Local execution',
+      title: 'Technical summary',
       loading: 'Loading',
       stats: {
         rendering: 'Rendering',
@@ -486,8 +486,8 @@ const COPY = {
       meshDefault: 'No mesh attached',
     },
     memory: {
-      browserActive: 'Local memory active',
-      projectLoaded: 'Project memory loaded',
+      browserActive: 'Saved data',
+      projectLoaded: 'Configuration loaded',
       defaultConfig: 'Default configuration',
     },
     validation: {
@@ -563,7 +563,7 @@ const COPY = {
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: 'Workspace local',
+      meta: '',
       formats: 'Formatos de exportación',
     },
     hero: {
@@ -574,7 +574,7 @@ const COPY = {
     },
     heroPanel: {
       eyebrow: 'Resumen',
-      title: 'Ejecución local',
+      title: 'Resumen técnico',
       loading: 'Cargando',
       stats: {
         rendering: 'Renderizado',
@@ -687,8 +687,8 @@ const COPY = {
       meshDefault: 'Ninguna malla adjunta',
     },
     memory: {
-      browserActive: 'Memoria local activa',
-      projectLoaded: 'Memoria del proyecto cargada',
+      browserActive: 'Datos guardados',
+      projectLoaded: 'Configuración cargada',
       defaultConfig: 'Configuración predeterminada',
     },
     validation: {
@@ -764,7 +764,7 @@ const COPY = {
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: '本地工作区',
+      meta: '',
       formats: '导出格式',
     },
     hero: {
@@ -775,7 +775,7 @@ const COPY = {
     },
     heroPanel: {
       eyebrow: '摘要',
-      title: '本地执行',
+      title: '技术摘要',
       loading: '加载中',
       stats: {
         rendering: '渲染',
@@ -888,8 +888,8 @@ const COPY = {
       meshDefault: '未附加网格',
     },
     memory: {
-      browserActive: '本地记忆已启用',
-      projectLoaded: '项目记忆已加载',
+      browserActive: '数据已保存',
+      projectLoaded: '配置已加载',
       defaultConfig: '默认配置',
     },
     validation: {
