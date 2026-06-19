@@ -1,7 +1,7 @@
 {
   "app": {
-    "title": "Criador de Perfis de Carga",
-    "subtitle": "Geração de lâminas profissionais no padrão visual Enaex.",
+    "title": "OpenBlast Profile Studio",
+    "subtitle": "Workspace técnico para perfis de carga.",
     "default_profile_type": "Perfis técnicos",
     "default_language": "pt-BR"
   },
@@ -10,7 +10,7 @@
     "output_dir": "output",
     "log_dir": "logs",
     "state_dir": "state",
-    "logo_path": "VISUAL/Enaex Brasil.png"
+    "logo_path": "VISUAL/OpenBlast/LOGO OPENBLAST TRANSPARENTE.png"
   },
   "layout": {
     "scale": 2,
@@ -32,8 +32,8 @@
     "write_pdf": true
   },
   "site": {
-    "storage_key": "enaex.profile-creator.web.state.v4",
-    "language_storage_key": "enaex.profile-creator.web.language.v1",
+    "storage_key": "openblast.profile-creator.web.state.v5",
+    "language_storage_key": "openblast.profile-creator.web.language.v2",
     "supported_languages": ["pt-BR", "es", "en", "zh-CN"],
     "preview_size": [1920, 1080],
     "export_size": [3840, 2160]
@@ -55,9 +55,9 @@
     ]
   },
   "defaults": {
-    "template_name": "Enaex clean",
+    "template_name": "Corporate clean",
     "polygon_name": "PP170526 (220-210)",
-    "observation": "Perfil técnico para reporte operacional.",
+    "observation": "Lâmina técnica padronizada para reporte operacional.",
     "profile_type": "Perfis técnicos",
     "profile_count": 2,
     "labels": {
@@ -157,7 +157,7 @@
     ]
   },
   "templates": {
-    "Enaex clean": {
+    "Corporate clean": {
       "bg": "#FFFFFF",
       "panel_bg": "#FFFFFF",
       "panel_alt": "#F9FAFB",
@@ -171,7 +171,7 @@
       "accent_dark": "#223A8D",
       "shadow": [17, 24, 39, 45]
     },
-    "Técnico minimalista": {
+    "Boardroom minimal": {
       "bg": "#FFFFFF",
       "panel_bg": "#FFFFFF",
       "panel_alt": "#F9FAFB",
@@ -185,7 +185,7 @@
       "accent_dark": "#1837B8",
       "shadow": [15, 23, 42, 35]
     },
-    "Relatório executivo": {
+    "Executive brief": {
       "bg": "#FFFFFF",
       "panel_bg": "#FFFFFF",
       "panel_alt": "#F8FAFC",

@@ -3,29 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <meta name="description" content="Interface profissional para criação, validação e exportação local de perfis de carga Enaex.">
-  <title>Criador de Perfis de Carga</title>
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Workspace profissional para criação, validação e exportação local de perfis de carga.">
+  <title>OpenBlast Profile Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js" defer></script>
   <script type="module" src="app.js"></script>
 </head>
 <body>
   <div class="ambient-grid" aria-hidden="true"></div>
-  <div class="brand-ribbon brand-ribbon--top" aria-hidden="true"></div>
-  <div class="brand-ribbon brand-ribbon--bottom" aria-hidden="true"></div>
 
   <div class="page-shell">
     <header class="topbar">
-      <div class="brand-lockup" aria-label="Enaex Brasil">
-        <span class="brand-mark"><img src="VISUAL/enaex-logo-official.svg" alt="Enaex Brasil"></span>
+      <div class="brand-lockup" aria-label="OpenBlast Profile Studio">
+        <span class="brand-mark"><img src="VISUAL/OpenBlast/LOGO OPENBLAST TRANSPARENTE.png" alt="OpenBlast"></span>
         <span class="brand-text">
-          <strong>Criador de Perfis</strong>
-          <span>Soluções Técnicas em Mineração</span>
+          <strong>OpenBlast Profile Studio</strong>
+          <span>Charge Profile Workspace</span>
         </span>
+      </div>
+      <div class="topbar__meta" aria-live="polite">
+        <span class="live-dot" aria-hidden="true"></span>
+        <span class="topbar__meta-text">Workspace local</span>
       </div>
       <div class="topbar__language">
         <select id="languageSelect" aria-label="Idioma"></select>
@@ -39,14 +41,15 @@
 
     <header class="hero">
       <div class="hero__copy">
-        <h1>Criador de Perfis de Carga</h1>
-        <p class="hero__subtitle">Crie, valide e exporte lâminas técnicas de perfis de carga em uma única interface no navegador.</p>
+        <p class="eyebrow">OpenBlast / Technical profiles</p>
+        <h1>Perfis de carga com linguagem executiva.</h1>
+        <p class="hero__subtitle">Estruture, valide e exporte lâminas técnicas em um workspace claro, local e pronto para uso em campo.</p>
       </div>
       <div class="hero__panel panel panel--hero">
         <div class="panel__head panel__head--compact">
           <div>
-            <p class="eyebrow">Estado</p>
-            <h2>Motor Local</h2>
+            <p class="eyebrow">Resumo</p>
+            <h2>Execução local</h2>
           </div>
           <span class="status-pill" id="memoryStatus">Carregando</span>
         </div>
@@ -54,6 +57,9 @@
           <div class="stat"><span>Renderização</span><strong>SVG</strong></div>
           <div class="stat"><span>Exportação</span><strong>3840x2160</strong></div>
           <div class="stat"><span>Armazenamento</span><strong>Local</strong></div>
+        </div>
+        <div class="hero__context">
+          <span class="helper-pill">Origem <strong id="projectSeed">Configuração padrão</strong></span>
         </div>
       </div>
     </header>

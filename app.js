@@ -1,7 +1,7 @@
 const FALLBACK_CONFIG = {
   app: {
-    title: 'Criador de Perfis de Carga',
-    subtitle: 'Geração de lâminas profissionais no padrão visual Enaex.',
+    title: 'OpenBlast Profile Studio',
+    subtitle: 'Workspace técnico para perfis de carga.',
     default_profile_type: 'Perfis técnicos',
     default_language: 'pt-BR',
   },
@@ -9,7 +9,7 @@ const FALLBACK_CONFIG = {
     output_dir: 'output',
     log_dir: 'logs',
     state_dir: 'state',
-    logo_path: 'VISUAL/Enaex Brasil.png',
+    logo_path: 'VISUAL/OpenBlast/LOGO OPENBLAST TRANSPARENTE.png',
   },
   layout: {
     scale: 2,
@@ -31,8 +31,8 @@ const FALLBACK_CONFIG = {
     write_pdf: true,
   },
   site: {
-    storage_key: 'enaex.profile-creator.web.state.v4',
-    language_storage_key: 'enaex.profile-creator.web.language.v1',
+    storage_key: 'openblast.profile-creator.web.state.v5',
+    language_storage_key: 'openblast.profile-creator.web.language.v2',
     supported_languages: ['pt-BR', 'es', 'en', 'zh-CN'],
     preview_size: [1920, 1080],
     export_size: [3840, 2160],
@@ -43,9 +43,9 @@ const FALLBACK_CONFIG = {
     required_text_fields: ['polygon_name', 'template_name', 'profile_type'],
   },
   defaults: {
-    template_name: 'Enaex clean',
+    template_name: 'Corporate clean',
     polygon_name: 'PP170526 (220-210)',
-    observation: 'Perfil técnico para reporte operacional.',
+    observation: 'Lâmina técnica padronizada para reporte operacional.',
     profile_type: 'Perfis técnicos',
     profile_count: 2,
     labels: {
@@ -101,7 +101,7 @@ const FALLBACK_CONFIG = {
     ],
   },
   templates: {
-    'Enaex clean': {
+    'Corporate clean': {
       bg: '#FFFFFF',
       panel_bg: '#FFFFFF',
       panel_alt: '#F9FAFB',
@@ -115,7 +115,7 @@ const FALLBACK_CONFIG = {
       accent_dark: '#223A8D',
       shadow: [17, 24, 39, 45],
     },
-    'Técnico minimalista': {
+    'Boardroom minimal': {
       bg: '#FFFFFF',
       panel_bg: '#FFFFFF',
       panel_alt: '#F9FAFB',
@@ -129,7 +129,7 @@ const FALLBACK_CONFIG = {
       accent_dark: '#1837B8',
       shadow: [15, 23, 42, 35],
     },
-    'Relatório executivo': {
+    'Executive brief': {
       bg: '#FFFFFF',
       panel_bg: '#FFFFFF',
       panel_alt: '#F8FAFC',
@@ -147,32 +147,32 @@ const FALLBACK_CONFIG = {
 };
 
 const DEFAULT_LANGUAGE = 'pt-BR';
-const DEFAULT_LANGUAGE_STORAGE_KEY = 'enaex.profile-creator.web.language.v1';
+const DEFAULT_LANGUAGE_STORAGE_KEY = 'openblast.profile-creator.web.language.v2';
 const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'es', 'en', 'zh-CN'];
 
 const COPY = {
   'pt-BR': {
     meta: {
-      title: 'Criador de Perfis de Carga',
-      description: 'Interface profissional para criação, validação e exportação local de perfis de carga Enaex.',
+      title: 'OpenBlast Profile Studio',
+      description: 'Workspace profissional para criação, validação e exportação local de perfis de carga.',
     },
     brand: {
-      title: 'Criador de Perfis',
-      subtitle: 'Soluções Técnicas em Mineração',
+      title: 'OpenBlast Profile Studio',
+      subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: '',
+      meta: 'Workspace local',
       formats: 'Formatos de exportação',
     },
     hero: {
-      eyebrow: '',
-      title: 'Criador de Perfis de Carga',
-      subtitle: 'Crie, valide e exporte lâminas técnicas de perfis de carga em uma única interface no navegador.',
+      eyebrow: 'OPENBLAST / TECHNICAL PROFILES',
+      title: 'Perfis de carga com linguagem executiva.',
+      subtitle: 'Estruture, valide e exporte lâminas técnicas em um workspace claro, local e pronto para uso em campo.',
       badges: [],
     },
     heroPanel: {
-      eyebrow: 'Estado',
-      title: 'Motor Local',
+      eyebrow: 'Resumo',
+      title: 'Execução local',
       loading: 'Carregando',
       stats: {
         rendering: 'Renderização',
@@ -186,7 +186,7 @@ const COPY = {
       profileCountWord: { one: 'perfil', many: 'perfis' },
       profileCountAria: 'Quantidade de perfis',
       projectSeed: 'Memória do projeto',
-      browserMemory: '',
+      browserMemory: 'Memória do navegador',
       projectMemory: 'Memória do projeto',
       defaultConfig: 'Configuração padrão',
     },
@@ -207,7 +207,7 @@ const COPY = {
     sections: {
       config: {
         title: 'Configuração',
-        subtitle: 'Documento, logo e arquivos da malha.',
+        subtitle: 'Logo oficial, observações e imagem da malha.',
       },
       labels: {
         title: 'Rótulos',
@@ -227,7 +227,7 @@ const COPY = {
       template: 'Modelo',
       polygonName: 'Identificação da malha',
       observation: 'Observações',
-      logo: 'Logo do cabeçalho',
+      logo: 'Logo oficial',
       mesh: 'Imagem da malha',
       profileName: 'Nome do perfil',
       kind: 'Categoria visual',
@@ -276,12 +276,12 @@ const COPY = {
     },
     defaults: {
       profileType: 'Perfis técnicos',
-      observation: 'Perfil técnico para reporte operacional.',
+      observation: 'Lâmina técnica padronizada para reporte operacional.',
       profileNames: ['Perfil A', 'Perfil B'],
       profileNamePrefix: 'Perfil',
     },
     fileChips: {
-      logoDefault: 'Logo Enaex padrão',
+      logoDefault: 'Logo OpenBlast padrão',
       meshDefault: 'Nenhuma malha anexada',
     },
     memory: {
@@ -306,10 +306,10 @@ const COPY = {
       saveFailure: 'Não foi possível salvar a memória local.',
     },
     svg: {
-      title: 'Criador de Perfis de Carga',
+      title: 'OpenBlast Profile Studio',
       desc: 'Perfil de carga editável com composição vetorial.',
       headerTitle: 'PERFIL DE CARGA',
-      headerBadge: 'Entrega técnica',
+      headerBadge: 'Workspace técnico',
       meshTitle: 'MALHA DE PERFURAÇÃO',
       meshAttached: 'ARQUIVO ANEXADO',
       meshPrompt: 'Anexe a imagem da malha',
@@ -338,9 +338,9 @@ const COPY = {
       'personalizado': 'Personalizado',
     },
     templates: {
-      'Enaex clean': 'Enaex limpo',
-      'Técnico minimalista': 'Técnico minimalista',
-      'Relatório executivo': 'Relatório executivo',
+      'Corporate clean': 'Corporate clean',
+      'Boardroom minimal': 'Boardroom minimal',
+      'Executive brief': 'Executive brief',
     },
     languageNames: {
       'pt-BR': 'Português (Brasil)',
@@ -349,31 +349,31 @@ const COPY = {
       'zh-CN': '中文',
     },
     downloads: {
-      baseName: 'criador-perfis-carga',
+      baseName: 'openblast-profile-studio',
     },
   },
   en: {
     meta: {
-      title: 'Charge Profile Creator',
-      description: 'Professional interface for creating, validating, and exporting Enaex charge profiles locally.',
+      title: 'OpenBlast Profile Studio',
+      description: 'Professional workspace for creating, validating, and exporting charge profiles locally.',
     },
     brand: {
-      title: 'Profile Creator',
-      subtitle: 'Mining Technical Solutions',
+      title: 'OpenBlast Profile Studio',
+      subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: 'Local engine in browser',
+      meta: 'Local workspace',
       formats: 'Export formats',
     },
     hero: {
-      eyebrow: 'ENAEX MTS / CHARGE PROFILES',
-      title: 'Professional charge profiles.',
-      subtitle: 'Create, validate, and export technical charge-profile sheets in one browser interface.',
-      badges: ['No install', 'Live SVG', '4K export', 'Enaex interface'],
+      eyebrow: 'OPENBLAST / TECHNICAL PROFILES',
+      title: 'Charge profiles with executive clarity.',
+      subtitle: 'Create, validate, and export technical sheets in a clean local workspace built for field teams.',
+      badges: ['No install', 'Live SVG', '4K export', 'Local workspace'],
     },
     heroPanel: {
-      eyebrow: 'Status',
-      title: 'Local Engine',
+      eyebrow: 'Summary',
+      title: 'Local execution',
       loading: 'Loading',
       stats: {
         rendering: 'Rendering',
@@ -408,7 +408,7 @@ const COPY = {
     sections: {
       config: {
         title: 'Configuration',
-        subtitle: 'Document, logo, and mesh files.',
+        subtitle: 'Official logo, notes, and mesh image.',
       },
       labels: {
         title: 'Labels',
@@ -428,7 +428,7 @@ const COPY = {
       template: 'Template',
       polygonName: 'Mesh ID',
       observation: 'Notes',
-      logo: 'Header logo',
+      logo: 'Official logo',
       mesh: 'Mesh image',
       profileName: 'Profile name',
       kind: 'Visual category',
@@ -477,12 +477,12 @@ const COPY = {
     },
     defaults: {
       profileType: 'Technical profiles',
-      observation: 'Technical profile for operational reporting.',
+      observation: 'Standard technical sheet for operational reporting.',
       profileNames: ['Profile A', 'Profile B'],
       profileNamePrefix: 'Profile',
     },
     fileChips: {
-      logoDefault: 'Default Enaex logo',
+      logoDefault: 'Default OpenBlast logo',
       meshDefault: 'No mesh attached',
     },
     memory: {
@@ -507,10 +507,10 @@ const COPY = {
       saveFailure: 'Could not save local memory.',
     },
     svg: {
-      title: 'Charge Profile Creator',
+      title: 'OpenBlast Profile Studio',
       desc: 'Editable charge profile with vector composition.',
       headerTitle: 'CHARGE PROFILE',
-      headerBadge: 'Technical delivery',
+      headerBadge: 'Technical workspace',
       meshTitle: 'DRILLING MESH',
       meshAttached: 'ATTACHED FILE',
       meshPrompt: 'Attach the mesh image',
@@ -539,9 +539,9 @@ const COPY = {
       'personalizado': 'Custom',
     },
     templates: {
-      'Enaex clean': 'Enaex Clean',
-      'Técnico minimalista': 'Minimal Technical',
-      'Relatório executivo': 'Executive Report',
+      'Corporate clean': 'Corporate clean',
+      'Boardroom minimal': 'Boardroom minimal',
+      'Executive brief': 'Executive brief',
     },
     languageNames: {
       'pt-BR': 'Portuguese (Brazil)',
@@ -550,31 +550,31 @@ const COPY = {
       'zh-CN': 'Chinese',
     },
     downloads: {
-      baseName: 'charge-profile-creator',
+      baseName: 'openblast-profile-studio',
     },
   },
   es: {
     meta: {
-      title: 'Creador de Perfiles de Carga',
-      description: 'Interfaz profesional para crear, validar y exportar perfiles de carga Enaex localmente.',
+      title: 'OpenBlast Profile Studio',
+      description: 'Workspace profesional para crear, validar y exportar perfiles de carga localmente.',
     },
     brand: {
-      title: 'Creador de Perfiles',
-      subtitle: 'Soluciones Técnicas en Minería',
+      title: 'OpenBlast Profile Studio',
+      subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: '',
+      meta: 'Workspace local',
       formats: 'Formatos de exportación',
     },
     hero: {
-      eyebrow: '',
-      title: 'Creador de Perfiles de Carga',
-      subtitle: 'Cree, valide y exporte láminas técnicas de perfiles de carga en una única interfaz del navegador.',
+      eyebrow: 'OPENBLAST / TECHNICAL PROFILES',
+      title: 'Perfiles de carga con lenguaje ejecutivo.',
+      subtitle: 'Cree, valide y exporte láminas técnicas en un workspace claro, local y listo para equipos de campo.',
       badges: [],
     },
     heroPanel: {
-      eyebrow: 'Estado',
-      title: 'Motor Local',
+      eyebrow: 'Resumen',
+      title: 'Ejecución local',
       loading: 'Cargando',
       stats: {
         rendering: 'Renderizado',
@@ -588,7 +588,7 @@ const COPY = {
       profileCountWord: { one: 'perfil', many: 'perfiles' },
       profileCountAria: 'Cantidad de perfiles',
       projectSeed: 'Memoria del proyecto',
-      browserMemory: '',
+      browserMemory: 'Memoria del navegador',
       projectMemory: 'Memoria del proyecto',
       defaultConfig: 'Configuración predeterminada',
     },
@@ -609,7 +609,7 @@ const COPY = {
     sections: {
       config: {
         title: 'Configuración',
-        subtitle: 'Documento, logo y archivos de la malla.',
+        subtitle: 'Logo oficial, notas e imagen de la malla.',
       },
       labels: {
         title: 'Rótulos',
@@ -629,7 +629,7 @@ const COPY = {
       template: 'Modelo',
       polygonName: 'Identificación de la malla',
       observation: 'Observaciones',
-      logo: 'Logo del encabezado',
+      logo: 'Logo oficial',
       mesh: 'Imagen de la malla',
       profileName: 'Nombre del perfil',
       kind: 'Categoría visual',
@@ -678,12 +678,12 @@ const COPY = {
     },
     defaults: {
       profileType: 'Perfiles técnicos',
-      observation: 'Perfil técnico para reporte operacional.',
+      observation: 'Lámina técnica estandarizada para reporte operacional.',
       profileNames: ['Perfil A', 'Perfil B'],
       profileNamePrefix: 'Perfil',
     },
     fileChips: {
-      logoDefault: 'Logo Enaex predeterminado',
+      logoDefault: 'Logo OpenBlast predeterminado',
       meshDefault: 'Ninguna malla adjunta',
     },
     memory: {
@@ -708,10 +708,10 @@ const COPY = {
       saveFailure: 'No fue posible guardar la memoria local.',
     },
     svg: {
-      title: 'Creador de Perfiles de Carga',
+      title: 'OpenBlast Profile Studio',
       desc: 'Perfil de carga editable con composición vectorial.',
       headerTitle: 'PERFIL DE CARGA',
-      headerBadge: 'Entrega técnica',
+      headerBadge: 'Workspace técnico',
       meshTitle: 'MALLA DE PERFORACIÓN',
       meshAttached: 'ARCHIVO ADJUNTO',
       meshPrompt: 'Adjunte la imagen de la malla',
@@ -740,9 +740,9 @@ const COPY = {
       'personalizado': 'Personalizado',
     },
     templates: {
-      'Enaex clean': 'Enaex limpio',
-      'Técnico minimalista': 'Técnico minimalista',
-      'Relatório executivo': 'Reporte ejecutivo',
+      'Corporate clean': 'Corporate clean',
+      'Boardroom minimal': 'Boardroom minimal',
+      'Executive brief': 'Executive brief',
     },
     languageNames: {
       'pt-BR': 'Portugués (Brasil)',
@@ -751,31 +751,31 @@ const COPY = {
       'zh-CN': 'Chino',
     },
     downloads: {
-      baseName: 'creador-perfiles-carga',
+      baseName: 'openblast-profile-studio',
     },
   },
   'zh-CN': {
     meta: {
-      title: '装药剖面创建器',
-      description: '用于本地创建、验证并导出 Enaex 装药剖面的专业界面。',
+      title: 'OpenBlast Profile Studio',
+      description: '用于本地创建、验证并导出装药剖面的专业工作区。',
     },
     brand: {
-      title: '剖面创建器',
-      subtitle: '采矿技术解决方案',
+      title: 'OpenBlast Profile Studio',
+      subtitle: 'Charge Profile Workspace',
     },
     topbar: {
-      meta: '浏览器本地引擎',
+      meta: '本地工作区',
       formats: '导出格式',
     },
     hero: {
-      eyebrow: 'ENAEX MTS / 装药剖面',
-      title: '专业装药剖面。',
-      subtitle: '在一个浏览器界面中创建、验证并导出技术装药剖面图。',
-      badges: ['无需安装', '实时 SVG', '4K 导出', 'Enaex 界面'],
+      eyebrow: 'OPENBLAST / TECHNICAL PROFILES',
+      title: '具备咨询级表达的装药剖面。',
+      subtitle: '在清晰的本地工作区中创建、验证并导出技术装药剖面图。',
+      badges: ['无需安装', '实时 SVG', '4K 导出', '本地工作区'],
     },
     heroPanel: {
-      eyebrow: '状态',
-      title: '本地引擎',
+      eyebrow: '摘要',
+      title: '本地执行',
       loading: '加载中',
       stats: {
         rendering: '渲染',
@@ -810,7 +810,7 @@ const COPY = {
     sections: {
       config: {
         title: '配置',
-        subtitle: '文档、Logo 和网格文件。',
+        subtitle: '官方 Logo、备注和网格图像。',
       },
       labels: {
         title: '标签',
@@ -830,7 +830,7 @@ const COPY = {
       template: '模板',
       polygonName: '网格编号',
       observation: '备注',
-      logo: '页眉 Logo',
+      logo: '官方 Logo',
       mesh: '网格图片',
       profileName: '剖面名称',
       kind: '可视类别',
@@ -879,12 +879,12 @@ const COPY = {
     },
     defaults: {
       profileType: '技术剖面',
-      observation: '用于运行报告的技术剖面。',
+      observation: '用于运行报告的标准技术页面。',
       profileNames: ['剖面 A', '剖面 B'],
       profileNamePrefix: '剖面',
     },
     fileChips: {
-      logoDefault: '默认 Enaex Logo',
+      logoDefault: '默认 OpenBlast Logo',
       meshDefault: '未附加网格',
     },
     memory: {
@@ -909,10 +909,10 @@ const COPY = {
       saveFailure: '无法保存本地记忆。',
     },
     svg: {
-      title: '装药剖面创建器',
+      title: 'OpenBlast Profile Studio',
       desc: '可编辑的装药剖面，采用矢量组成。',
       headerTitle: '装药剖面',
-      headerBadge: '技术交付',
+      headerBadge: '技术工作区',
       meshTitle: '钻孔网格',
       meshAttached: '已附加文件',
       meshPrompt: '请附加网格图片',
@@ -941,9 +941,9 @@ const COPY = {
       'personalizado': '自定义',
     },
     templates: {
-      'Enaex clean': 'Enaex 简洁',
-      'Técnico minimalista': '极简技术',
-      'Relatório executivo': '执行报告',
+      'Corporate clean': 'Corporate clean',
+      'Boardroom minimal': 'Boardroom minimal',
+      'Executive brief': 'Executive brief',
     },
     languageNames: {
       'pt-BR': '葡萄牙语（巴西）',
@@ -952,7 +952,7 @@ const COPY = {
       'zh-CN': '中文',
     },
     downloads: {
-      baseName: 'charge-profile-creator',
+      baseName: 'openblast-profile-studio',
     },
   },
 };
@@ -1122,7 +1122,7 @@ const PROFILE_FIELDS = [
 const DECK_POSITIONS = ['above_stemming', 'mid_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
 const SEGMENT_TYPES = ['stemming', 'column', 'blastbag', 'airdeck'];
 
-const DEFAULT_STORAGE_KEY = 'enaex.profile-creator.web.state.v4';
+const DEFAULT_STORAGE_KEY = 'openblast.profile-creator.web.state.v5';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
 const DEFAULT_PREVIEW_SIZE = [1920, 1080];
 
@@ -1296,6 +1296,13 @@ function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
 }
 
+function resolveTemplateName(value, currentConfig = config) {
+  const raw = isNonEmptyString(value) ? String(value).trim() : '';
+  if (!raw) return '';
+  if (currentConfig?.templates?.[raw]) return raw;
+  return '';
+}
+
 function loadJson(path, fallback = null) {
   return fetch(path, { cache: 'no-store' })
     .then((response) => {
@@ -1313,6 +1320,7 @@ function createDefaultState(currentConfig, language = currentConfig?.app?.defaul
   const defaults = currentConfig.defaults;
   const lang = normalizeLanguage(language);
   const copy = getCopy(lang);
+  const defaultTemplate = resolveTemplateName(defaults.template_name, currentConfig) || Object.keys(currentConfig.templates || {})[0] || '';
   const profiles = clone(defaults.profiles).map((profile, index) => ({
     ...profile,
     kind: normalizeKind(profile.kind),
@@ -1321,7 +1329,7 @@ function createDefaultState(currentConfig, language = currentConfig?.app?.defaul
   return {
     language: lang,
     profileType: copy.defaults.profileType,
-    templateName: defaults.template_name,
+    templateName: defaultTemplate,
     polygonName: defaults.polygon_name,
     observation: copy.defaults.observation,
     profileCount: clamp(Number(defaults.profile_count) || 2, currentConfig.validation.min_profiles, currentConfig.validation.max_profiles),
@@ -1380,9 +1388,7 @@ function mergeLoadedState(currentConfig, savedState) {
 
   if (!request || typeof request !== 'object') return base;
 
-  const templateName = isNonEmptyString(request.template_name) && currentConfig.templates[request.template_name]
-    ? request.template_name
-    : base.templateName;
+  const templateName = resolveTemplateName(request.template_name, currentConfig) || base.templateName;
 
   const polygonName = isNonEmptyString(request.polygon_name) ? String(request.polygon_name).trim() : base.polygonName;
   const observation = typeof request.observation === 'string' ? request.observation : base.observation;
@@ -1442,7 +1448,7 @@ function validateState(appState, currentConfig) {
     }
   }
 
-  if (!isNonEmptyString(appState.templateName) || !currentConfig.templates[appState.templateName]) {
+  if (!resolveTemplateName(appState.templateName, currentConfig)) {
     issues.push(copy.validation.modelInvalid);
   }
 
@@ -1594,7 +1600,8 @@ function setStatusMessage(message) {
 }
 
 function getTheme(templateName) {
-  return config.templates[templateName] || config.templates['Enaex clean'];
+  const resolved = resolveTemplateName(templateName, config);
+  return config.templates[resolved] || config.templates['Corporate clean'];
 }
 
 function getLogoFallbackSvg() {
@@ -1602,8 +1609,8 @@ function getLogoFallbackSvg() {
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 72">
       <rect width="260" height="72" rx="16" fill="#FFFFFF"/>
       <rect x="12" y="12" width="236" height="4" rx="2" fill="#D71920"/>
-      <text x="22" y="45" fill="#D71920" font-family="IBM Plex Sans, sans-serif" font-size="26" font-weight="700">ENAEX</text>
-      <text x="120" y="45" fill="#66707e" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="600">BRASIL</text>
+      <text x="22" y="45" fill="#D71920" font-family="IBM Plex Sans, sans-serif" font-size="22" font-weight="700">OPENBLAST</text>
+      <text x="22" y="60" fill="#66707e" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="600">PROFILE STUDIO</text>
     </svg>`;
   return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 }
@@ -2046,7 +2053,7 @@ function renderHeader(theme, box) {
       const logoUrl = state.logo?.dataUrl || logoDataUrl;
       return logoUrl
         ? `<image href="${logoUrl}" x="${logoBox.x + 14}" y="${logoBox.y + 16}" width="${logoBox.w - 28}" height="${logoBox.h - 26}" preserveAspectRatio="xMidYMid meet"/>`
-        : `<text x="${logoBox.x + 20}" y="${logoBox.y + 64}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="28" font-weight="700">ENAEX</text>`;
+        : `<text x="${logoBox.x + 20}" y="${logoBox.y + 64}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="24" font-weight="700">OPENBLAST</text>`;
     })()}
     <text x="${x + 256}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
     <text x="${x + 256}" y="${y + 80}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
@@ -2440,7 +2447,7 @@ function handleInputEvent(event) {
       const [, key] = path.split('.');
       state.labels[key] = value;
     } else if (path === 'templateName') {
-      state.templateName = value;
+      state.templateName = resolveTemplateName(value, config) || createDefaultState(config, getActiveLanguage()).templateName;
     } else if (path === 'polygonName') {
       state.polygonName = value;
     } else if (path === 'observation') {

@@ -8,7 +8,7 @@
       "stemming": "Tampão",
       "subdrill": "Subperfuração"
     },
-    "observation": "Perfil técnico para reporte operacional.",
+    "observation": "Lâmina técnica padronizada para reporte operacional.",
     "polygon_name": "PP170526 (220-210)",
     "profile_count": 2,
     "profile_type": "Perfis técnicos",
@@ -40,7 +40,7 @@
         "subperfuracao": 0.0
       }
     ],
-    "template_name": "Enaex clean"
+    "template_name": "Corporate clean"
   },
   "saved_at": "2026-05-12T10:04:21",
   "schema_version": 1
