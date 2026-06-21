@@ -40,7 +40,7 @@ class HeaderTests(unittest.TestCase):
     def test_header_top_pixel_is_red(self) -> None:
         from generator.layout import _draw_header, TEMPLATE_PRESETS
         canvas = self._make_canvas()
-        theme = TEMPLATE_PRESETS["Enaex clean"]
+        theme = TEMPLATE_PRESETS["Corporate clean"]
         _draw_header(canvas, theme, "PP170526 (220-210)", "Perfis técnicos", None)
         r, g, b, a = canvas.getpixel((1920, 2))
         self.assertGreater(r, 180)
@@ -50,7 +50,7 @@ class HeaderTests(unittest.TestCase):
     def test_header_background_is_white(self) -> None:
         from generator.layout import _draw_header, TEMPLATE_PRESETS
         canvas = self._make_canvas()
-        theme = TEMPLATE_PRESETS["Enaex clean"]
+        theme = TEMPLATE_PRESETS["Corporate clean"]
         _draw_header(canvas, theme, "PP170526 (220-210)", "Perfis técnicos", None)
         r, g, b, a = canvas.getpixel((1920, 200))
         self.assertGreater(r, 220)
@@ -131,7 +131,7 @@ class ProfileCardTests(unittest.TestCase):
         from PIL import Image
         from generator.profile import ProfileInput, render_profile_panel
         from generator.layout import TEMPLATE_PRESETS
-        theme = TEMPLATE_PRESETS["Enaex clean"]
+        theme = TEMPLATE_PRESETS["Corporate clean"]
         profile = ProfileInput(name=name, kind=kind, diametro_furo=140,
                                altura_banco=10.5, subperfuracao=0.6, stemming=2.3,
                                air_deck=0.35, blastbag=0.15, inclinacao=0.0,

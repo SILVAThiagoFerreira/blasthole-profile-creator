@@ -1,1 +1,1 @@
-"""Core orchestration package for Enaex Profile Creator."""
+"""Core orchestration package for OpenBlast Profile Creator."""

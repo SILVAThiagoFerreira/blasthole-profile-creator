@@ -10,7 +10,7 @@
 - O app suporta até 4 perfis na mesma lâmina.
 - Com 4 perfis, a composição usa cards compactos em grade 2x2.
 - A resolução de exportação usa 3840x2160 para manter nitidez.
-- O logo principal vem de `VISUAL/Enaex Brasil.png`, com substituição opcional por upload.
+- O logo principal vem de `VISUAL/OpenBlast/LOGO OPENBLAST TRANSPARENTE.png`, com substituição opcional por upload.
 - As últimas preferências válidas ficam salvas em `state/user_preferences.json` e em `localStorage`.
 
 ## Regras Importantes

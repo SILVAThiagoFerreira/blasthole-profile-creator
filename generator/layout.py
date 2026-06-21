@@ -81,10 +81,10 @@ def load_default_logo_bytes() -> bytes | None:
     logo_path = get_project_root() / get_paths_config().get("logo_path", "")
     if logo_path.exists():
         return logo_path.read_bytes()
-    legacy_logo_path = BASE_DIR / "VISUAL" / "Enaex Brasil - White.png"
+    legacy_logo_path = BASE_DIR / "VISUAL" / "OpenBlast/LOGO OPENBLAST TRANSPARENTE.png"
     if legacy_logo_path.exists():
         return legacy_logo_path.read_bytes()
-    logo_svg_path = BASE_DIR / "VISUAL" / "enaex-logo-official.svg"
+    logo_svg_path = BASE_DIR / "VISUAL" / "OpenBlast/LOGO OPENBLAST TRANSPARENTE.png"
     if logo_svg_path.exists():
         return _build_default_logo_bytes()
     return None
@@ -105,7 +105,7 @@ def _build_default_logo_bytes() -> bytes:
     draw.polygon(mark_2, fill=red)
 
     text_font = _font(112, bold=True)
-    draw.text((330, 86), "ENAEX", font=text_font, fill=gray)
+    draw.text((330, 86), "OPENBLAST", font=text_font, fill=gray)
 
     bbox = logo.getbbox() or (0, 0, logo.size[0], logo.size[1])
     cropped = logo.crop(bbox)
@@ -223,7 +223,7 @@ def _draw_header(canvas: Image.Image, theme: TemplateTheme, polygon_name: str, p
     if logo_bytes:
         _paste_logo(canvas, logo_bytes, (_s(50), _s(34), _s(220), _s(128)))
     else:
-        draw.text((_s(56), _s(50)), "ENAEX", font=_font(_s(30), bold=True), fill=theme.accent_red)
+        draw.text((_s(56), _s(50)), "OPENBLAST", font=_font(_s(30), bold=True), fill=theme.accent_red)
         draw.text((_s(56), _s(88)), "BRASIL", font=_font(_s(22), bold=True), fill=theme.muted)
 
     # Title block (center)
