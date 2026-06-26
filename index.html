@@ -18,61 +18,60 @@
 
   <div class="page-shell">
     <header class="topbar">
-      <div class="brand-lockup" aria-label="OpenBlast Profile Studio">
-        <span class="brand-mark"><img src="VISUAL/OpenBlast/LOGO OPENBLAST TRANSPARENTE.png" alt="OpenBlast"></span>
-        <span class="brand-text">
-          <strong>OpenBlast Profile Studio</strong>
-          <span>Charge Profile Workspace</span>
-        </span>
+      <div class="topbar__left">
+        <div class="brand-lockup" aria-label="OpenBlast Profile Studio">
+          <span class="brand-mark"><img src="VISUAL/OpenBlast/LOGO OPENBLAST TRANSPARENTE.png" alt="OpenBlast"></span>
+          <span class="brand-text">
+            <strong>OpenBlast Profile Studio</strong>
+          </span>
+        </div>
+        <div class="topbar__polygon">
+          <input id="polygonNameTop" type="text" aria-label="Identificação da malha">
+        </div>
+        <div class="topbar__template">
+          <select id="templateNameTop" aria-label="Modelo"></select>
+        </div>
+        <div class="segmented-control" aria-label="Quantidade de perfis">
+          <button type="button" id="profileMinus" aria-label="Remover perfil">-</button>
+          <span id="profileCountLabel">2 perfis</span>
+          <button type="button" id="profilePlus" aria-label="Adicionar perfil">+</button>
+        </div>
+        <div class="topbar__language">
+          <select id="languageSelect" aria-label="Idioma"></select>
+        </div>
       </div>
-      <div class="topbar__language">
-        <select id="languageSelect" aria-label="Idioma"></select>
-      </div>
-      <div class="topbar__actions" aria-label="Formatos de exportação">
-        <span>SVG</span>
-        <span>PNG</span>
-        <span>PDF</span>
+      <div class="topbar__right">
+        <div class="download-group" aria-label="Formatos de exportação">
+          <button class="ghost-button" type="button" data-download="svg">SVG</button>
+          <button class="ghost-button" type="button" data-download="png">PNG</button>
+          <button class="ghost-button" type="button" data-download="jpg">JPG</button>
+          <button class="ghost-button accent-button" type="button" data-download="pdf">PDF</button>
+        </div>
+        <div class="topbar__actions">
+          <button class="ghost-button" type="button" id="saveButton">Salvar</button>
+          <button class="ghost-button" type="button" id="resetButton">Restaurar</button>
+        </div>
       </div>
     </header>
 
     <main class="workspace">
-      <section class="panel builder-panel">
-        <div class="panel__head">
-          <div>
-            <p class="eyebrow">Painel de Controle</p>
-            <h2>Editor</h2>
-          </div>
-          <div class="panel__meta">
-            <button class="ghost-button" type="button" id="resetButton">Restaurar</button>
-            <button class="ghost-button" type="button" id="saveButton">Salvar</button>
-          </div>
-        </div>
-        <div class="builder-toolbar">
-          <div class="segmented-control" aria-label="Quantidade de perfis">
-            <button type="button" id="profileMinus" aria-label="Remover perfil">-</button>
-            <span id="profileCountLabel">2 perfis</span>
-            <button type="button" id="profilePlus" aria-label="Adicionar perfil">+</button>
+      <aside class="sidebar" id="sidebar">
+        <div class="profile-tabs" id="profileTabs"></div>
+        <div class="sidebar__body" id="sidebarBody">
+          <div id="segmentEditorArea"></div>
+          <div id="autoCalcSummary"></div>
+          <div class="sidebar__collapsible">
+            <button class="sidebar__collapsible-toggle" type="button" id="toggleGlobalSection" aria-expanded="false">
+              <span>Configuração &amp; Rótulos</span>
+              <span class="chevron" aria-hidden="true"></span>
+            </button>
+            <div class="sidebar__collapsible-body" id="globalSettingsArea" hidden></div>
           </div>
         </div>
-        <form id="builderForm" class="builder-form" autocomplete="off"></form>
-      </section>
+      </aside>
 
-      <section class="panel preview-panel">
-        <div class="panel__head">
-          <div>
-            <p class="eyebrow">Pré-visualização</p>
-            <h2>Lâmina ao vivo</h2>
-          </div>
-          <div class="download-group">
-            <button class="primary-button" type="button" data-download="svg">SVG</button>
-            <button class="primary-button" type="button" data-download="png">PNG</button>
-            <button class="primary-button" type="button" data-download="jpg">JPG</button>
-            <button class="primary-button" type="button" data-download="pdf">PDF</button>
-          </div>
-        </div>
-        <div class="preview-frame">
-          <div class="preview-canvas" id="previewCanvas" aria-live="polite"></div>
-        </div>
+      <section class="canvas-area">
+        <div class="preview-canvas" id="previewCanvas" aria-live="polite"></div>
         <div class="validation" id="validation"></div>
       </section>
     </main>

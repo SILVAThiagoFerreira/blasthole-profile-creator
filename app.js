@@ -1135,6 +1135,8 @@ let logoDataUrl = '';
 let seedSource = 'default';
 let updateTimer = 0;
 let saveTimer = 0;
+let selectedProfileIndex = 0;
+let selectedSegmentKey = null;
 
 const measureCanvas = document.createElement('canvas');
 const measureCtx = measureCanvas.getContext('2d');
@@ -1852,25 +1854,26 @@ function renderProfileCard(profile, theme, box, compact, index) {
     const segH = Math.max(1, holeH * (segVal / total));
     const y2 = type === 'subdrill' ? holeBottom : yCur + segH;
     const midY = (yCur + y2) / 2;
+    const segAttrs = `data-profile="${index}" data-segment-key="${key}" data-segment-type="${type}" style="cursor:pointer"`;
     if (type === 'airdeck') {
       let hatch = '';
       for (let yy = yCur + (compact ? 2 : 3); yy < y2; yy += compact ? 5 : 6) {
         hatch += `<line x1="${cylX1 + (compact ? 2 : 3)}" y1="${yy}" x2="${cylX2 - (compact ? 2 : 3)}" y2="${yy}" stroke="${segColor}" stroke-width="1"/>`;
       }
-      segmentMarkup.push(`<rect x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#FFFFFF"/>${hatch}`);
+      segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#FFFFFF"/>${hatch}`);
     } else if (type === 'blastbag') {
       const darker = mixHex(segColor, '#000000', 0.1);
       const lighter = mixHex(segColor, '#FFFFFF', 0.18);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${lighter}"/><stop offset="100%" stop-color="${darker}"/></linearGradient></defs><rect x="${cylX1 + 2}" y="${yCur}" width="${cylW - 4}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${lighter}"/><stop offset="100%" stop-color="${darker}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1 + 2}" y="${yCur}" width="${cylW - 4}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
     } else if (type === 'column') {
       const light = mixHex(segColor, '#FFFFFF', 0.36);
       const dark = mixHex(segColor, '#1b2430', 0.12);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="18%" stop-color="${segColor}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="18%" stop-color="${segColor}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
       segmentMarkup.push(`<rect x="${cylX1 + 4}" y="${yCur}" width="${Math.max(1, cylW * 0.12)}" height="${y2 - yCur}" fill="rgba(255,255,255,0.22)"/>`);
     } else {
       const light = mixHex(segColor, '#FFFFFF', 0.22);
       const dark = mixHex(segColor, '#1b2430', 0.14);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
     }
 
     if (y2 - yCur >= (compact ? 10 : 14)) {
@@ -2179,32 +2182,22 @@ function renderLayout(currentConfig) {
 function renderGlobalSection(currentConfig) {
   const copy = getCopy();
   const templateOptions = Object.keys(currentConfig.templates).map((template) => `<option value="${escapeXml(template)}"${template === state.templateName ? ' selected' : ''}>${escapeXml(templateDisplayName(template))}</option>`).join('');
-  const logoName = state.logo?.name ? shortText(state.logo.name, 32) : copy.fileChips.logoDefault;
-  const meshName = state.mesh?.name ? shortText(state.mesh.name, 32) : copy.fileChips.meshDefault;
+  const logoName = state.logo?.name ? shortText(state.logo.name, 28) : copy.fileChips.logoDefault;
+  const meshName = state.mesh?.name ? shortText(state.mesh.name, 28) : copy.fileChips.meshDefault;
   return `
-    <div class="form-grid form-grid--two">
-      <div class="field">
-        <label for="templateName">${copy.fieldLabels.template}</label>
-        <select id="templateName" data-path="templateName">${templateOptions}</select>
-      </div>
-      <div class="field">
-        <label for="polygonName">${copy.fieldLabels.polygonName}</label>
-        <input id="polygonName" data-path="polygonName" type="text" value="${escapeXml(state.polygonName)}" placeholder="${escapeXml(copy.fieldLabels.polygonName)}">
-      </div>
-      <div class="field" style="grid-column: 1 / -1;">
-        <label for="observation">${copy.fieldLabels.observation}</label>
-        <textarea id="observation" data-path="observation" placeholder="${escapeXml(copy.fieldPlaceholders.observation)}">${escapeXml(state.observation)}</textarea>
-      </div>
+    <div class="field">
+      <label for="observation">${copy.fieldLabels.observation}</label>
+      <textarea id="observation" data-path="observation" placeholder="${escapeXml(copy.fieldPlaceholders.observation)}">${escapeXml(state.observation)}</textarea>
     </div>
-    <div class="image-upload-row" style="margin-top: 14px;">
-      <div class="field" style="flex: 1 1 300px; min-width: 260px;">
+    <div class="image-upload-row">
+      <div class="field">
         <label for="logoFile">${copy.fieldLabels.logo}</label>
         <input id="logoFile" data-role="logo-file" type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml">
       </div>
       <span class="file-chip" id="logoChip">${escapeXml(logoName)}</span>
     </div>
-    <div class="image-upload-row" style="margin-top: 14px;">
-      <div class="field" style="flex: 1 1 300px; min-width: 260px;">
+    <div class="image-upload-row">
+      <div class="field">
         <label for="meshFile">${copy.fieldLabels.mesh}</label>
         <input id="meshFile" data-role="mesh-file" type="file" accept="image/png,image/jpeg,image/jpg">
       </div>
@@ -2266,21 +2259,33 @@ function segmentTypeOptions() {
 
 function renderSegmentEditor(profile, index) {
   const copy = getCopy();
-  const rows = (profile.segments || []).map((item, itemIndex) => `
-    <div class="deck-item segment-item">
-      ${renderSelect(`${copy.fieldLabels.segmentType} ${itemIndex + 1}`, `profiles.${index}.segments.${itemIndex}.type`, item.type, segmentTypeOptions(), '')}
-      ${renderInput(`${copy.fieldLabels.segmentHeight} ${itemIndex + 1}`, `profiles.${index}.segments.${itemIndex}.height`, item.height, 'number', { step: 0.05, min: 0 })}
-      <button class="ghost-button deck-item__remove" type="button" data-action="move-segment-up" data-profile-index="${index}" data-item-index="${itemIndex}">Subir</button>
-      <button class="ghost-button deck-item__remove" type="button" data-action="move-segment-down" data-profile-index="${index}" data-item-index="${itemIndex}">Descer</button>
-      <button class="ghost-button deck-item__remove" type="button" data-action="remove-segment" data-profile-index="${index}" data-item-index="${itemIndex}">Remover</button>
-    </div>`).join('');
-  return `
-    <div class="deck-editor segment-editor">
-      <div class="deck-editor__head">
-        <strong>${escapeXml(copy.fieldLabels.chargeSequence)}</strong>
-        <button class="ghost-button" type="button" data-action="add-segment" data-profile-index="${index}">${escapeXml(copy.fieldLabels.addSegment)}</button>
+  const typeOpts = segmentTypeOptions();
+  const rows = (profile.segments || []).map((item, itemIndex) => {
+    const isHighlighted = selectedSegmentKey !== null && selectedSegmentKey === `${item.type}-${itemIndex}`;
+    return `
+    <div class="segment-row${isHighlighted ? ' highlighted' : ''}" data-segment-row="${itemIndex}">
+      <div class="field segment-row__type">
+        <select data-path="profiles.${index}.segments.${itemIndex}.type">${typeOpts.map((opt) => `<option value="${escapeXml(opt.value)}"${opt.value === item.type ? ' selected' : ''}>${escapeXml(opt.label)}</option>`).join('')}</select>
       </div>
-      <div class="deck-editor__rows">${rows}</div>
+      <div class="field segment-row__height">
+        <input data-path="profiles.${index}.segments.${itemIndex}.height" type="number" step="0.05" min="0" value="${escapeXml(String(item.height ?? ''))}">
+      </div>
+      <div class="segment-row__btns">
+        <button class="segment-row__btn" type="button" data-action="move-segment-up" data-profile-index="${index}" data-item-index="${itemIndex}" title="Subir">&#9650;</button>
+        <button class="segment-row__btn" type="button" data-action="move-segment-down" data-profile-index="${index}" data-item-index="${itemIndex}" title="Descer">&#9660;</button>
+        <button class="segment-row__btn danger" type="button" data-action="remove-segment" data-profile-index="${index}" data-item-index="${itemIndex}" title="${escapeXml(copy.buttons.removeProfile)}">&#10005;</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `
+    <div class="segment-editor-card">
+      <div class="segment-editor-card__head">
+        <p class="segment-editor-card__title">${escapeXml(copy.fieldLabels.chargeSequence)}</p>
+        <button class="ghost-button" type="button" data-action="add-segment" data-profile-index="${index}" style="min-height:28px;font-size:0.66rem;">+ ${escapeXml(copy.fieldLabels.addSegment)}</button>
+      </div>
+      <div class="segment-editor-card__body">
+        ${rows}
+      </div>
     </div>`;
 }
 
@@ -2293,38 +2298,28 @@ function renderProfileEditor(profile, index) {
     return String(profile.name || '?').trim()[0]?.toUpperCase() || '?';
   })();
   const accent = KIND_ACCENTS[profile.kind]?.accent || KIND_ACCENTS.personalizado.accent;
-  const accentSoft = KIND_ACCENTS[profile.kind]?.soft || KIND_ACCENTS.personalizado.soft;
+  const stem = sumSegmentsByType(profile.segments, 'stemming');
+  const charge = sumSegmentsByType(profile.segments, 'column');
+  const bb = sumSegmentsByType(profile.segments, 'blastbag');
+  const ad = sumSegmentsByType(profile.segments, 'airdeck');
 
   return `
-    <article class="profile-card" style="--accent: ${accent};">
-      <div class="profile-card__head">
-        <div class="profile-headline">
-          <div class="profile-badge">${escapeXml(letter)}</div>
-          <div>
-            <div class="profile-title">${escapeXml(shortText(profile.name || defaultProfileName(getActiveLanguage(), index), 28).toUpperCase())}</div>
-            <div class="profile-subtitle">${escapeXml(`${kindLabel(profile.kind).toUpperCase()} • ${Math.round(profile.diametro_furo)} MM`)}</div>
-          </div>
+    <div class="segment-editor-area">
+      <div class="profile-params" style="border-left: 3px solid ${accent};">
+        <p class="profile-params__title">${escapeXml(shortText(profile.name || defaultProfileName(getActiveLanguage(), index), 24).toUpperCase())}</p>
+        <div class="form-grid form-grid--two">
+          ${renderInput(copy.fieldLabels.profileName, `profiles.${index}.name`, profile.name)}
+          ${renderSelect(copy.fieldLabels.kind, `profiles.${index}.kind`, profile.kind, KIND_OPTIONS.map((key) => ({ value: key, label: kindLabel(key) })), '')}
+          ${renderInput(copy.fieldLabels.diameter, `profiles.${index}.diametro_furo`, profile.diametro_furo, 'number', { step: 1, min: 0 })}
+          ${renderInput(copy.fieldLabels.height, `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
+          ${renderInput(copy.fieldLabels.subdrill, `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
+          ${renderInput(copy.fieldLabels.inclination, `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
+          ${renderInput(copy.fieldLabels.azimuth, `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
+          ${renderInput(copy.fieldLabels.density, `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
         </div>
-        <span class="profile-chip" style="background:${accentSoft}; color:${accent};">${escapeXml(kindLabel(profile.kind))}</span>
-      </div>
-      <div class="profile-grid">
-        ${renderInput(copy.fieldLabels.profileName, `profiles.${index}.name`, profile.name)}
-        ${renderSelect(copy.fieldLabels.kind, `profiles.${index}.kind`, profile.kind, KIND_OPTIONS.map((key) => ({ value: key, label: kindLabel(key) })), '')}
-        ${renderInput(copy.fieldLabels.diameter, `profiles.${index}.diametro_furo`, profile.diametro_furo, 'number', { step: 1, min: 0 })}
-        ${renderInput(copy.fieldLabels.height, `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
-        ${renderInput(copy.fieldLabels.subdrill, `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
-        ${renderInput(copy.fieldLabels.stemming, `profiles.${index}.stemming`, profile.stemming, 'number', { step: 0.05, min: 0 })}
-        ${renderInput(copy.fieldLabels.inclination, `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
-        ${renderInput(copy.fieldLabels.azimuth, `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
-        ${renderInput(copy.fieldLabels.density, `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
       </div>
       ${renderSegmentEditor(profile, index)}
-      <div class="profile-footer">
-        <span class="summary-chip"><strong>H</strong> ${formatDecimal(profile.altura_banco)} m</span>
-        <span class="summary-chip"><strong>C</strong> ${formatDecimal(sumSegmentsByType(profile.segments, 'column'))} m</span>
-        <span class="summary-chip"><strong>S</strong> ${formatDecimal(profile.subperfuracao)} m</span>
-      </div>
-    </article>`;
+    </div>`;
 }
 
 function renderSelect(label, path, value, options, helpText = '') {
@@ -2341,18 +2336,95 @@ function deckPositionOptions() {
   return DECK_POSITIONS.map((value) => ({ value, label: positions[value] || value }));
 }
 
+function renderAutoCalcSummary(profile, lang) {
+  const copy = getCopy(lang);
+  const labels = copy.labels;
+  const stem = sumSegmentsByType(profile.segments, 'stemming');
+  const charge = sumSegmentsByType(profile.segments, 'column');
+  const sub = Math.max(profile.subperfuracao, 0);
+  const bb = sumSegmentsByType(profile.segments, 'blastbag');
+  const ad = sumSegmentsByType(profile.segments, 'airdeck');
+  return `
+    <div class="auto-calc-bar">
+      <span class="auto-calc-chip" style="border-left: 3px solid var(--accent-blue);"><strong>H:</strong> ${formatDecimal(profile.altura_banco)}</span>
+      <span class="auto-calc-chip" style="border-left: 3px solid var(--accent-blue);"><strong>C:</strong> ${formatDecimal(charge)}</span>
+      <span class="auto-calc-chip" style="border-left: 3px solid #C8CDD5;"><strong>S:</strong> ${formatDecimal(stem)}</span>
+      <span class="auto-calc-chip" style="border-left: 3px solid #2F343B;"><strong>BB:</strong> ${formatDecimal(bb)}</span>
+      ${ad > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid var(--accent-orange);"><strong>AD:</strong> ${formatDecimal(ad)}</span>` : ''}
+      ${sub > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid #4B5563;"><strong>Sub:</strong> ${formatDecimal(sub)}</span>` : ''}
+    </div>`;
+}
+
+function handleSVGClick(event) {
+  const target = event.target;
+  if (!(target instanceof SVGElement)) return;
+  const rect = target.closest('rect[data-segment-key]');
+  if (!rect) return;
+  const profileIdx = Number(rect.getAttribute('data-profile'));
+  const segKey = rect.getAttribute('data-segment-key');
+  const segType = rect.getAttribute('data-segment-type');
+  if (!Number.isFinite(profileIdx) || !segKey) return;
+
+  if (profileIdx !== selectedProfileIndex) {
+    selectedProfileIndex = profileIdx;
+    selectedSegmentKey = segKey;
+    renderShell(config);
+  } else {
+    selectedSegmentKey = selectedSegmentKey === segKey ? null : segKey;
+    renderForms();
+  }
+}
+
 function renderForms() {
   const lang = getActiveLanguage();
-  dom.globalFields.innerHTML = renderGlobalSection(config);
-  dom.labelFields.innerHTML = renderLabelSection();
-  dom.profilesFields.innerHTML = renderProfilesSection();
-  dom.logoChip = document.getElementById('logoChip');
-  dom.meshChip = document.getElementById('meshChip');
+  const profile = state.profiles[selectedProfileIndex] || state.profiles[0];
+
+  if (dom.segmentEditorArea) {
+    dom.segmentEditorArea.innerHTML = renderProfileEditor(profile, selectedProfileIndex);
+  }
+  if (dom.autoCalcSummary && profile) {
+    dom.autoCalcSummary.innerHTML = renderAutoCalcSummary(profile, lang);
+  }
+  if (dom.globalFields) {
+    dom.globalFields.innerHTML = renderGlobalSection(config);
+  }
+  if (dom.labelFields) {
+    dom.labelFields.innerHTML = renderLabelSection();
+  }
+  if (dom.logoChip) syncLogoChip();
+  if (dom.meshChip) syncMeshChip();
   if (dom.profileCountLabel) dom.profileCountLabel.textContent = profileCountText(state.profileCount, lang);
-  if (dom.profileSectionCount) dom.profileSectionCount.textContent = profileCountText(state.profileCount, lang);
-  if (dom.projectSeed) dom.projectSeed.textContent = getSeedSourceLabel(seedSource, lang);
-  syncLogoChip();
-  syncMeshChip();
+  syncTopbarInputs();
+  renderProfileTabs();
+}
+
+function renderProfileTabs() {
+  if (!dom.profileTabs) return;
+  const letters = [];
+  for (let i = 0; i < state.profileCount; i++) {
+    const p = state.profiles[i];
+    const letter = (() => {
+      const parts = String(p.name || '').trim().split(/\s+/);
+      const last = parts[parts.length - 1];
+      if (last && last.length === 1 && last === last.toUpperCase()) return last;
+      return String(p.name || '?').trim()[0]?.toUpperCase() || '?';
+    })();
+    const accent = KIND_ACCENTS[p.kind]?.accent || KIND_ACCENTS.personalizado.accent;
+    const isActive = i === selectedProfileIndex;
+    letters.push(`<button class="profile-tab${isActive ? ' active' : ''}" type="button" data-profile-tab="${i}" style="${isActive ? `--accent:${accent}` : ''}">${escapeXml(letter)}</button>`);
+  }
+  dom.profileTabs.innerHTML = letters.join('');
+}
+
+function syncTopbarInputs() {
+  if (dom.polygonNameTop) {
+    dom.polygonNameTop.value = state.polygonName || '';
+  }
+  if (dom.templateNameTop) {
+    const copy = getCopy();
+    const opts = Object.keys(config.templates).map((t) => `<option value="${escapeXml(t)}"${t === state.templateName ? ' selected' : ''}>${escapeXml(templateDisplayName(t))}</option>`).join('');
+    dom.templateNameTop.innerHTML = opts;
+  }
 }
 
 function syncLogoChip() {
@@ -2686,26 +2758,14 @@ function renderStaticChrome() {
   const brandTitle = document.querySelector('.brand-text strong');
   if (brandTitle) brandTitle.textContent = copy.brand.title;
 
-  const brandSubtitle = document.querySelector('.brand-text span');
-  if (brandSubtitle) brandSubtitle.textContent = copy.brand.subtitle;
+  const profileMinus = document.getElementById('profileMinus');
+  if (profileMinus) profileMinus.setAttribute('aria-label', copy.buttons.removeProfile);
 
-  const topbarMeta = document.querySelector('.topbar__meta-text');
-  if (topbarMeta) topbarMeta.textContent = copy.topbar.meta;
+  const profilePlus = document.getElementById('profilePlus');
+  if (profilePlus) profilePlus.setAttribute('aria-label', copy.buttons.addProfile);
 
-  const topbarActions = document.querySelector('.topbar__actions');
-  if (topbarActions) topbarActions.setAttribute('aria-label', copy.topbar.formats);
-
-  const builderEyebrow = document.querySelector('.builder-panel .panel__head .eyebrow');
-  if (builderEyebrow) builderEyebrow.textContent = copy.builderPanel.eyebrow;
-
-  const builderTitle = document.querySelector('.builder-panel .panel__head h2');
-  if (builderTitle) builderTitle.textContent = copy.builderPanel.title;
-
-  const previewEyebrow = document.querySelector('.preview-panel .panel__head .eyebrow');
-  if (previewEyebrow) previewEyebrow.textContent = copy.preview.eyebrow;
-
-  const previewTitle = document.querySelector('.preview-panel .panel__head h2');
-  if (previewTitle) previewTitle.textContent = copy.preview.title;
+  const profileCountLabel = document.getElementById('profileCountLabel');
+  if (profileCountLabel) profileCountLabel.textContent = profileCountText(state.profileCount, lang);
 
   const resetButton = document.getElementById('resetButton');
   if (resetButton) resetButton.textContent = copy.buttons.reset;
@@ -2713,27 +2773,18 @@ function renderStaticChrome() {
   const saveButton = document.getElementById('saveButton');
   if (saveButton) saveButton.textContent = copy.buttons.save;
 
-  const profileMinus = document.getElementById('profileMinus');
-  if (profileMinus) profileMinus.setAttribute('aria-label', copy.buttons.removeProfile);
-
-  const profilePlus = document.getElementById('profilePlus');
-  if (profilePlus) profilePlus.setAttribute('aria-label', copy.buttons.addProfile);
-
-  const profileCountControl = document.querySelector('.segmented-control');
-  if (profileCountControl) profileCountControl.setAttribute('aria-label', copy.controls.profileCountAria);
-
-  const profileCountLabel = document.getElementById('profileCountLabel');
-  if (profileCountLabel) profileCountLabel.textContent = profileCountText(state.profileCount, lang);
-
-  const projectSeed = document.getElementById('projectSeed');
-  if (projectSeed) projectSeed.textContent = getSeedSourceLabel(seedSource, lang);
-
   const languageSelect = document.getElementById('languageSelect');
   if (languageSelect) {
     const languages = getSupportedLanguages(config);
     languageSelect.setAttribute('aria-label', copy.controls.language);
     languageSelect.innerHTML = languages.map((code) => `<option value="${escapeXml(code)}"${code === lang ? ' selected' : ''}>${escapeXml(languageDisplayName(code, lang))}</option>`).join('');
     languageSelect.value = lang;
+  }
+
+  const toggleBtn = document.getElementById('toggleGlobalSection');
+  if (toggleBtn) {
+    const firstSpan = toggleBtn.querySelector('span:first-child');
+    if (firstSpan) firstSpan.textContent = `${copy.sections.config.title} & ${copy.sections.labels.title}`;
   }
 }
 
@@ -2747,44 +2798,21 @@ function setLanguage(nextLanguage) {
   }
   renderStaticChrome();
   renderShell(config);
-  renderForms();
-  updateMemoryStatus(getMemoryStatusText(seedSource, normalized));
   scheduleUpdate(true);
 }
 
 function renderShell(currentConfig) {
   const copy = getCopy();
-  dom.builderForm.innerHTML = `
-    <section class="section">
-      <div class="section__head">
-        <div>
-          <p class="section__title">${copy.sections.config.title}</p>
-        </div>
-      </div>
-      <div id="globalFields"></div>
-    </section>
-    <section class="section">
-      <div class="section__head">
-        <div>
-          <p class="section__title">${copy.sections.labels.title}</p>
-        </div>
-      </div>
-      <div id="labelFields"></div>
-    </section>
-    <section class="section">
-      <div class="section__head">
-        <div>
-          <p class="section__title">${copy.sections.profiles.title}</p>
-        </div>
-        <span class="helper-pill" id="profileSectionCount">${profileCountText(state.profileCount)}</span>
-      </div>
-      <div id="profilesFields"></div>
-    </section>`;
+  const labelCopy = copy.sections.labels.title;
+  const configCopy = copy.sections.config.title;
 
-  dom.globalFields = document.getElementById('globalFields');
-  dom.labelFields = document.getElementById('labelFields');
-  dom.profilesFields = document.getElementById('profilesFields');
-  dom.profileSectionCount = document.getElementById('profileSectionCount');
+  if (dom.globalSettingsArea) {
+    dom.globalSettingsArea.innerHTML = `
+      <div id="labelFields"></div>
+      <div id="globalFields"></div>`;
+    dom.labelFields = document.getElementById('labelFields');
+    dom.globalFields = document.getElementById('globalFields');
+  }
   renderForms();
 }
 
@@ -2813,30 +2841,73 @@ async function init() {
   saveLanguagePreference(config, state.language);
   seedSource = stored ? 'browser' : (seed ? 'project' : 'default');
 
-  dom.builderForm = document.getElementById('builderForm');
+  dom.sidebar = document.getElementById('sidebar');
+  dom.profileTabs = document.getElementById('profileTabs');
+  dom.sidebarBody = document.getElementById('sidebarBody');
+  dom.segmentEditorArea = document.getElementById('segmentEditorArea');
+  dom.autoCalcSummary = document.getElementById('autoCalcSummary');
+  dom.globalSettingsArea = document.getElementById('globalSettingsArea');
+  dom.globalFields = null;
+  dom.labelFields = null;
   dom.previewCanvas = document.getElementById('previewCanvas');
   dom.validation = document.getElementById('validation');
-  dom.memoryStatus = document.getElementById('memoryStatus');
+  dom.memoryStatus = null;
   dom.profileCountLabel = document.getElementById('profileCountLabel');
-  dom.projectSeed = document.getElementById('projectSeed');
+  dom.projectSeed = null;
   dom.logoChip = null;
   dom.meshChip = null;
+  dom.polygonNameTop = document.getElementById('polygonNameTop');
+  dom.templateNameTop = document.getElementById('templateNameTop');
   dom.downloadButtons = Array.from(document.querySelectorAll('[data-download]'));
 
   renderStaticChrome();
   renderShell(config);
   logoDataUrl = await loadLogo(config.paths.logo_path || FALLBACK_CONFIG.paths.logo_path);
-  updateMemoryStatus(getMemoryStatusText(seedSource, state.language));
-  if (dom.projectSeed) dom.projectSeed.textContent = getSeedSourceLabel(seedSource, state.language);
 
-  document.getElementById('builderForm').addEventListener('input', handleInputEvent);
-  document.getElementById('builderForm').addEventListener('change', handleInputEvent);
+  dom.polygonNameTop?.addEventListener('input', (event) => {
+    state.polygonName = event.target.value;
+    scheduleUpdate();
+  });
+
+  dom.templateNameTop?.addEventListener('change', (event) => {
+    state.templateName = resolveTemplateName(event.target.value, config) || createDefaultState(config, getActiveLanguage()).templateName;
+    scheduleUpdate();
+  });
+
+  document.getElementById('sidebarBody')?.addEventListener('input', handleInputEvent);
+  document.getElementById('sidebarBody')?.addEventListener('change', handleInputEvent);
   document.addEventListener('click', handleClickEvent);
+
+  const toggleGlobalBtn = document.getElementById('toggleGlobalSection');
+  toggleGlobalBtn?.addEventListener('click', () => {
+    const area = dom.globalSettingsArea;
+    if (!area) return;
+    const expanded = toggleGlobalBtn.getAttribute('aria-expanded') === 'true';
+    toggleGlobalBtn.setAttribute('aria-expanded', String(!expanded));
+    area.hidden = expanded;
+    if (!expanded && !area.dataset.rendered) {
+      area.dataset.rendered = '1';
+      renderShell(config);
+    }
+  });
+
+  dom.profileTabs?.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof HTMLElement)) return;
+    const idx = target.getAttribute('data-profile-tab');
+    if (idx === null) return;
+    selectedProfileIndex = Number(idx);
+    selectedSegmentKey = null;
+    renderForms();
+    scheduleUpdate();
+  });
+
+  dom.previewCanvas?.addEventListener('click', handleSVGClick);
+
   document.getElementById('languageSelect')?.addEventListener('change', (event) => {
     if (event.target instanceof HTMLSelectElement) setLanguage(event.target.value);
   });
 
-  renderForms();
   await updatePreview(true);
 }
 
