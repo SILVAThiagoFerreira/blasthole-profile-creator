@@ -21,10 +21,6 @@
   --radius-sm: 2px;
 }
 
-.hero {
-  display: none !important;
-}
-
 * {
   box-sizing: border-box;
 }
