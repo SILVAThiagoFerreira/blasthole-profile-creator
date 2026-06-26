@@ -2728,36 +2728,6 @@ function renderStaticChrome() {
   const projectSeed = document.getElementById('projectSeed');
   if (projectSeed) projectSeed.textContent = getSeedSourceLabel(seedSource, lang);
 
-  const heroEyebrow = document.querySelector('.hero .eyebrow');
-  if (heroEyebrow) heroEyebrow.textContent = copy.hero.eyebrow;
-
-  const heroTitle = document.querySelector('.hero h1');
-  if (heroTitle) heroTitle.textContent = copy.hero.title;
-
-  const heroSubtitle = document.querySelector('.hero__subtitle');
-  if (heroSubtitle) heroSubtitle.textContent = copy.hero.subtitle;
-
-  const heroBadges = document.querySelector('.hero__badges');
-  if (heroBadges) heroBadges.remove();
-
-  const heroPanelEyebrow = document.querySelector('.panel--hero .panel__head .eyebrow');
-  if (heroPanelEyebrow) heroPanelEyebrow.textContent = copy.heroPanel.eyebrow;
-
-  const heroPanelTitle = document.querySelector('.panel--hero h2');
-  if (heroPanelTitle) heroPanelTitle.textContent = copy.heroPanel.title;
-
-  if (dom.memoryStatus) dom.memoryStatus.textContent = copy.heroPanel.loading;
-
-  Array.from(document.querySelectorAll('.hero__stats .stat span')).forEach((span, index) => {
-    const values = [copy.heroPanel.stats.rendering, copy.heroPanel.stats.export, copy.heroPanel.stats.storage];
-    if (values[index]) span.textContent = values[index];
-  });
-
-  Array.from(document.querySelectorAll('.hero__stats .stat strong')).forEach((strong, index) => {
-    const values = ['SVG', '3840x2160', copy.heroPanel.stats.storageValue];
-    if (values[index]) strong.textContent = values[index];
-  });
-
   const languageSelect = document.getElementById('languageSelect');
   if (languageSelect) {
     const languages = getSupportedLanguages(config);
@@ -2789,7 +2759,6 @@ function renderShell(currentConfig) {
       <div class="section__head">
         <div>
           <p class="section__title">${copy.sections.config.title}</p>
-          <p class="section__subtitle">${copy.sections.config.subtitle}</p>
         </div>
       </div>
       <div id="globalFields"></div>
@@ -2798,7 +2767,6 @@ function renderShell(currentConfig) {
       <div class="section__head">
         <div>
           <p class="section__title">${copy.sections.labels.title}</p>
-          <p class="section__subtitle">${copy.sections.labels.subtitle}</p>
         </div>
       </div>
       <div id="labelFields"></div>
@@ -2807,7 +2775,6 @@ function renderShell(currentConfig) {
       <div class="section__head">
         <div>
           <p class="section__title">${copy.sections.profiles.title}</p>
-          <p class="section__subtitle">${copy.sections.profiles.subtitle(currentConfig.validation.max_profiles)}</p>
         </div>
         <span class="helper-pill" id="profileSectionCount">${profileCountText(state.profileCount)}</span>
       </div>
