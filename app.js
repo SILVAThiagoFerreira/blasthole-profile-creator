@@ -262,6 +262,7 @@ const COPY = {
       initiatorNone: 'Nenhum',
       initiatorBrinel: 'Brinel (Não Eletrônico)',
       initiatorDVT: 'DVT (Eletrônico)',
+      initiatorBoth: 'Brinel + DVT (Dupla)',
       hasBooster: 'Reforçador (X-Booster)',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pré-corte)',
@@ -276,6 +277,7 @@ const COPY = {
     segmentTypes: {
       stemming: 'Tampão',
       column: 'Carga',
+      cartridge: 'Cartucho',
       blastbag: 'Bolsa de Ar',
       airdeck: 'Deck de ar',
     },
@@ -470,6 +472,7 @@ const COPY = {
       initiatorNone: 'None',
       initiatorBrinel: 'Brinel (Non-Electronic)',
       initiatorDVT: 'DVT (Electronic)',
+      initiatorBoth: 'Brinel + DVT (Dual)',
       hasBooster: 'Booster (X-Booster)',
       boosterWeight: 'Weight (g)',
       cartridgeCount: 'Cartridges (pre-cut)',
@@ -484,6 +487,7 @@ const COPY = {
     segmentTypes: {
       stemming: 'Stemming',
       column: 'Charge',
+      cartridge: 'Cartridge',
       blastbag: 'Air bag',
       airdeck: 'Air deck',
     },
@@ -678,6 +682,7 @@ const COPY = {
       initiatorNone: 'Ninguno',
       initiatorBrinel: 'Brinel (No Electrónico)',
       initiatorDVT: 'DVT (Electrónico)',
+      initiatorBoth: 'Brinel + DVT (Doble)',
       hasBooster: 'Reforzador (X-Booster)',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pre-corte)',
@@ -692,6 +697,7 @@ const COPY = {
     segmentTypes: {
       stemming: 'Taco',
       column: 'Carga',
+      cartridge: 'Cartucho',
       blastbag: 'Bolsa de aire',
       airdeck: 'Deck de aire',
     },
@@ -886,6 +892,7 @@ const COPY = {
       initiatorNone: '无',
       initiatorBrinel: 'Brinel (非电子)',
       initiatorDVT: 'DVT (电子)',
+      initiatorBoth: 'Brinel + DVT (双重)',
       hasBooster: '增强器 (X-Booster)',
       boosterWeight: '重量 (g)',
       cartridgeCount: '药卷 (预裂)',
@@ -900,6 +907,7 @@ const COPY = {
     segmentTypes: {
       stemming: '堵塞',
       column: '装药',
+      cartridge: '药卷',
       blastbag: '缓冲袋',
       airdeck: '空气间隔',
     },
@@ -995,8 +1003,8 @@ const COPY = {
 
 const KIND_OPTIONS = ['produção', 'amortecimento', 'contorno', 'personalizado'];
 const KIND_ACCENTS = {
-  produção: { accent: '#1D6FB8', soft: '#E9F2FB', title: 'Produção' },
-  amortecimento: { accent: '#F28C28', soft: '#FFF1E2', title: 'Amortecimento' },
+  produção: { accent: '#1565C0', soft: '#E3F2FD', title: 'Produção' },
+  amortecimento: { accent: '#EF9A3A', soft: '#FFF3E0', title: 'Amortecimento' },
   contorno: { accent: '#D71920', soft: '#FFE3E5', title: 'Contorno' },
   personalizado: { accent: '#223A8D', soft: '#E8ECFA', title: 'Personalizado' },
 };
@@ -1160,7 +1168,7 @@ const PROFILE_FIELDS = [
 ];
 
 const DECK_POSITIONS = ['above_stemming', 'mid_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
-const SEGMENT_TYPES = ['stemming', 'column', 'blastbag', 'airdeck'];
+const SEGMENT_TYPES = ['stemming', 'column', 'cartridge', 'blastbag', 'airdeck'];
 
 const DEFAULT_STORAGE_KEY = 'openblast.profile-creator.web.state.v5';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
@@ -1413,7 +1421,7 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.inclinacao = normalizeNumber(profile.inclinacao, fallback.inclinacao);
   profile.azimute = normalizeNumber(profile.azimute, fallback.azimute);
   profile.densidade = normalizeNumber(profile.densidade, fallback.densidade);
-  profile.initiator = ['none', 'brinel', 'dvt'].includes(profile.initiator) ? profile.initiator : (fallback.initiator || 'none');
+  profile.initiator = ['none', 'brinel', 'dvt', 'both'].includes(profile.initiator) ? profile.initiator : (fallback.initiator || 'none');
   profile.has_booster = Boolean(profile.has_booster);
   profile.booster_weight = normalizeNumber(profile.booster_weight, fallback.booster_weight || 450);
   profile.cartridge_count = Math.max(0, Math.round(normalizeNumber(profile.cartridge_count, fallback.cartridge_count || 0)));
@@ -1926,7 +1934,17 @@ function renderProfileCard(profile, theme, box, compact, index) {
     } else if (type === 'blastbag') {
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1 + gapX}" y="${yCur}" width="${cylW - gapX * 2}" height="${y2 - yCur}" fill="#1F2937" rx="1"/>`);
     } else if (type === 'column') {
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="#D4843E"/><stop offset="25%" stop-color="#C4762F"/><stop offset="100%" stop-color="#A85D1A"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})" rx="0"/>`);
+      const colLight = mixHex(accent, '#FFFFFF', 0.25);
+      const colDark = mixHex(accent, '#000000', 0.15);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${colLight}"/><stop offset="25%" stop-color="${accent}"/><stop offset="100%" stop-color="${colDark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})" rx="0"/>`);
+    } else if (type === 'cartridge') {
+      const cartLight = mixHex(accent, '#FFFFFF', 0.15);
+      const cartDark = mixHex(accent, '#000000', 0.20);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${cartLight}"/><stop offset="30%" stop-color="${accent}"/><stop offset="100%" stop-color="${cartDark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})" rx="0"/>`);
+      const innerW = cylW * 0.6;
+      const innerH = Math.max(4, (y2 - yCur) * 0.5);
+      const innerY = yCur + (y2 - yCur - innerH) / 2;
+      segmentMarkup.push(`<rect x="${cx - innerW / 2}" y="${innerY}" width="${innerW}" height="${innerH}" rx="${compact ? 3 : 5}" fill="${mixHex(accent, '#FFFFFF', 0.4)}" stroke="${mixHex(accent, '#000000', 0.1)}" stroke-width="0.5"/>`);
     } else {
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#6B7280" rx="0"/>`);
     }
@@ -2019,39 +2037,49 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ${(() => {
       const overlay = [];
       if (profile.has_booster) {
-        const boostH = compact ? 10 : 16;
-        const boostW = cylW * 0.55;
-        const boostCx = cx;
+        const boostH = compact ? 10 : 14;
+        const boostW = cylW * 0.45;
+        const boostX = cx - boostW / 2;
         const boostY = holeBottom - boostH - 2;
-        overlay.push(`<polygon points="${boostCx - boostW / 2},${boostY} ${boostCx + boostW / 2},${boostY} ${boostCx + boostW * 0.15},${boostY + boostH} ${boostCx - boostW * 0.15},${boostY + boostH}" fill="#E74C3C" stroke="#C0392B" stroke-width="1"/>`);
+        overlay.push(`<rect x="${boostX}" y="${boostY}" width="${boostW}" height="${boostH}" rx="2" fill="#E74C3C" stroke="#C0392B" stroke-width="1"/>`);
         if (!compact) {
           const lblX = cylX2 + 14;
-          overlay.push(`<line x1="${boostCx}" y1="${boostY + boostH / 2}" x2="${lblX - 2}" y2="${boostY + boostH / 2}" stroke="#E74C3C" stroke-width="0.6"/>`);
+          overlay.push(`<line x1="${cx}" y1="${boostY + boostH / 2}" x2="${lblX - 2}" y2="${boostY + boostH / 2}" stroke="#E74C3C" stroke-width="0.6"/>`);
           overlay.push(`<text x="${lblX}" y="${boostY + boostH / 2 + 1}" fill="#E74C3C" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">X-Booster ${profile.booster_weight}g</text>`);
         }
       }
-      if (profile.initiator !== 'none') {
-        const cableColor = profile.initiator === 'brinel' ? '#E67E22' : '#8E44AD';
-        const cableX = cx - (compact ? 2 : 4);
-        const firstColIdx = segmentData.findIndex(s => s.type === 'column');
+      const drawCable = (color, offsetX, label) => {
+        const cableX = cx + offsetX;
         let cableBottom = holeBottom - 4;
         if (profile.has_booster) {
-          cableBottom = holeBottom - (compact ? 22 : 28);
-        } else if (firstColIdx >= 0) {
+          cableBottom = holeBottom - (compact ? 18 : 24);
+        } else {
           let accY = holeTop;
-          for (let si = 0; si <= firstColIdx; si++) {
-            const sv = Math.max(segmentData[si].value, 0);
-            accY += holeH * (sv / total);
+          for (const seg of segmentData) {
+            const sv = Math.max(seg.value, 0);
+            const segH = holeH * (sv / total);
+            if (seg.type === 'column' || seg.type === 'cartridge') {
+              cableBottom = accY + segH - 2;
+              break;
+            }
+            accY += segH;
           }
-          cableBottom = accY - 2;
         }
-        overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${cableBottom}" stroke="${cableColor}" stroke-width="${compact ? 1.5 : 2.5}" stroke-linecap="round"/>`);
-        overlay.push(`<circle cx="${cableX}" cy="${holeTop - 4}" r="${compact ? 2 : 3}" fill="${cableColor}"/>`);
-        if (!compact) {
+        overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${cableBottom}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
+        overlay.push(`<circle cx="${cableX}" cy="${holeTop - 4}" r="${compact ? 2 : 3}" fill="${color}"/>`);
+        if (!compact && label) {
           const lblX = cylX2 + 14;
           const lblY = (holeTop + cableBottom) / 2;
-          overlay.push(`<text x="${lblX}" y="${lblY}" fill="${cableColor}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${profile.initiator === 'brinel' ? 'Brinel' : 'DVT'}</text>`);
+          overlay.push(`<text x="${lblX}" y="${lblY}" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
         }
+      };
+      if (profile.initiator === 'brinel') {
+        drawCable('#E67E22', compact ? -2 : -4, 'Brinel');
+      } else if (profile.initiator === 'dvt') {
+        drawCable('#8E44AD', compact ? -2 : -4, 'DVT');
+      } else if (profile.initiator === 'both') {
+        drawCable('#E67E22', compact ? -4 : -6, 'Brinel');
+        drawCable('#8E44AD', compact ? 0 : 2, 'DVT');
       }
       if (profile.cartridge_count > 0 && !compact) {
         const chargeStart = segmentData.slice(0, segmentData.findIndex(s => s.type === 'column') >= 0 ? segmentData.findIndex(s => s.type === 'column') : 0).reduce((acc, s) => acc + holeH * (Math.max(s.value, 0) / total), holeTop);
@@ -2422,6 +2450,7 @@ function renderProfileEditor(profile, index) {
             { value: 'none', label: copy.fieldLabels.initiatorNone },
             { value: 'brinel', label: copy.fieldLabels.initiatorBrinel },
             { value: 'dvt', label: copy.fieldLabels.initiatorDVT },
+            { value: 'both', label: copy.fieldLabels.initiatorBoth },
           ], '')}
           <div class="field">
             <label><input type="checkbox" data-path="profiles.${index}.has_booster"${profile.has_booster ? ' checked' : ''}> ${escapeXml(copy.fieldLabels.hasBooster)}</label>
