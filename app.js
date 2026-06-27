@@ -1,6 +1,6 @@
 const FALLBACK_CONFIG = {
   app: {
-    title: 'Charge Profile Studio',
+    title: 'Blasthole Profile Studio',
     subtitle: 'Workspace técnico para perfis de carga.',
     default_profile_type: 'Perfis técnicos',
     default_language: 'pt-BR',
@@ -159,11 +159,11 @@ const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'es', 'en', 'zh-CN'];
 const COPY = {
   'pt-BR': {
     meta: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       description: 'Workspace profissional para criação, validação e exportação local de perfis de carga.',
     },
     brand: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -321,7 +321,7 @@ const COPY = {
       saveFailure: 'Não foi possível salvar a memória local.',
     },
     svg: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       desc: 'Perfil de carga editável com composição vetorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: 'Workspace técnico',
@@ -369,11 +369,11 @@ const COPY = {
   },
   en: {
     meta: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       description: 'Professional workspace for creating, validating, and exporting charge profiles locally.',
     },
     brand: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -531,7 +531,7 @@ const COPY = {
       saveFailure: 'Could not save local memory.',
     },
     svg: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       desc: 'Editable charge profile with vector composition.',
       headerTitle: 'CHARGE PROFILE',
       headerBadge: 'Technical workspace',
@@ -579,11 +579,11 @@ const COPY = {
   },
   es: {
     meta: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       description: 'Workspace profesional para crear, validar y exportar perfiles de carga localmente.',
     },
     brand: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -741,7 +741,7 @@ const COPY = {
       saveFailure: 'No fue posible guardar la memoria local.',
     },
     svg: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       desc: 'Perfil de carga editable con composición vectorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: 'Workspace técnico',
@@ -789,11 +789,11 @@ const COPY = {
   },
   'zh-CN': {
     meta: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       description: '用于本地创建、验证并导出装药剖面的专业工作区。',
     },
     brand: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -951,7 +951,7 @@ const COPY = {
       saveFailure: '无法保存本地记忆。',
     },
     svg: {
-      title: 'Charge Profile Studio',
+      title: 'Blasthole Profile Studio',
       desc: '可编辑的装药剖面，采用矢量组成。',
       headerTitle: '装药剖面',
       headerBadge: '技术工作区',
