@@ -1726,14 +1726,14 @@ function iconDensity(x, y, size, color) {
 
 function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alternate, compact }) {
   const rowFill = alternate ? '#F9FAFB' : 'transparent';
-  const iconSize = compact ? 18 : 24;
+  const iconSize = compact ? 18 : 26;
   const iconX = x + 10;
   const iconY = y + (h - iconSize) / 2;
-  const labelX = x + 44;
+  const labelX = x + 46;
   const labelY = y + (compact ? 14 : 16);
-  const valueFont = compact ? 10 : 12;
-  const labelFont = compact ? 9 : 10;
-  const valueY = y + (compact ? 22 : 24);
+  const valueFont = compact ? 10 : 13;
+  const labelFont = compact ? 9 : 11;
+  const valueY = y + (compact ? 22 : 26);
   const rightValue = value;
   const valueWidth = measureTextWidth(rightValue, valueFont, `'IBM Plex Sans', sans-serif`, 700);
   const valueX = x + w - 14 - valueWidth;
@@ -1757,7 +1757,7 @@ function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alterna
       ${icons[kind] || iconStem(iconX, iconY, iconSize, color)}
       <text x="${labelX}" y="${labelY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelFont}" font-weight="700" letter-spacing="0.08em">${escapeXml(label.toUpperCase())}</text>
       <text x="${valueX}" y="${valueY}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${valueFont}" font-weight="700">${escapeXml(rightValue)}</text>
-      <line x1="${x + 6}" y1="${y + h - 1}" x2="${x + w - 6}" y2="${y + h - 1}" stroke="#E5E7EB" stroke-width="1"/>
+      <line x1="${x + 6}" y1="${y + h - 1}" x2="${x + w - 6}" y2="${y + h - 1}" stroke="#E9EBED" stroke-width="0.5"/>
     </g>`;
 }
 
@@ -1813,9 +1813,9 @@ function renderProfileCard(profile, theme, box, compact, index) {
     return String(profile.name || '?').trim()[0]?.toUpperCase() || '?';
   })();
 
-  const titleSize = compact ? 17 : 18;
-  const subSize = compact ? 10 : 11;
-  const tagSize = compact ? 8 : 10;
+  const titleSize = compact ? 17 : 20;
+  const subSize = compact ? 10 : 12;
+  const tagSize = compact ? 9 : 11;
   const badgeR = compact ? 20 : 22;
   const badgeCx = x + (compact ? 44 : 46);
   const badgeCy = y + (compact ? 46 : 50);
@@ -1824,20 +1824,20 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const tagX = Math.min(x + w - tagWidth - 34, x + (compact ? 320 : 380) - tagWidth / 2 - 8);
   const tagY = y + (compact ? 22 : 24);
   const tagHeight = compact ? 22 : 24;
-  const contentTop = compact ? y + 86 : y + 108;
-  const contentBottomPad = compact ? 22 : 36;
+  const contentTop = compact ? y + 86 : y + 112;
+  const contentBottomPad = compact ? 22 : 32;
   const drawingBox = compact
     ? { x: x + 18, y: contentTop, w: 92, h: h - (contentTop - y) - contentBottomPad }
-    : { x: x + 34, y: y + 108, w: 144, h: h - 218 };
+    : { x: x + 34, y: y + 112, w: 160, h: h - 220 };
   const infoBox = compact
     ? { x: x + 160, y: contentTop, w: w - 184, h: h - (contentTop - y) - contentBottomPad }
-    : { x: x + 274, y: y + 108, w: w - 302, h: h - 218 };
+    : { x: x + 296, y: y + 112, w: w - 324, h: h - 220 };
   const left = drawingBox.x;
   const top = drawingBox.y;
   const right = drawingBox.x + drawingBox.w;
   const bottom = drawingBox.y + drawingBox.h;
   const cx = left + drawingBox.w / 2;
-  const cylW = compact ? 34 : 52;
+  const cylW = compact ? 34 : 60;
   const cylX1 = cx - cylW / 2;
   const cylX2 = cx + cylW / 2;
   const holeTop = top + (compact ? 20 : 28);
@@ -1877,12 +1877,12 @@ function renderProfileCard(profile, theme, box, compact, index) {
     }
 
     if (y2 - yCur >= (compact ? 10 : 14)) {
-      const labelX = cylX2 + (compact ? 4 : 8);
-      const labelSize = compact ? 7 : 10;
+      const labelX = cylX2 + (compact ? 4 : 10);
+      const labelSize = compact ? 7 : 11;
       const labelValue = `${segmentDisplayLabel(type, lang, compact)} ${formatDecimal(segVal)}m`;
       const safeLabel = shortText(labelValue, compact ? 13 : 22);
-      segmentMarkup.push(`<line x1="${cylX2 + 2}" y1="${midY}" x2="${labelX + (compact ? 2 : 8)}" y2="${midY}" stroke="${theme.muted}" stroke-width="1" stroke-dasharray="3 3"/>`);
-      segmentMarkup.push(`<text x="${labelX + (compact ? 4 : 10)}" y="${midY - 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="${compact ? 700 : 500}">${escapeXml(safeLabel)}</text>`);
+      segmentMarkup.push(`<line x1="${cylX2 + 2}" y1="${midY}" x2="${labelX + (compact ? 2 : 8)}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.8" stroke-dasharray="3 3"/>`);
+      segmentMarkup.push(`<text x="${labelX + (compact ? 4 : 10)}" y="${midY - 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="600">${escapeXml(safeLabel)}</text>`);
     }
     yCur = y2;
   }
@@ -1909,7 +1909,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
       ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
     ];
 
-  const rowHeight = compact ? 28 : 40;
+  const rowHeight = compact ? 28 : 44;
   const rowStart = infoBox.y + (compact ? 34 : 44);
   const rowsMarkup = metricRows.map((row, idx) => renderMetricRow({
     x: infoBox.x + 8,
@@ -1953,31 +1953,32 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
   return `
     <g filter="url(#shadow)">
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
     </g>
-    <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="26" fill="none" stroke="#FFFFFF"/>
-    <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="6" rx="3" fill="${accentSoft}"/>
+    <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="18" fill="none" stroke="#FFFFFF"/>
+    <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${accentSoft}"/>
 
     <circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="${accent}"/>
     <text x="${badgeCx}" y="${badgeCy + 6}" fill="#FFFFFF" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 18 : 20}" font-weight="700">${escapeXml(badgeLetter)}</text>
 
-    <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 36 : 30)}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
+    <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 36 : 32)}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
     <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 58 : 58)}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM`)}</text>
-    ${compact ? '' : `<rect x="${tagX}" y="${tagY}" width="${tagWidth + 16}" height="${tagHeight}" rx="10" fill="${accentSoft}"/>
+    ${compact ? '' : `<rect x="${tagX}" y="${tagY}" width="${tagWidth + 16}" height="${tagHeight}" rx="8" fill="${accentSoft}"/>
     <text x="${tagX + 8}" y="${tagY + 16}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${tagSize}" font-weight="700">${escapeXml(tagText)}</text>`}
 
-    <rect x="${x + 18}" y="${y + (compact ? 80 : 88)}" width="${w - 36}" height="4" rx="2" fill="${accent}"/>
+    <rect x="${x + 18}" y="${y + (compact ? 80 : 92)}" width="${w - 36}" height="3" rx="1.5" fill="${accent}"/>
 
-    <rect x="${drawingBox.x}" y="${drawingBox.y}" width="${drawingBox.w}" height="${drawingBox.h}" rx="16" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <rect x="${drawingBox.x}" y="${drawingBox.y}" width="${drawingBox.w}" height="${drawingBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
     ${segmentMarkup.join('')}
-    <rect x="${cylX1}" y="${holeTop}" width="${cylW}" height="${holeBottom - holeTop}" rx="${compact ? 16 : 20}" fill="none" stroke="${theme.title}" stroke-width="2"/>
-    <ellipse cx="${cx}" cy="${holeTop + 2}" rx="${cylW / 2}" ry="7" fill="#E9EEF4" stroke="${theme.title}" stroke-width="2"/>
-    <ellipse cx="${cx}" cy="${holeBottom - 2}" rx="${cylW / 2}" ry="7" fill="#374151" stroke="${theme.title}" stroke-width="2"/>
-    <line x1="${cylX1 + 5}" y1="${holeTop + 14}" x2="${cylX1 + 5}" y2="${holeBottom - 14}" stroke="rgba(255,255,255,0.75)" stroke-width="2"/>
+    <rect x="${cylX1}" y="${holeTop}" width="${cylW}" height="${holeBottom - holeTop}" rx="${compact ? 16 : 18}" fill="none" stroke="${theme.title}" stroke-width="2"/>
+    <rect x="${cylX1 + 1}" y="${holeTop}" width="${Math.max(2, cylW * 0.15)}" height="${holeBottom - holeTop}" rx="3" fill="rgba(255,255,255,0.35)"/>
+    <ellipse cx="${cx}" cy="${holeTop + 2}" rx="${cylW / 2}" ry="${compact ? 7 : 9}" fill="#E9EEF4" stroke="${theme.title}" stroke-width="2"/>
+    <ellipse cx="${cx}" cy="${holeBottom - 2}" rx="${cylW / 2}" ry="${compact ? 7 : 9}" fill="#374151" stroke="${theme.title}" stroke-width="2"/>
+    <line x1="${cylX1 + 6}" y1="${holeTop + 16}" x2="${cylX1 + 6}" y2="${holeBottom - 16}" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"/>
     <text x="${left + 4}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 9 : 10}" font-weight="700">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>
 
-    <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="16" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 6}" fill="${accent}" rx="3"/>
+    <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 5}" fill="${accent}" rx="2.5"/>
     <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
     ${rowsMarkup}
     ${chipMarkup.join('')}
@@ -1990,14 +1991,14 @@ function renderMeshPanel(theme, box) {
   if (state.mesh?.dataUrl) {
     return `
       <g filter="url(#shadow)">
-        <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
+        <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
       </g>
-      <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="26" fill="none" stroke="#FFFFFF"/>
-      <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="6" rx="3" fill="${theme.accent_red}"/>
-      <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">${copy.svg.meshTitle}</text>
-      <rect x="${x + 28}" y="${y + 60}" width="52" height="4" rx="2" fill="${theme.accent_red}"/>
-      <rect x="${x + 28}" y="${y + 84}" width="140" height="28" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
-      <text x="${x + 40}" y="${y + 102}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">${copy.svg.meshAttached}</text>
+      <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="18" fill="none" stroke="#FFFFFF"/>
+      <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${theme.accent_red}"/>
+      <text x="${x + 26}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="18" font-weight="700">${copy.svg.meshTitle}</text>
+      <rect x="${x + 26}" y="${y + 58}" width="48" height="3" rx="1.5" fill="${theme.accent_red}"/>
+      <rect x="${x + 26}" y="${y + 78}" width="130" height="26" rx="8" fill="#F8FAFC" stroke="#E5E7EB"/>
+      <text x="${x + 38}" y="${y + 96}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">${copy.svg.meshAttached}</text>
       <rect x="${x + 32}" y="${y + 128}" width="${w - 64}" height="${h - 176}" rx="20" fill="#F9FAFB" stroke="#E5E7EB"/>
       <image href="${state.mesh.dataUrl}" x="${x + 44}" y="${y + 140}" width="${w - 88}" height="${h - 200}" preserveAspectRatio="xMidYMid meet"/>
     `;
@@ -2005,31 +2006,31 @@ function renderMeshPanel(theme, box) {
 
   const grid = [];
   for (let gx = x + 16; gx <= x + w - 16; gx += 18) {
-    grid.push(`<line x1="${gx}" y1="${y + 18}" x2="${gx}" y2="${y + h - 16}" stroke="rgba(29,111,184,0.10)" stroke-width="1"/>`);
+    grid.push(`<line x1="${gx}" y1="${y + 18}" x2="${gx}" y2="${y + h - 16}" stroke="rgba(29,111,184,0.06)" stroke-width="1"/>`);
   }
   for (let gy = y + 18; gy <= y + h - 16; gy += 18) {
-    grid.push(`<line x1="${x + 16}" y1="${gy}" x2="${x + w - 16}" y2="${gy}" stroke="rgba(29,111,184,0.08)" stroke-width="1"/>`);
+    grid.push(`<line x1="${x + 16}" y1="${gy}" x2="${x + w - 16}" y2="${gy}" stroke="rgba(29,111,184,0.05)" stroke-width="1"/>`);
   }
 
   return `
     <g filter="url(#shadow)">
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="28" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
     </g>
-    <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="26" fill="none" stroke="#FFFFFF"/>
-    <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="6" rx="3" fill="${theme.accent_red}"/>
-    <text x="${x + 28}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="20" font-weight="700">${copy.svg.meshTitle}</text>
-    <rect x="${x + 28}" y="${y + 60}" width="52" height="4" rx="2" fill="${theme.accent_red}"/>
-    <text x="${x + 28}" y="${y + 78}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="14">${escapeXml(state.polygonName)}</text>
-    <rect x="${x + 32}" y="${y + 104}" width="${w - 64}" height="${h - 194}" rx="20" fill="#F8FAFC" stroke="#E5E7EB" stroke-dasharray="8 8"/>
+    <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="18" fill="none" stroke="#FFFFFF"/>
+    <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${theme.accent_red}"/>
+    <text x="${x + 26}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="18" font-weight="700">${copy.svg.meshTitle}</text>
+    <rect x="${x + 26}" y="${y + 58}" width="48" height="3" rx="1.5" fill="${theme.accent_red}"/>
+    <text x="${x + 26}" y="${y + 78}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13">${escapeXml(state.polygonName)}</text>
+    <rect x="${x + 32}" y="${y + 104}" width="${w - 64}" height="${h - 194}" rx="16" fill="#F8FAFC" stroke="#E5E7EB" stroke-dasharray="6 6"/>
     ${grid.join('')}
-    <circle cx="${x + w / 2}" cy="${y + 200}" r="34" fill="#F9FAFB" stroke="#D1D5DB"/>
-    <path d="M${x + w / 2} ${y + 188} V${y + 210}" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
-    <path d="M${x + w / 2} ${y + 188} l-7 10 h14 Z" fill="#9CA3AF"/>
-    <text x="${x + w / 2}" y="${y + 250}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">${copy.svg.meshPrompt}</text>
-    <text x="${x + w / 2}" y="${y + 276}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">${copy.svg.meshNoAttachment}</text>
-    <rect x="${x + w / 2 - 62}" y="${y + h - 98}" width="124" height="28" rx="12" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <text x="${x + w / 2}" y="${y + h - 78}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">${copy.svg.referenceMode}</text>
-    <text x="${x + 36}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12">${copy.svg.referenceModeDesc}</text>
+    <circle cx="${x + w / 2}" cy="${y + 200}" r="30" fill="#F9FAFB" stroke="#D1D5DB"/>
+    <path d="M${x + w / 2} ${y + 190} V${y + 210}" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
+    <path d="M${x + w / 2} ${y + 190} l-6 9 h12 Z" fill="#9CA3AF"/>
+    <text x="${x + w / 2}" y="${y + 248}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${copy.svg.meshPrompt}</text>
+    <text x="${x + w / 2}" y="${y + 270}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11">${copy.svg.meshNoAttachment}</text>
+    <rect x="${x + w / 2 - 58}" y="${y + h - 92}" width="116" height="26" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <text x="${x + w / 2}" y="${y + h - 74}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">${copy.svg.referenceMode}</text>
+    <text x="${x + 34}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11">${copy.svg.referenceModeDesc}</text>
   `;
 }
 
@@ -2037,33 +2038,33 @@ function renderHeader(theme, box) {
   const copy = getCopy();
   const { x, y, w, h } = box;
   const title = copy.svg.headerTitle;
-  const titleSize = fitFontSize(title, w - 560, 32, `'IBM Plex Sans', sans-serif`, 700, 24);
-  const polygonSize = fitFontSize(state.polygonName, w - 560, 27, `'IBM Plex Sans', sans-serif`, 700, 19);
-  const logoBox = { x: x + 40, y: y + 18, w: 184, h: 92 };
+  const titleSize = fitFontSize(title, w - 560, 30, `'IBM Plex Sans', sans-serif`, 700, 22);
+  const polygonSize = fitFontSize(state.polygonName, w - 560, 24, `'IBM Plex Sans', sans-serif`, 700, 18);
+  const logoBox = { x: x + 40, y: y + 14, w: 170, h: 80 };
   const rightBadgeText = String(state.profileType || copy.defaults.profileType).toUpperCase();
-  const badgeFont = 19;
+  const badgeFont = 17;
   const badgeTextWidth = measureTextWidth(rightBadgeText, badgeFont, `'IBM Plex Sans', sans-serif`, 700);
-  const badgeW = Math.max(210, badgeTextWidth + 52);
+  const badgeW = Math.max(200, badgeTextWidth + 48);
   const badgeX = x + w - badgeW - 40;
 
   return `
     <rect x="0" y="0" width="${w}" height="${h}" fill="#FFFFFF"/>
-    <rect x="0" y="0" width="${w}" height="6" fill="${theme.accent_red}"/>
+    <rect x="0" y="0" width="${w}" height="5" fill="${theme.accent_red}"/>
     <line x1="${x + 40}" y1="${y + h - 1}" x2="${x + w - 40}" y2="${y + h - 1}" stroke="#EEF2F7" stroke-width="1"/>
-    <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="${logoBox.h}" rx="18" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="6" rx="3" fill="${theme.accent_red}"/>
+    <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="${logoBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="5" rx="2.5" fill="${theme.accent_red}"/>
     ${(() => {
       const logoUrl = state.logo?.dataUrl || logoDataUrl;
       return logoUrl
-        ? `<image href="${logoUrl}" x="${logoBox.x + 14}" y="${logoBox.y + 16}" width="${logoBox.w - 28}" height="${logoBox.h - 26}" preserveAspectRatio="xMidYMid meet"/>`
-        : `<text x="${logoBox.x + 20}" y="${logoBox.y + 64}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="24" font-weight="700">OPENBLAST</text>`;
+        ? `<image href="${logoUrl}" x="${logoBox.x + 12}" y="${logoBox.y + 14}" width="${logoBox.w - 24}" height="${logoBox.h - 22}" preserveAspectRatio="xMidYMid meet"/>`
+        : `<text x="${logoBox.x + 18}" y="${logoBox.y + 56}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="22" font-weight="700">OPENBLAST</text>`;
     })()}
-    <text x="${x + 256}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
-    <text x="${x + 256}" y="${y + 80}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
-    <rect x="${x + 256}" y="${y + 100}" width="182" height="24" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
-    <text x="${x + 270}" y="${y + 116}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700">${copy.svg.headerBadge}</text>
-    <rect x="${badgeX}" y="${y + 34}" width="${badgeW}" height="60" rx="18" fill="${theme.accent_red}"/>
-    <text x="${badgeX + badgeW / 2}" y="${y + 69}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
+    <text x="${x + 240}" y="${y + 40}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
+    <text x="${x + 240}" y="${y + 74}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
+    <rect x="${x + 240}" y="${y + 88}" width="170" height="22" rx="8" fill="#F8FAFC" stroke="#E5E7EB"/>
+    <text x="${x + 252}" y="${y + 103}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">${copy.svg.headerBadge}</text>
+    <rect x="${badgeX}" y="${y + 28}" width="${badgeW}" height="52" rx="14" fill="${theme.accent_red}"/>
+    <text x="${badgeX + badgeW / 2}" y="${y + 60}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
   `;
 }
 
@@ -2077,13 +2078,13 @@ function renderFooter(theme, box, showLegend = false) {
   ];
 
   const legendMarkup = showLegend ? legend.map(([label, color], index) => {
-    const posX = x + 48 + legend.slice(0, index).reduce((acc, [previousLabel]) => acc + measureTextWidth(previousLabel, 15, `'IBM Plex Sans', sans-serif`, 700) + 36, 0);
-    return `<rect x="${posX}" y="${y + 16}" width="14" height="14" rx="4" fill="${color}"/><text x="${posX + 20}" y="${y + 28}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700">${escapeXml(label)}</text>`;
+    const posX = x + 48 + legend.slice(0, index).reduce((acc, [previousLabel]) => acc + measureTextWidth(previousLabel, 14, `'IBM Plex Sans', sans-serif`, 700) + 32, 0);
+    return `<rect x="${posX}" y="${y + 14}" width="12" height="12" rx="3" fill="${color}"/><text x="${posX + 18}" y="${y + 25}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${escapeXml(label)}</text>`;
   }).join('') : '';
 
-  const observationLines = wrapText(state.observation, w - 96, 17, `'IBM Plex Sans', sans-serif`, 400).slice(0, 3);
+  const observationLines = wrapText(state.observation, w - 96, 16, `'IBM Plex Sans', sans-serif`, 400).slice(0, 3);
   const observationMarkup = observationLines.length
-    ? textBlock(x + 48, y + (showLegend ? 54 : 28), observationLines, { size: 16, weight: 400, fill: theme.muted })
+    ? textBlock(x + 48, y + (showLegend ? 48 : 24), observationLines, { size: 14, weight: 400, fill: theme.muted })
     : '';
 
   return `
@@ -2099,11 +2100,11 @@ function renderObservationPanel(theme, box) {
   const lines = wrapText(state.observation || copy.defaults.observation, w - 52, 15, `'IBM Plex Sans', sans-serif`, 400).slice(0, 4);
   return `
     <g filter="url(#shadow)">
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FFFFFF" stroke="${theme.panel_border}"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="#FFFFFF" stroke="${theme.panel_border}"/>
     </g>
-    <rect x="${x + 18}" y="${y + 16}" width="42" height="4" rx="2" fill="${theme.accent_red}"/>
-    <text x="${x + 22}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700">${escapeXml(copy.fieldLabels.observation)}</text>
-    ${textBlock(x + 22, y + 68, lines, { size: 14, weight: 400, fill: theme.muted, lineHeight: 1.35 })}
+    <rect x="${x + 16}" y="${y + 14}" width="38" height="3" rx="1.5" fill="${theme.accent_red}"/>
+    <text x="${x + 20}" y="${y + 38}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">${escapeXml(copy.fieldLabels.observation)}</text>
+    ${textBlock(x + 20, y + 60, lines, { size: 13, weight: 400, fill: theme.muted, lineHeight: 1.4 })}
   `;
 }
 
@@ -2112,15 +2113,15 @@ function renderLayout(currentConfig) {
   const theme = getTheme(state.templateName);
   const [viewW, viewH] = currentConfig.site?.preview_size || DEFAULT_PREVIEW_SIZE;
   const margin = 40;
-  const headerH = 136;
-  const mainTop = headerH + 24;
-  const bottom = 36;
-  const panelGap = 28;
+  const headerH = 120;
+  const mainTop = headerH + 28;
+  const bottom = 32;
+  const panelGap = 32;
   const meshW = 500;
   const mainH = viewH - mainTop - bottom;
   const profileAreaW = viewW - (margin * 2) - meshW - panelGap;
   const compact = state.profileCount >= 3;
-  const observationH = 176;
+  const observationH = 160;
   const meshH = mainH - observationH - panelGap;
   const cards = [];
 
@@ -2168,8 +2169,8 @@ function renderLayout(currentConfig) {
           <stop offset="0%" stop-color="${theme.bg}"/>
           <stop offset="100%" stop-color="#F8F9FB"/>
         </linearGradient>
-        <filter id="shadow" x="-15%" y="-15%" width="130%" height="130%">
-      <feDropShadow dx="0" dy="12" stdDeviation="18" flood-color="${rgbToHex(theme.shadow[0], theme.shadow[1], theme.shadow[2])}" flood-opacity="${(theme.shadow[3] || 45) / 100}"/>
+        <filter id="shadow" x="-12%" y="-12%" width="124%" height="124%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="${rgbToHex(theme.shadow[0], theme.shadow[1], theme.shadow[2])}" flood-opacity="${(theme.shadow[3] || 35) / 100}"/>
         </filter>
       </defs>
       <rect width="100%" height="100%" fill="url(#pageBg)"/>
