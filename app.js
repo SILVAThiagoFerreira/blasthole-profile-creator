@@ -2,7 +2,7 @@ const FALLBACK_CONFIG = {
   app: {
     title: 'Blasthole Profile Studio',
     subtitle: 'Workspace técnico para perfis de carga.',
-    default_profile_type: 'Perfis técnicos',
+    default_profile_type: 'DOCUMENTO DE USO TÉCNICO',
     default_language: 'pt-BR',
   },
   paths: {
@@ -45,8 +45,8 @@ const FALLBACK_CONFIG = {
   defaults: {
     template_name: 'Corporate clean',
     polygon_name: 'PP170526 (220-210)',
-    observation: 'Lâmina técnica padronizada para reporte operacional.',
-    profile_type: 'Perfis técnicos',
+    observation: 'Perfil de Carregamento',
+    profile_type: 'DOCUMENTO DE USO TÉCNICO',
     profile_count: 2,
     labels: {
       stemming: 'Tampão',
@@ -290,8 +290,8 @@ const COPY = {
       subdrill: 'Subperfuração',
     },
     defaults: {
-      profileType: 'Perfis técnicos',
-      observation: 'Lâmina técnica padronizada para reporte operacional.',
+      profileType: 'DOCUMENTO DE USO TÉCNICO',
+      observation: 'Perfil de Carregamento',
       profileNames: ['Perfil A', 'Perfil B'],
       profileNamePrefix: 'Perfil',
     },
@@ -324,7 +324,7 @@ const COPY = {
       title: 'Blasthole Profile Studio',
       desc: 'Perfil de carga editável com composição vetorial.',
       headerTitle: 'PERFIL DE CARGA',
-      headerBadge: 'Workspace técnico',
+      headerBadge: '',
       meshTitle: 'MALHA DE PERFURAÇÃO',
       meshAttached: 'ARQUIVO ANEXADO',
       meshPrompt: 'Anexe a imagem da malha',
@@ -500,7 +500,7 @@ const COPY = {
       subdrill: 'Subdrilling',
     },
     defaults: {
-      profileType: 'Technical profiles',
+      profileType: 'TECHNICAL USE DOCUMENT',
       observation: 'Standard technical sheet for operational reporting.',
       profileNames: ['Profile A', 'Profile B'],
       profileNamePrefix: 'Profile',
@@ -534,7 +534,7 @@ const COPY = {
       title: 'Blasthole Profile Studio',
       desc: 'Editable charge profile with vector composition.',
       headerTitle: 'CHARGE PROFILE',
-      headerBadge: 'Technical workspace',
+      headerBadge: '',
       meshTitle: 'DRILLING MESH',
       meshAttached: 'ATTACHED FILE',
       meshPrompt: 'Attach the mesh image',
@@ -710,7 +710,7 @@ const COPY = {
       subdrill: 'Subperforación',
     },
     defaults: {
-      profileType: 'Perfiles técnicos',
+      profileType: 'DOCUMENTO DE USO TÉCNICO',
       observation: 'Lámina técnica estandarizada para reporte operacional.',
       profileNames: ['Perfil A', 'Perfil B'],
       profileNamePrefix: 'Perfil',
@@ -744,7 +744,7 @@ const COPY = {
       title: 'Blasthole Profile Studio',
       desc: 'Perfil de carga editable con composición vectorial.',
       headerTitle: 'PERFIL DE CARGA',
-      headerBadge: 'Workspace técnico',
+      headerBadge: '',
       meshTitle: 'MALLA DE PERFORACIÓN',
       meshAttached: 'ARCHIVO ADJUNTO',
       meshPrompt: 'Adjunte la imagen de la malla',
@@ -920,7 +920,7 @@ const COPY = {
       subdrill: '超深',
     },
     defaults: {
-      profileType: '技术剖面',
+      profileType: '技术使用文件',
       observation: '用于运行报告的标准技术页面。',
       profileNames: ['剖面 A', '剖面 B'],
       profileNamePrefix: '剖面',
@@ -954,7 +954,7 @@ const COPY = {
       title: 'Blasthole Profile Studio',
       desc: '可编辑的装药剖面，采用矢量组成。',
       headerTitle: '装药剖面',
-      headerBadge: '技术工作区',
+      headerBadge: '',
       meshTitle: '钻孔网格',
       meshAttached: '已附加文件',
       meshPrompt: '请附加网格图片',
@@ -2173,8 +2173,6 @@ function renderHeader(theme, box) {
     })()}
     <text x="${x + 240}" y="${y + 40}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
     <text x="${x + 240}" y="${y + 74}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
-    <rect x="${x + 240}" y="${y + 88}" width="170" height="22" rx="8" fill="#F8FAFC" stroke="#E5E7EB"/>
-    <text x="${x + 252}" y="${y + 103}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11" font-weight="700">${copy.svg.headerBadge}</text>
     <rect x="${badgeX}" y="${y + 28}" width="${badgeW}" height="52" rx="14" fill="${theme.accent_red}"/>
     <text x="${badgeX + badgeW / 2}" y="${y + 60}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
   `;
@@ -2524,17 +2522,13 @@ function renderForms() {
 function renderProfileTabs() {
   if (!dom.profileTabs) return;
   const letters = [];
+  const suffixes = ['º', 'º', 'º', 'º'];
   for (let i = 0; i < state.profileCount; i++) {
     const p = state.profiles[i];
-    const letter = (() => {
-      const parts = String(p.name || '').trim().split(/\s+/);
-      const last = parts[parts.length - 1];
-      if (last && last.length === 1 && last === last.toUpperCase()) return last;
-      return String(p.name || '?').trim()[0]?.toUpperCase() || '?';
-    })();
+    const label = `${i + 1}${suffixes[i] || 'º'}`;
     const accent = KIND_ACCENTS[p.kind]?.accent || KIND_ACCENTS.personalizado.accent;
     const isActive = i === selectedProfileIndex;
-    letters.push(`<button class="profile-tab${isActive ? ' active' : ''}" type="button" data-profile-tab="${i}" style="${isActive ? `--accent:${accent}` : ''}">${escapeXml(letter)}</button>`);
+    letters.push(`<button class="profile-tab${isActive ? ' active' : ''}" type="button" data-profile-tab="${i}" style="${isActive ? `--accent:${accent}` : ''}">${escapeXml(label)}</button>`);
   }
   dom.profileTabs.innerHTML = letters.join('');
 }
