@@ -1265,6 +1265,7 @@ function normalizeSegments(items, profile, fallbackSegments = []) {
     return {
       type: normalizeSegmentType(item?.type, fallbackItem.type || 'column'),
       height: Math.max(normalizeNumber(item?.height, fallbackItem.height ?? 0), 0),
+      has_booster: Boolean(item?.has_booster),
     };
   }).filter((item) => item.height > 0).slice(0, 24);
 }
@@ -2384,7 +2385,7 @@ function renderSegmentEditor(profile, index) {
       <div class="field segment-row__height">
         <input data-path="profiles.${index}.segments.${itemIndex}.height" type="number" step="0.05" min="0" value="${escapeXml(String(item.height ?? ''))}">
       </div>
-      ${showBooster ? `<div class="segment-row__booster"><label title="Reforçador (Booster)"><input type="checkbox" data-path="profiles.${index}.segments.${itemIndex}.has_booster"${item.has_booster ? ' checked' : ''}> &#9679;</label></div>` : ''}
+      ${showBooster ? `<div class="segment-row__booster"><label class="booster-toggle" title="Reforçador (Booster)"><input type="checkbox" data-path="profiles.${index}.segments.${itemIndex}.has_booster"${item.has_booster ? ' checked' : ''}><span class="booster-toggle__icon"></span></label></div>` : ''}
       <div class="segment-row__btns">
         <button class="segment-row__btn" type="button" data-action="move-segment-up" data-profile-index="${index}" data-item-index="${itemIndex}" title="Subir">&#9650;</button>
         <button class="segment-row__btn" type="button" data-action="move-segment-down" data-profile-index="${index}" data-item-index="${itemIndex}" title="Descer">&#9660;</button>

@@ -451,7 +451,43 @@ body::before {
 }
 
 .segment-row__booster input[type="checkbox"] {
-  accent-color: #E74C3C;
+  display: none;
+}
+
+.booster-toggle {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.booster-toggle__icon {
+  width: 22px;
+  height: 22px;
+  border: 2px solid #D1D5DB;
+  border-radius: 4px;
+  background: var(--surface);
+  position: relative;
+  display: grid;
+  place-items: center;
+  transition: all 0.15s;
+}
+
+.booster-toggle__icon::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #D1D5DB;
+  transition: all 0.15s;
+}
+
+.booster-toggle input:checked + .booster-toggle__icon {
+  border-color: #E74C3C;
+  background: #FEE2E2;
+}
+
+.booster-toggle input:checked + .booster-toggle__icon::after {
+  background: #E74C3C;
 }
 
 .segment-add-row {
