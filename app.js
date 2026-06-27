@@ -1,6 +1,6 @@
 const FALLBACK_CONFIG = {
   app: {
-    title: 'OpenBlast Profile Studio',
+    title: 'Charge Profile Studio',
     subtitle: 'Workspace técnico para perfis de carga.',
     default_profile_type: 'Perfis técnicos',
     default_language: 'pt-BR',
@@ -159,11 +159,11 @@ const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'es', 'en', 'zh-CN'];
 const COPY = {
   'pt-BR': {
     meta: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       description: 'Workspace profissional para criação, validação e exportação local de perfis de carga.',
     },
     brand: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -258,10 +258,10 @@ const COPY = {
       density: 'Densidade (g/cm3)',
       initiator: 'Iniciador',
       initiatorNone: 'Nenhum',
-      initiatorBrinel: 'Brinel (Não Eletrônico)',
-      initiatorDVT: 'DVT (Eletrônico)',
-      initiatorBoth: 'Brinel + DVT (Dupla)',
-      hasBooster: 'Reforçador (X-Booster)',
+      initiatorBrinel: 'NonEl (Não Eletrônico)',
+      initiatorDVT: 'Eletrônico',
+      initiatorBoth: 'NonEl + Eletrônico (Dupla)',
+      hasBooster: 'Reforçador (Booster)',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pré-corte)',
     },
@@ -321,7 +321,7 @@ const COPY = {
       saveFailure: 'Não foi possível salvar a memória local.',
     },
     svg: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       desc: 'Perfil de carga editável com composição vetorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: 'Workspace técnico',
@@ -369,11 +369,11 @@ const COPY = {
   },
   en: {
     meta: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       description: 'Professional workspace for creating, validating, and exporting charge profiles locally.',
     },
     brand: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -468,10 +468,10 @@ const COPY = {
       density: 'Density (g/cm3)',
       initiator: 'Initiator',
       initiatorNone: 'None',
-      initiatorBrinel: 'Brinel (Non-Electronic)',
-      initiatorDVT: 'DVT (Electronic)',
-      initiatorBoth: 'Brinel + DVT (Dual)',
-      hasBooster: 'Booster (X-Booster)',
+      initiatorBrinel: 'NonEl (Non-Electronic)',
+      initiatorDVT: 'Electronic',
+      initiatorBoth: 'NonEl + Electronic (Dual)',
+      hasBooster: 'Booster',
       boosterWeight: 'Weight (g)',
       cartridgeCount: 'Cartridges (pre-cut)',
     },
@@ -531,7 +531,7 @@ const COPY = {
       saveFailure: 'Could not save local memory.',
     },
     svg: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       desc: 'Editable charge profile with vector composition.',
       headerTitle: 'CHARGE PROFILE',
       headerBadge: 'Technical workspace',
@@ -579,11 +579,11 @@ const COPY = {
   },
   es: {
     meta: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       description: 'Workspace profesional para crear, validar y exportar perfiles de carga localmente.',
     },
     brand: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -678,10 +678,10 @@ const COPY = {
       density: 'Densidad (g/cm3)',
       initiator: 'Iniciador',
       initiatorNone: 'Ninguno',
-      initiatorBrinel: 'Brinel (No Electrónico)',
-      initiatorDVT: 'DVT (Electrónico)',
-      initiatorBoth: 'Brinel + DVT (Doble)',
-      hasBooster: 'Reforzador (X-Booster)',
+      initiatorBrinel: 'NonEl (No Electrónico)',
+      initiatorDVT: 'Electrónico',
+      initiatorBoth: 'NonEl + Electrónico (Doble)',
+      hasBooster: 'Reforzador (Booster)',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pre-corte)',
     },
@@ -741,7 +741,7 @@ const COPY = {
       saveFailure: 'No fue posible guardar la memoria local.',
     },
     svg: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       desc: 'Perfil de carga editable con composición vectorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: 'Workspace técnico',
@@ -789,11 +789,11 @@ const COPY = {
   },
   'zh-CN': {
     meta: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       description: '用于本地创建、验证并导出装药剖面的专业工作区。',
     },
     brand: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -888,10 +888,10 @@ const COPY = {
       density: '密度 (g/cm3)',
       initiator: '起爆器',
       initiatorNone: '无',
-      initiatorBrinel: 'Brinel (非电子)',
-      initiatorDVT: 'DVT (电子)',
-      initiatorBoth: 'Brinel + DVT (双重)',
-      hasBooster: '增强器 (X-Booster)',
+      initiatorBrinel: 'NonEl (非电子)',
+      initiatorDVT: '电子',
+      initiatorBoth: 'NonEl + 电子 (双重)',
+      hasBooster: '增强器 (Booster)',
       boosterWeight: '重量 (g)',
       cartridgeCount: '药卷 (预裂)',
     },
@@ -951,7 +951,7 @@ const COPY = {
       saveFailure: '无法保存本地记忆。',
     },
     svg: {
-      title: 'OpenBlast Profile Studio',
+      title: 'Charge Profile Studio',
       desc: '可编辑的装药剖面，采用矢量组成。',
       headerTitle: '装药剖面',
       headerBadge: '技术工作区',
@@ -2029,50 +2029,57 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ${segmentMarkup.join('')}
     ${(() => {
       const overlay = [];
-      if (profile.has_booster) {
-        const boostH = compact ? 10 : 14;
-        const boostW = cylW * 0.45;
-        const boostX = cx - boostW / 2;
-        const boostY = holeBottom - boostH - 2;
-        overlay.push(`<rect x="${boostX}" y="${boostY}" width="${boostW}" height="${boostH}" rx="2" fill="#E74C3C" stroke="#C0392B" stroke-width="1"/>`);
-        if (!compact) {
-          const lblX = cylX2 + 14;
-          overlay.push(`<line x1="${cx}" y1="${boostY + boostH / 2}" x2="${lblX - 2}" y2="${boostY + boostH / 2}" stroke="#E74C3C" stroke-width="0.6"/>`);
-          overlay.push(`<text x="${lblX}" y="${boostY + boostH / 2 + 1}" fill="#E74C3C" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">X-Booster ${profile.booster_weight}g</text>`);
+      const boostH = compact ? 8 : 12;
+      const boostW = cylW * 0.40;
+      const boostPositions = [];
+      let accY = holeTop;
+      const isDeck = (type) => type === 'stemming' || type === 'airdeck' || type === 'blastbag';
+      for (let si = 0; si < segmentData.length; si++) {
+        const seg = segmentData[si];
+        const sv = Math.max(seg.value, 0);
+        const segH = holeH * (sv / total);
+        const segEnd = accY + segH;
+        if ((seg.type === 'column' || seg.type === 'cartridge') && si > 0 && isDeck(segmentData[si - 1].type)) {
+          boostPositions.push(accY + 2);
         }
+        if ((seg.type === 'column' || seg.type === 'cartridge') && si === segmentData.length - 1) {
+          boostPositions.push(segEnd - boostH - 2);
+        }
+        if ((seg.type === 'column' || seg.type === 'cartridge') && si < segmentData.length - 1 && isDeck(segmentData[si + 1].type)) {
+          boostPositions.push(segEnd - boostH - 2);
+        }
+        accY = segEnd;
+      }
+      if (boostPositions.length === 0 && profile.has_booster) {
+        boostPositions.push(holeBottom - boostH - 2);
+      }
+      for (const bp of boostPositions) {
+        const bx = cx - boostW / 2;
+        overlay.push(`<rect x="${bx}" y="${bp}" width="${boostW}" height="${boostH}" rx="2" fill="#E74C3C" stroke="#C0392B" stroke-width="1"/>`);
+      }
+      if (!compact && boostPositions.length > 0) {
+        const lblX = cylX2 + 14;
+        const lblY = boostPositions[0] + boostH / 2;
+        overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#E74C3C" stroke-width="0.6"/>`);
+        overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#E74C3C" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
       }
       const drawCable = (color, offsetX, label) => {
         const cableX = cx + offsetX;
-        let cableBottom = holeBottom - 4;
-        if (profile.has_booster) {
-          cableBottom = holeBottom - (compact ? 18 : 24);
-        } else {
-          let accY = holeTop;
-          for (const seg of segmentData) {
-            const sv = Math.max(seg.value, 0);
-            const segH = holeH * (sv / total);
-            if (seg.type === 'column' || seg.type === 'cartridge') {
-              cableBottom = accY + segH - 2;
-              break;
-            }
-            accY += segH;
-          }
-        }
-        overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${cableBottom}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
+        overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${holeBottom - 4}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
         overlay.push(`<circle cx="${cableX}" cy="${holeTop - 4}" r="${compact ? 2 : 3}" fill="${color}"/>`);
         if (!compact && label) {
           const lblX = cylX2 + 14;
-          const lblY = (holeTop + cableBottom) / 2;
+          const lblY = (holeTop + holeBottom) / 2;
           overlay.push(`<text x="${lblX}" y="${lblY}" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
         }
       };
       if (profile.initiator === 'brinel') {
-        drawCable('#E67E22', compact ? -2 : -4, 'Brinel');
+        drawCable('#E67E22', compact ? -2 : -4, 'NonEl');
       } else if (profile.initiator === 'dvt') {
-        drawCable('#8E44AD', compact ? -2 : -4, 'DVT');
+        drawCable('#8E44AD', compact ? -2 : -4, 'Eletrônico');
       } else if (profile.initiator === 'both') {
-        drawCable('#E67E22', compact ? -4 : -6, 'Brinel');
-        drawCable('#8E44AD', compact ? 0 : 2, 'DVT');
+        drawCable('#E67E22', compact ? -4 : -6, 'NonEl');
+        drawCable('#8E44AD', compact ? 0 : 2, 'Eletrônico');
       }
       return overlay.join('\n');
     })()}
@@ -2433,10 +2440,7 @@ function renderProfileEditor(profile, index) {
             { value: 'dvt', label: copy.fieldLabels.initiatorDVT },
             { value: 'both', label: copy.fieldLabels.initiatorBoth },
           ], '')}
-          <div class="field">
-            <label><input type="checkbox" data-path="profiles.${index}.has_booster"${profile.has_booster ? ' checked' : ''}> ${escapeXml(copy.fieldLabels.hasBooster)}</label>
-          </div>
-          ${profile.has_booster ? renderInput(copy.fieldLabels.boosterWeight, `profiles.${index}.booster_weight`, profile.booster_weight, 'number', { step: 10, min: 0 }) : ''}
+          ${renderInput(copy.fieldLabels.boosterWeight, `profiles.${index}.booster_weight`, profile.booster_weight, 'number', { step: 10, min: 0 })}
         </div>
       </div>
       ${renderSegmentEditor(profile, index)}
@@ -2614,19 +2618,6 @@ function setNestedValue(path, rawValue, target) {
 function handleInputEvent(event) {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
-
-  if (target.type === 'checkbox' && target.matches('[data-path]')) {
-    const path = target.getAttribute('data-path');
-    if (!path) return;
-    if (path.startsWith('profiles.')) {
-      const [, index, field] = path.split('.');
-      if (!state.profiles[Number(index)]) return;
-      state.profiles[Number(index)][field] = target.checked;
-    }
-    renderForms();
-    scheduleUpdate();
-    return;
-  }
 
   if (target.matches('[data-path]')) {
     const path = target.getAttribute('data-path');
