@@ -1726,14 +1726,14 @@ function iconDensity(x, y, size, color) {
 
 function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alternate, compact }) {
   const rowFill = alternate ? '#F9FAFB' : 'transparent';
-  const iconSize = compact ? 18 : 26;
+  const iconSize = compact ? 16 : 26;
   const iconX = x + 10;
   const iconY = y + (h - iconSize) / 2;
   const labelX = x + 46;
   const labelY = y + (compact ? 14 : 16);
-  const valueFont = compact ? 10 : 13;
+  const valueFont = compact ? 11 : 13;
   const labelFont = compact ? 9 : 11;
-  const valueY = y + (compact ? 22 : 26);
+  const valueY = y + (compact ? 18 : 26);
   const rightValue = value;
   const valueWidth = measureTextWidth(rightValue, valueFont, `'IBM Plex Sans', sans-serif`, 700);
   const valueX = x + w - 14 - valueWidth;
@@ -1888,29 +1888,20 @@ function renderProfileCard(profile, theme, box, compact, index) {
   }
 
   const labels = labelSet();
-  const metricRows = compact
-    ? [
-      ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', fieldLabel('height', lang), `${formatDecimal(profile.altura_banco, 2, lang)} m`, 'height'],
-      ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
-      ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
-      ['column', labels.column, `${formatDecimal(charge)} m`, 'column'],
-      ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
-    ]
-    : [
-      ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
-      ['height', fieldLabel('height', lang), `${formatDecimal(profile.altura_banco, 2, lang)} m`, 'height'],
-      ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
-      ['stemming', labels.stemming, `${formatDecimal(profile.stemming)} m`, 'stemming'],
-      ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
-      ['airdeck', labels.airdeck, `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
-      ['inclination', fieldLabel('inclination', lang), `${formatDecimal(profile.inclinacao, 1, lang)}°`, 'inclination'],
-      ['azimuth', fieldLabel('azimuth', lang), `${formatDecimal(profile.azimute, 1, lang)}°`, 'azimuth'],
-      ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
-    ];
+  const metricRows = [
+    ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
+    ['height', fieldLabel('height', lang), `${formatDecimal(profile.altura_banco, 2, lang)} m`, 'height'],
+    ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
+    ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
+    ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
+    ['airdeck', labels.airdeck, `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
+    ['inclination', fieldLabel('inclination', lang), `${formatDecimal(profile.inclinacao, 1, lang)}°`, 'inclination'],
+    ['azimuth', fieldLabel('azimuth', lang), `${formatDecimal(profile.azimute, 1, lang)}°`, 'azimuth'],
+    ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
+  ];
 
-  const rowHeight = compact ? 28 : 44;
-  const rowStart = infoBox.y + (compact ? 34 : 44);
+  const rowHeight = compact ? 26 : 44;
+  const rowStart = infoBox.y + (compact ? 32 : 44);
   const rowsMarkup = metricRows.map((row, idx) => renderMetricRow({
     x: infoBox.x + 8,
     y: rowStart + idx * rowHeight,
