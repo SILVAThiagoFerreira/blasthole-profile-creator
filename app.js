@@ -1820,6 +1820,7 @@ function buildChargeSegments(profile, accent) {
     key: `${item.type}-${itemIndex}`,
     type: item.type,
     value: item.height,
+    has_booster: Boolean(item.has_booster),
     color: item.type === 'blastbag' ? '#1F2937' : (item.type === 'stemming' ? '#C8CDD5' : accent),
   }));
   if (sub > 0) segments.push({ key: 'subdrill', type: 'subdrill', value: sub, color: '#4B5563' });
@@ -2032,26 +2033,19 @@ function renderProfileCard(profile, theme, box, compact, index) {
       const boostH = compact ? 8 : 12;
       const boostW = cylW * 0.40;
       const boostPositions = [];
-      let accY = holeTop;
-      const isDeck = (type) => type === 'stemming' || type === 'airdeck' || type === 'blastbag';
-      for (let si = 0; si < segmentData.length; si++) {
-        const seg = segmentData[si];
-        const sv = Math.max(seg.value, 0);
-        const segH = holeH * (sv / total);
-        const segEnd = accY + segH;
-        if ((seg.type === 'column' || seg.type === 'cartridge') && si > 0 && isDeck(segmentData[si - 1].type)) {
-          boostPositions.push(accY + 2);
+      const isContorno = profile.kind === 'contorno';
+      if (!isContorno) {
+        let accY = holeTop;
+        for (let si = 0; si < segmentData.length; si++) {
+          const seg = segmentData[si];
+          const sv = Math.max(seg.value, 0);
+          const segH = holeH * (sv / total);
+          const segEnd = accY + segH;
+          if ((seg.type === 'column' || seg.type === 'cartridge') && seg.has_booster) {
+            boostPositions.push(segEnd - boostH - 2);
+          }
+          accY = segEnd;
         }
-        if ((seg.type === 'column' || seg.type === 'cartridge') && si === segmentData.length - 1) {
-          boostPositions.push(segEnd - boostH - 2);
-        }
-        if ((seg.type === 'column' || seg.type === 'cartridge') && si < segmentData.length - 1 && isDeck(segmentData[si + 1].type)) {
-          boostPositions.push(segEnd - boostH - 2);
-        }
-        accY = segEnd;
-      }
-      if (boostPositions.length === 0 && profile.has_booster) {
-        boostPositions.push(holeBottom - boostH - 2);
       }
       for (const bp of boostPositions) {
         const bx = cx - boostW / 2;
@@ -2378,8 +2372,10 @@ function segmentTypeOptions() {
 function renderSegmentEditor(profile, index) {
   const copy = getCopy();
   const typeOpts = segmentTypeOptions();
+  const isContorno = profile.kind === 'contorno';
   const rows = (profile.segments || []).map((item, itemIndex) => {
     const isHighlighted = selectedSegmentKey !== null && selectedSegmentKey === `${item.type}-${itemIndex}`;
+    const showBooster = (item.type === 'column' || item.type === 'cartridge') && !isContorno;
     return `
     <div class="segment-row${isHighlighted ? ' highlighted' : ''}" data-segment-row="${itemIndex}">
       <div class="field segment-row__type">
@@ -2388,6 +2384,7 @@ function renderSegmentEditor(profile, index) {
       <div class="field segment-row__height">
         <input data-path="profiles.${index}.segments.${itemIndex}.height" type="number" step="0.05" min="0" value="${escapeXml(String(item.height ?? ''))}">
       </div>
+      ${showBooster ? `<div class="segment-row__booster"><label title="Reforçador (Booster)"><input type="checkbox" data-path="profiles.${index}.segments.${itemIndex}.has_booster"${item.has_booster ? ' checked' : ''}> &#9679;</label></div>` : ''}
       <div class="segment-row__btns">
         <button class="segment-row__btn" type="button" data-action="move-segment-up" data-profile-index="${index}" data-item-index="${itemIndex}" title="Subir">&#9650;</button>
         <button class="segment-row__btn" type="button" data-action="move-segment-down" data-profile-index="${index}" data-item-index="${itemIndex}" title="Descer">&#9660;</button>
