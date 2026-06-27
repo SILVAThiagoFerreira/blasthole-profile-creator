@@ -50,7 +50,7 @@ const FALLBACK_CONFIG = {
     profile_count: 2,
     labels: {
       stemming: 'Tampão',
-      blastbag: 'Blastbag',
+      blastbag: 'Bolsa de Ar',
       airdeck: 'Deck de ar',
       column: 'Carga',
       subdrill: 'Subperfuração',
@@ -235,10 +235,10 @@ const COPY = {
       height: 'Altura do banco (m)',
       subdrill: 'Subperfuração (m)',
       stemming: 'Tampão (m)',
-      blastbag: 'Blastbag (m)',
-      blastbagPosition: 'Posição blastbag',
-      blastbags: 'Blastbags',
-      addBlastbag: 'Adicionar blastbag',
+      blastbag: 'Bolsa de Ar (m)',
+      blastbagPosition: 'Posição Bolsa de Ar',
+      blastbags: 'Bolsas de Ar',
+      addBlastbag: 'Adicionar Bolsa de Ar',
       airdeck: 'Deck de ar (m)',
       airdeckPosition: 'Posição deck de ar',
       airdecks: 'Decks de ar',
@@ -261,7 +261,7 @@ const COPY = {
     segmentTypes: {
       stemming: 'Tampão',
       column: 'Carga',
-      blastbag: 'Blastbag',
+      blastbag: 'Bolsa de Ar',
       airdeck: 'Deck de ar',
     },
     fieldPlaceholders: {
@@ -269,7 +269,7 @@ const COPY = {
     },
     labels: {
       stemming: 'Tampão',
-      blastbag: 'Blastbag',
+      blastbag: 'Bolsa de Ar',
       airdeck: 'Deck de ar',
       column: 'Coluna de carga',
       subdrill: 'Subperfuração',
@@ -436,10 +436,10 @@ const COPY = {
       height: 'Bench height (m)',
       subdrill: 'Subdrilling (m)',
       stemming: 'Stemming (m)',
-      blastbag: 'Blastbag (m)',
-      blastbagPosition: 'Blastbag position',
-      blastbags: 'Blastbags',
-      addBlastbag: 'Add blastbag',
+      blastbag: 'Air bag (m)',
+      blastbagPosition: 'Air bag position',
+      blastbags: 'Air bags',
+      addBlastbag: 'Add air bag',
       airdeck: 'Air deck (m)',
       airdeckPosition: 'Air deck position',
       airdecks: 'Air decks',
@@ -462,7 +462,7 @@ const COPY = {
     segmentTypes: {
       stemming: 'Stemming',
       column: 'Charge',
-      blastbag: 'Blastbag',
+      blastbag: 'Air bag',
       airdeck: 'Air deck',
     },
     fieldPlaceholders: {
@@ -470,7 +470,7 @@ const COPY = {
     },
     labels: {
       stemming: 'Stemming',
-      blastbag: 'Blastbag',
+      blastbag: 'Air bag',
       airdeck: 'Air deck',
       column: 'Charge column',
       subdrill: 'Subdrilling',
@@ -637,10 +637,10 @@ const COPY = {
       height: 'Altura del banco (m)',
       subdrill: 'Subperforación (m)',
       stemming: 'Taco (m)',
-      blastbag: 'Blastbag (m)',
-      blastbagPosition: 'Posición blastbag',
-      blastbags: 'Blastbags',
-      addBlastbag: 'Agregar blastbag',
+      blastbag: 'Bolsa de aire (m)',
+      blastbagPosition: 'Posición bolsa de aire',
+      blastbags: 'Bolsas de aire',
+      addBlastbag: 'Agregar bolsa de aire',
       airdeck: 'Deck de aire (m)',
       airdeckPosition: 'Posición deck de aire',
       airdecks: 'Decks de aire',
@@ -663,7 +663,7 @@ const COPY = {
     segmentTypes: {
       stemming: 'Taco',
       column: 'Carga',
-      blastbag: 'Blastbag',
+      blastbag: 'Bolsa de aire',
       airdeck: 'Deck de aire',
     },
     fieldPlaceholders: {
@@ -671,7 +671,7 @@ const COPY = {
     },
     labels: {
       stemming: 'Taco',
-      blastbag: 'Blastbag',
+      blastbag: 'Bolsa de aire',
       airdeck: 'Deck de aire',
       column: 'Columna de carga',
       subdrill: 'Subperforación',
@@ -1792,7 +1792,7 @@ function segmentDisplayLabel(type, lang = getActiveLanguage(), short = false) {
   const shortLabels = {
     stemming: 'Tamp.',
     column: 'Carga',
-    blastbag: 'BB',
+    blastbag: 'B.Air',
     airdeck: 'Deck',
     subdrill: 'Sub.',
   };
