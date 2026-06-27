@@ -1848,6 +1848,8 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
   let yCur = holeTop;
   const segmentMarkup = [];
+  const cL = compact ? 1 : 2;
+  const gapX = compact ? 1 : 2;
   for (const segment of segmentData) {
     const { key, type, value: segVal, color: segColor } = segment;
     if (segVal <= 0) continue;
@@ -1855,34 +1857,50 @@ function renderProfileCard(profile, theme, box, compact, index) {
     const y2 = type === 'subdrill' ? holeBottom : yCur + segH;
     const midY = (yCur + y2) / 2;
     const segAttrs = `data-profile="${index}" data-segment-key="${key}" data-segment-type="${type}" style="cursor:pointer"`;
-    if (type === 'airdeck') {
+    if (type === 'stemming') {
+      let dots = '';
+      const cols = Math.floor((cylW - gapX * 2) / (compact ? 6 : 7));
+      const rows = Math.max(1, Math.floor((y2 - yCur) / (compact ? 5 : 6)));
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const dx = cylX1 + gapX + c * (compact ? 6 : 7) + (r % 2 ? 3 : 0);
+          const dy = yCur + cL + r * (compact ? 5 : 6);
+          if (dy < y2 - cL) {
+            const shade = r % 3 === 0 ? '#B8BCC4' : (r % 3 === 1 ? '#C8CDD5' : '#D0D4DC');
+            dots += `<circle cx="${dx}" cy="${dy}" r="${compact ? 1.5 : 2}" fill="${shade}"/>`;
+          }
+        }
+      }
+      segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#E8ECF0" rx="1"/>${dots}`);
+    } else if (type === 'airdeck') {
       let hatch = '';
-      for (let yy = yCur + (compact ? 2 : 3); yy < y2; yy += compact ? 5 : 6) {
-        hatch += `<line x1="${cylX1 + (compact ? 2 : 3)}" y1="${yy}" x2="${cylX2 - (compact ? 2 : 3)}" y2="${yy}" stroke="${segColor}" stroke-width="1"/>`;
+      const step = compact ? 5 : 6;
+      for (let yy = yCur + cL; yy < y2; yy += step) {
+        hatch += `<line x1="${cylX1 + gapX}" y1="${yy}" x2="${cylX2 - gapX}" y2="${yy}" stroke="${segColor}" stroke-width="0.7" stroke-dasharray="4 2"/>`;
       }
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#FFFFFF"/>${hatch}`);
     } else if (type === 'blastbag') {
-      const darker = mixHex(segColor, '#000000', 0.1);
-      const lighter = mixHex(segColor, '#FFFFFF', 0.18);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${lighter}"/><stop offset="100%" stop-color="${darker}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1 + 2}" y="${yCur}" width="${cylW - 4}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
+      const darker = mixHex(segColor, '#000000', 0.15);
+      const lighter = mixHex(segColor, '#FFFFFF', 0.12);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${lighter}"/><stop offset="100%" stop-color="${darker}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1 + gapX}" y="${yCur}" width="${cylW - gapX * 2}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})" rx="2"/>`);
     } else if (type === 'column') {
-      const light = mixHex(segColor, '#FFFFFF', 0.36);
-      const dark = mixHex(segColor, '#1b2430', 0.12);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="18%" stop-color="${segColor}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
-      segmentMarkup.push(`<rect x="${cylX1 + 4}" y="${yCur}" width="${Math.max(1, cylW * 0.12)}" height="${y2 - yCur}" fill="rgba(255,255,255,0.22)"/>`);
+      const light = mixHex(segColor, '#FFFFFF', 0.32);
+      const dark = mixHex(segColor, '#1b2430', 0.10);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="20%" stop-color="${segColor}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
+      segmentMarkup.push(`<rect x="${cylX1 + gapX + 2}" y="${yCur}" width="${Math.max(1, cylW * 0.10)}" height="${y2 - yCur}" fill="rgba(255,255,255,0.20)"/>`);
     } else {
       const light = mixHex(segColor, '#FFFFFF', 0.22);
       const dark = mixHex(segColor, '#1b2430', 0.14);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${darker}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
     }
 
-    if (y2 - yCur >= (compact ? 10 : 14)) {
-      const labelX = cylX2 + (compact ? 4 : 10);
-      const labelSize = compact ? 7 : 11;
+    if (y2 - yCur >= (compact ? 8 : 12)) {
+      const labelX = cylX2 + (compact ? 6 : 14);
+      const labelSize = compact ? 7 : 10;
       const labelValue = `${segmentDisplayLabel(type, lang, compact)} ${formatDecimal(segVal)}m`;
-      const safeLabel = shortText(labelValue, compact ? 13 : 22);
-      segmentMarkup.push(`<line x1="${cylX2 + 2}" y1="${midY}" x2="${labelX + (compact ? 2 : 8)}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.8" stroke-dasharray="3 3"/>`);
-      segmentMarkup.push(`<text x="${labelX + (compact ? 4 : 10)}" y="${midY - 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="600">${escapeXml(safeLabel)}</text>`);
+      const safeLabel = shortText(labelValue, compact ? 14 : 22);
+      segmentMarkup.push(`<line x1="${cylX2 + 1}" y1="${midY}" x2="${labelX - 2}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.6"/>`);
+      segmentMarkup.push(`<text x="${labelX}" y="${midY + 1}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="500" dominant-baseline="middle">${escapeXml(safeLabel)}</text>`);
     }
     yCur = y2;
   }
@@ -1961,12 +1979,17 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
     <rect x="${drawingBox.x}" y="${drawingBox.y}" width="${drawingBox.w}" height="${drawingBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
     ${segmentMarkup.join('')}
-    <rect x="${cylX1}" y="${holeTop}" width="${cylW}" height="${holeBottom - holeTop}" rx="${compact ? 16 : 18}" fill="none" stroke="${theme.title}" stroke-width="2"/>
-    <rect x="${cylX1 + 1}" y="${holeTop}" width="${Math.max(2, cylW * 0.15)}" height="${holeBottom - holeTop}" rx="3" fill="rgba(255,255,255,0.35)"/>
-    <ellipse cx="${cx}" cy="${holeTop + 2}" rx="${cylW / 2}" ry="${compact ? 7 : 9}" fill="#E9EEF4" stroke="${theme.title}" stroke-width="2"/>
-    <ellipse cx="${cx}" cy="${holeBottom - 2}" rx="${cylW / 2}" ry="${compact ? 7 : 9}" fill="#374151" stroke="${theme.title}" stroke-width="2"/>
-    <line x1="${cylX1 + 6}" y1="${holeTop + 16}" x2="${cylX1 + 6}" y2="${holeBottom - 16}" stroke="rgba(255,255,255,0.6)" stroke-width="2.5" stroke-linecap="round"/>
-    <text x="${left + 4}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 9 : 10}" font-weight="700">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>
+    <rect x="${cylX1}" y="${holeTop}" width="${cylW}" height="${holeBottom - holeTop}" rx="${compact ? 12 : 14}" fill="none" stroke="${theme.title}" stroke-width="1.5"/>
+    <ellipse cx="${cx}" cy="${holeTop + 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#F0F2F5" stroke="${theme.title}" stroke-width="1.5"/>
+    <ellipse cx="${cx}" cy="${holeBottom - 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#2D3748" stroke="${theme.title}" stroke-width="1.5"/>
+    <line x1="${cylX1 + 4}" y1="${holeTop + 12}" x2="${cylX1 + 4}" y2="${holeBottom - 12}" stroke="rgba(255,255,255,0.5)" stroke-width="1.5" stroke-linecap="round"/>
+    ${!compact ? `
+    <line x1="${left - 12}" y1="${holeTop}" x2="${left - 12}" y2="${holeBottom}" stroke="${theme.muted}" stroke-width="0.8"/>
+    <line x1="${left - 16}" y1="${holeTop}" x2="${left - 8}" y2="${holeTop}" stroke="${theme.muted}" stroke-width="0.8"/>
+    <line x1="${left - 16}" y1="${holeBottom}" x2="${left - 8}" y2="${holeBottom}" stroke="${theme.muted}" stroke-width="0.8"/>
+    <text x="${left - 18}" y="${(holeTop + holeBottom) / 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="8" font-weight="600" text-anchor="end" transform="rotate(-90, ${left - 18}, ${(holeTop + holeBottom) / 2})">${formatDecimal(profile.altura_banco, 2, lang)} m</text>
+    ` : ''}
+    <text x="${left + 2}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="600">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>
 
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 5}" fill="${accent}" rx="2.5"/>
