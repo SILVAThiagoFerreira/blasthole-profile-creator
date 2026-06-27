@@ -79,7 +79,6 @@ const FALLBACK_CONFIG = {
         initiator: 'brinel',
         has_booster: true,
         booster_weight: 450,
-        cartridge_count: 0,
       },
       {
         name: 'Perfil B',
@@ -104,7 +103,6 @@ const FALLBACK_CONFIG = {
         initiator: 'none',
         has_booster: true,
         booster_weight: 450,
-        cartridge_count: 0,
       },
     ],
   },
@@ -1164,7 +1162,6 @@ const PROFILE_FIELDS = [
   'initiator',
   'has_booster',
   'booster_weight',
-  'cartridge_count',
 ];
 
 const DECK_POSITIONS = ['above_stemming', 'mid_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
@@ -1424,7 +1421,6 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.initiator = ['none', 'brinel', 'dvt', 'both'].includes(profile.initiator) ? profile.initiator : (fallback.initiator || 'none');
   profile.has_booster = Boolean(profile.has_booster);
   profile.booster_weight = normalizeNumber(profile.booster_weight, fallback.booster_weight || 450);
-  profile.cartridge_count = Math.max(0, Math.round(normalizeNumber(profile.cartridge_count, fallback.cartridge_count || 0)));
 
   if (index >= defaultCount && !isNonEmptyString(source?.name)) {
     profile.name = defaultProfileName(language, index);
@@ -1938,13 +1934,10 @@ function renderProfileCard(profile, theme, box, compact, index) {
       const colDark = mixHex(accent, '#000000', 0.15);
       segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${colLight}"/><stop offset="25%" stop-color="${accent}"/><stop offset="100%" stop-color="${colDark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})" rx="0"/>`);
     } else if (type === 'cartridge') {
-      const cartLight = mixHex(accent, '#FFFFFF', 0.15);
-      const cartDark = mixHex(accent, '#000000', 0.20);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${cartLight}"/><stop offset="30%" stop-color="${accent}"/><stop offset="100%" stop-color="${cartDark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})" rx="0"/>`);
-      const innerW = cylW * 0.6;
-      const innerH = Math.max(4, (y2 - yCur) * 0.5);
-      const innerY = yCur + (y2 - yCur - innerH) / 2;
-      segmentMarkup.push(`<rect x="${cx - innerW / 2}" y="${innerY}" width="${innerW}" height="${innerH}" rx="${compact ? 3 : 5}" fill="${mixHex(accent, '#FFFFFF', 0.4)}" stroke="${mixHex(accent, '#000000', 0.1)}" stroke-width="0.5"/>`);
+      const innerW = cylW * 0.5;
+      const innerH = Math.max(6, y2 - yCur);
+      const innerY = yCur;
+      segmentMarkup.push(`<rect ${segAttrs} x="${cx - innerW / 2}" y="${innerY}" width="${innerW}" height="${innerH}" rx="${compact ? 3 : 4}" fill="#E74C3C" stroke="#C0392B" stroke-width="1"/>`);
     } else {
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#6B7280" rx="0"/>`);
     }
@@ -2080,18 +2073,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
       } else if (profile.initiator === 'both') {
         drawCable('#E67E22', compact ? -4 : -6, 'Brinel');
         drawCable('#8E44AD', compact ? 0 : 2, 'DVT');
-      }
-      if (profile.cartridge_count > 0 && !compact) {
-        const chargeStart = segmentData.slice(0, segmentData.findIndex(s => s.type === 'column') >= 0 ? segmentData.findIndex(s => s.type === 'column') : 0).reduce((acc, s) => acc + holeH * (Math.max(s.value, 0) / total), holeTop);
-        const chargeEnd = chargeStart + holeH * (charge / total);
-        const cartH = Math.min(18, (chargeEnd - chargeStart) / (profile.cartridge_count + 1) * 0.6);
-        const cartW = cylW * 0.35;
-        for (let ci = 0; ci < profile.cartridge_count; ci++) {
-          const cy = chargeStart + ((chargeEnd - chargeStart) / (profile.cartridge_count + 1)) * (ci + 1);
-          overlay.push(`<rect x="${cx - cartW / 2}" y="${cy - cartH / 2}" width="${cartW}" height="${cartH}" rx="4" fill="#95A5A6" stroke="#7F8C8D" stroke-width="1"/>`);
-        }
-        const lblX = cylX2 + 14;
-        overlay.push(`<text x="${lblX}" y="${(chargeStart + chargeEnd) / 2}" fill="#7F8C8D" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">Ibegel 2x24"</text>`);
       }
       return overlay.join('\n');
     })()}
@@ -2456,7 +2437,6 @@ function renderProfileEditor(profile, index) {
             <label><input type="checkbox" data-path="profiles.${index}.has_booster"${profile.has_booster ? ' checked' : ''}> ${escapeXml(copy.fieldLabels.hasBooster)}</label>
           </div>
           ${profile.has_booster ? renderInput(copy.fieldLabels.boosterWeight, `profiles.${index}.booster_weight`, profile.booster_weight, 'number', { step: 10, min: 0 }) : ''}
-          ${renderInput(copy.fieldLabels.cartridgeCount, `profiles.${index}.cartridge_count`, profile.cartridge_count, 'number', { step: 1, min: 0 })}
         </div>
       </div>
       ${renderSegmentEditor(profile, index)}
@@ -2616,7 +2596,7 @@ function setNestedValue(path, rawValue, target) {
     cursor = key.match(/^\d+$/) ? cursor[Number(key)] : cursor[key];
   }
   const last = parts[parts.length - 1];
-  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade', 'booster_weight', 'cartridge_count'].some((field) => path.endsWith(field));
+  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade', 'booster_weight'].some((field) => path.endsWith(field));
   const value = isNumberField ? (rawValue === '' ? Number.NaN : Number(rawValue)) : rawValue;
 
   if (parts.length === 1) {
@@ -2661,6 +2641,10 @@ function handleInputEvent(event) {
         currentProfile[field][Number(itemIndex)][itemField] = target.type === 'number'
           ? (target.value === '' ? Number.NaN : Number(target.value))
           : value;
+        if (field === 'segments' && itemField === 'type' && value === 'cartridge') {
+          const seg = currentProfile.segments[Number(itemIndex)];
+          if (seg && (seg.height === 1 || seg.height === 0)) seg.height = 0.6;
+        }
         currentProfile.stemming = sumSegmentsByType(currentProfile.segments, 'stemming');
         currentProfile.blastbag = sumSegmentsByType(currentProfile.segments, 'blastbag');
         currentProfile.air_deck = sumSegmentsByType(currentProfile.segments, 'airdeck');
