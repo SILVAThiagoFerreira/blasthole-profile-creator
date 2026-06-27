@@ -1891,7 +1891,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     } else {
       const light = mixHex(segColor, '#FFFFFF', 0.22);
       const dark = mixHex(segColor, '#1b2430', 0.14);
-      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${darker}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
+      segmentMarkup.push(`<defs><linearGradient id="grad-${index}-${key}" x1="0" x2="1" y1="0" y2="0"><stop offset="0%" stop-color="${light}"/><stop offset="100%" stop-color="${dark}"/></linearGradient></defs><rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="url(#grad-${index}-${key})"/>`);
     }
 
     if (y2 - yCur >= (compact ? 8 : 12)) {
