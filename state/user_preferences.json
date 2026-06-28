@@ -10,8 +10,8 @@
     },
     "observation": "Perfil de Carregamento",
     "polygon_name": "PP170526 (220-210)",
-    "profile_count": 4,
-    "profile_type": "Perfis técnicos",
+    "profile_count": 1,
+    "profile_type": "DOCUMENTO DE USO TÉCNICO",
     "profiles": [
       {
         "air_deck": 0.0,
@@ -32,45 +32,6 @@
           { "height": 2.3, "type": "stemming" },
           { "height": 8.3, "has_booster": true, "type": "column" }
         ]
-      },
-      {
-        "air_deck": 0.6,
-        "altura_banco": 10.0,
-        "azimute": 0.0,
-        "blastbag": 0.0,
-        "densidade": 1.05,
-        "diametro_furo": 102.0,
-        "inclinacao": 0.0,
-        "kind": "Produção",
-        "name": "Perfil B",
-        "stemming": 4.0,
-        "subperfuracao": 0.0
-      },
-      {
-        "air_deck": 0.0,
-        "altura_banco": 10.0,
-        "azimute": 0.0,
-        "blastbag": 0.0,
-        "densidade": 1.05,
-        "diametro_furo": 102.0,
-        "inclinacao": 0.0,
-        "kind": "Amortecimento",
-        "name": "Perfil 3",
-        "stemming": 3.5,
-        "subperfuracao": 0.0
-      },
-      {
-        "air_deck": 2.9,
-        "altura_banco": 10.0,
-        "azimute": 0.0,
-        "blastbag": 0.0,
-        "densidade": 1.05,
-        "diametro_furo": 102.0,
-        "inclinacao": 0.0,
-        "kind": "Amortecimento",
-        "name": "Perfil 4",
-        "stemming": 0.0,
-        "subperfuracao": 0.0
       }
     ],
     "template_name": "Corporate clean"

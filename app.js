@@ -31,7 +31,7 @@ const FALLBACK_CONFIG = {
     write_pdf: true,
   },
   site: {
-    storage_key: 'openblast.profile-creator.web.state.v5',
+    storage_key: 'openblast.profile-creator.web.state.v6',
     language_storage_key: 'openblast.profile-creator.web.language.v2',
     supported_languages: ['pt-BR', 'es', 'en', 'zh-CN'],
     preview_size: [1920, 1080],
@@ -47,7 +47,7 @@ const FALLBACK_CONFIG = {
     polygon_name: 'PP170526 (220-210)',
     observation: 'Perfil de Carregamento',
     profile_type: 'DOCUMENTO DE USO TÉCNICO',
-    profile_count: 2,
+    profile_count: 1,
     labels: {
       stemming: 'Tampão',
       blastbag: 'Bolsa de Ar',
@@ -63,44 +63,18 @@ const FALLBACK_CONFIG = {
         altura_banco: 10.0,
         subperfuracao: 0.6,
         stemming: 2.3,
-        air_deck: 0.35,
-        air_decks: [{ height: 0.35, position: 'mid_charge' }],
-        blastbag: 0.15,
-        blastbags: [{ height: 0.15, position: 'below_stemming' }],
+        air_deck: 0.0,
+        air_decks: [],
+        blastbag: 0.0,
+        blastbags: [],
         segments: [
           { type: 'stemming', height: 2.3 },
-          { type: 'blastbag', height: 0.15 },
-          { type: 'column', height: 7.2 },
-          { type: 'airdeck', height: 0.35 },
+          { type: 'column', height: 8.3 },
         ],
         inclinacao: 0.0,
         azimute: 0.0,
         densidade: 1.15,
         initiator: 'brinel',
-        has_booster: true,
-        booster_weight: 450,
-      },
-      {
-        name: 'Perfil B',
-        kind: 'amortecimento',
-        diametro_furo: 102.0,
-        altura_banco: 10.0,
-        subperfuracao: 0.0,
-        stemming: 3.5,
-        air_deck: 0.2,
-        air_decks: [{ height: 0.2, position: 'mid_charge' }],
-        blastbag: 0.1,
-        blastbags: [{ height: 0.1, position: 'below_stemming' }],
-        segments: [
-          { type: 'stemming', height: 3.5 },
-          { type: 'column', height: 6.2 },
-          { type: 'blastbag', height: 0.1 },
-          { type: 'airdeck', height: 0.2 },
-        ],
-        inclinacao: 0.0,
-        azimute: 0.0,
-        densidade: 1.05,
-        initiator: 'none',
         has_booster: true,
         booster_weight: 450,
       },
@@ -1167,7 +1141,7 @@ const PROFILE_FIELDS = [
 const DECK_POSITIONS = ['above_stemming', 'mid_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
 const SEGMENT_TYPES = ['stemming', 'column', 'cartridge', 'blastbag', 'airdeck'];
 
-const DEFAULT_STORAGE_KEY = 'openblast.profile-creator.web.state.v5';
+const DEFAULT_STORAGE_KEY = 'openblast.profile-creator.web.state.v6';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
 const DEFAULT_PREVIEW_SIZE = [1920, 1080];
 
