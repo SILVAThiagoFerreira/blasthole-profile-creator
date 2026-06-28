@@ -59,7 +59,7 @@
     "polygon_name": "PP170526 (220-210)",
     "observation": "Lâmina técnica padronizada para reporte operacional.",
     "profile_type": "Perfis técnicos",
-    "profile_count": 2,
+    "profile_count": 4,
     "labels": {
       "stemming": "Tampão",
       "blastbag": "Blastbag",
@@ -75,37 +75,11 @@
         "altura_banco": 10.0,
         "subperfuracao": 0.6,
         "stemming": 2.3,
-        "air_deck": 0.35,
-        "air_decks": [
-          {
-            "height": 0.35,
-            "position": "mid_charge"
-          }
-        ],
-        "blastbag": 0.15,
-        "blastbags": [
-          {
-            "height": 0.15,
-            "position": "below_stemming"
-          }
-        ],
+        "air_deck": 0.0,
+        "blastbag": 0.0,
         "segments": [
-          {
-            "type": "stemming",
-            "height": 2.3
-          },
-          {
-            "type": "blastbag",
-            "height": 0.15
-          },
-          {
-            "type": "column",
-            "height": 7.2
-          },
-          {
-            "type": "airdeck",
-            "height": 0.35
-          }
+          { "type": "stemming", "height": 2.3 },
+          { "type": "column", "height": 8.3 }
         ],
         "inclinacao": 0.0,
         "azimute": 0.0,
@@ -113,42 +87,54 @@
       },
       {
         "name": "Perfil B",
+        "kind": "produção",
+        "diametro_furo": 102.0,
+        "altura_banco": 10.0,
+        "subperfuracao": 0.0,
+        "stemming": 4.0,
+        "air_deck": 0.6,
+        "blastbag": 0.0,
+        "segments": [
+          { "type": "stemming", "height": 4.0 },
+          { "type": "column", "height": 5.4 },
+          { "type": "airdeck", "height": 0.6 }
+        ],
+        "inclinacao": 0.0,
+        "azimute": 0.0,
+        "densidade": 1.05
+      },
+      {
+        "name": "Perfil 3",
         "kind": "amortecimento",
         "diametro_furo": 102.0,
         "altura_banco": 10.0,
         "subperfuracao": 0.0,
         "stemming": 3.5,
-        "air_deck": 0.2,
-        "air_decks": [
-          {
-            "height": 0.2,
-            "position": "mid_charge"
-          }
-        ],
-        "blastbag": 0.1,
-        "blastbags": [
-          {
-            "height": 0.1,
-            "position": "below_stemming"
-          }
-        ],
+        "air_deck": 0.0,
+        "blastbag": 0.0,
         "segments": [
-          {
-            "type": "stemming",
-            "height": 3.5
-          },
-          {
-            "type": "column",
-            "height": 6.2
-          },
-          {
-            "type": "blastbag",
-            "height": 0.1
-          },
-          {
-            "type": "airdeck",
-            "height": 0.2
-          }
+          { "type": "stemming", "height": 3.5 },
+          { "type": "column", "height": 6.5 }
+        ],
+        "inclinacao": 0.0,
+        "azimute": 0.0,
+        "densidade": 1.05
+      },
+      {
+        "name": "Perfil 4",
+        "kind": "amortecimento",
+        "diametro_furo": 102.0,
+        "altura_banco": 10.0,
+        "subperfuracao": 0.0,
+        "stemming": 0.0,
+        "air_deck": 2.9,
+        "air_decks": [
+          { "height": 2.9, "position": "below_stemming" }
+        ],
+        "blastbag": 0.0,
+        "segments": [
+          { "type": "column", "height": 7.1 },
+          { "type": "airdeck", "height": 2.9 }
         ],
         "inclinacao": 0.0,
         "azimute": 0.0,

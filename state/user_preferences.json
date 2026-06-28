@@ -3,45 +3,78 @@
     "language": "pt-BR",
     "labels": {
       "airdeck": "Deck de ar",
-      "blastbag": "Blastbag",
-      "column": "Carga",
+      "blastbag": "Bolsa de Ar",
+      "column": "Coluna de carga",
       "stemming": "Tampão",
       "subdrill": "Subperfuração"
     },
-    "observation": "Lâmina técnica padronizada para reporte operacional.",
+    "observation": "Perfil de Carregamento",
     "polygon_name": "PP170526 (220-210)",
-    "profile_count": 2,
+    "profile_count": 4,
     "profile_type": "Perfis técnicos",
     "profiles": [
       {
-        "air_deck": 0.35,
+        "air_deck": 0.0,
         "altura_banco": 10.0,
         "azimute": 0.0,
-        "blastbag": 0.15,
+        "blastbag": 0.0,
         "densidade": 1.15,
         "diametro_furo": 140.0,
+        "booster_weight": 450,
+        "has_booster": true,
+        "initiator": "both",
         "inclinacao": 0.0,
         "kind": "Produção",
         "name": "Perfil A",
         "stemming": 2.3,
-        "subperfuracao": 0.6
+        "subperfuracao": 0.6,
+        "segments": [
+          { "height": 2.3, "type": "stemming" },
+          { "height": 8.3, "has_booster": true, "type": "column" }
+        ]
       },
       {
-        "air_deck": 0.2,
+        "air_deck": 0.6,
         "altura_banco": 10.0,
         "azimute": 0.0,
-        "blastbag": 0.1,
+        "blastbag": 0.0,
+        "densidade": 1.05,
+        "diametro_furo": 102.0,
+        "inclinacao": 0.0,
+        "kind": "Produção",
+        "name": "Perfil B",
+        "stemming": 4.0,
+        "subperfuracao": 0.0
+      },
+      {
+        "air_deck": 0.0,
+        "altura_banco": 10.0,
+        "azimute": 0.0,
+        "blastbag": 0.0,
         "densidade": 1.05,
         "diametro_furo": 102.0,
         "inclinacao": 0.0,
         "kind": "Amortecimento",
-        "name": "Perfil B",
+        "name": "Perfil 3",
         "stemming": 3.5,
+        "subperfuracao": 0.0
+      },
+      {
+        "air_deck": 2.9,
+        "altura_banco": 10.0,
+        "azimute": 0.0,
+        "blastbag": 0.0,
+        "densidade": 1.05,
+        "diametro_furo": 102.0,
+        "inclinacao": 0.0,
+        "kind": "Amortecimento",
+        "name": "Perfil 4",
+        "stemming": 0.0,
         "subperfuracao": 0.0
       }
     ],
     "template_name": "Corporate clean"
   },
-  "saved_at": "2026-05-12T10:04:21",
+  "saved_at": "2026-06-27T19:00:00",
   "schema_version": 1
 }
