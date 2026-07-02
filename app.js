@@ -51,8 +51,9 @@ const FALLBACK_CONFIG = {
     labels: {
       stemming: 'Tampão',
       blastbag: 'Bolsa de Ar',
+      cartridge: 'Cartucho',
       airdeck: 'Deck de ar',
-      column: 'Carga',
+      column: 'Coluna de carga',
       subdrill: 'Subperfuração',
     },
     profiles: [
@@ -175,6 +176,8 @@ const COPY = {
       save: 'Salvar',
       removeProfile: 'Remover perfil',
       addProfile: 'Adicionar perfil',
+      uploadLogo: 'Anexar logo',
+      uploadMesh: 'Anexar imagem da malha',
     },
     preview: {
       eyebrow: 'Pré-visualização',
@@ -259,6 +262,7 @@ const COPY = {
     labels: {
       stemming: 'Tampão',
       blastbag: 'Bolsa de Ar',
+      cartridge: 'Cartucho',
       airdeck: 'Deck de ar',
       column: 'Coluna de carga',
       subdrill: 'Subperfuração',
@@ -385,6 +389,8 @@ const COPY = {
       save: 'Save',
       removeProfile: 'Remove profile',
       addProfile: 'Add profile',
+      uploadLogo: 'Upload logo',
+      uploadMesh: 'Upload mesh image',
     },
     preview: {
       eyebrow: 'Preview',
@@ -469,6 +475,7 @@ const COPY = {
     labels: {
       stemming: 'Stemming',
       blastbag: 'Air bag',
+      cartridge: 'Cartridge',
       airdeck: 'Air deck',
       column: 'Charge column',
       subdrill: 'Subdrilling',
@@ -595,6 +602,8 @@ const COPY = {
       save: 'Guardar',
       removeProfile: 'Eliminar perfil',
       addProfile: 'Agregar perfil',
+      uploadLogo: 'Adjuntar logo',
+      uploadMesh: 'Adjuntar imagen de la malla',
     },
     preview: {
       eyebrow: 'Vista previa',
@@ -679,6 +688,7 @@ const COPY = {
     labels: {
       stemming: 'Taco',
       blastbag: 'Bolsa de aire',
+      cartridge: 'Cartucho',
       airdeck: 'Deck de aire',
       column: 'Columna de carga',
       subdrill: 'Subperforación',
@@ -805,6 +815,8 @@ const COPY = {
       save: '保存',
       removeProfile: '移除剖面',
       addProfile: '添加剖面',
+      uploadLogo: '上传标志',
+      uploadMesh: '上传网格图片',
     },
     preview: {
       eyebrow: '预览',
@@ -889,6 +901,7 @@ const COPY = {
     labels: {
       stemming: '堵塞',
       blastbag: '缓冲袋',
+      cartridge: '药卷',
       airdeck: '空气间隔',
       column: '装药柱',
       subdrill: '超深',
@@ -1453,7 +1466,14 @@ function mergeLoadedState(currentConfig, savedState) {
         dataUrl: isNonEmptyString(asset.dataUrl) ? String(asset.dataUrl) : '',
       };
     })(),
-    mesh: clone(base.mesh),
+    mesh: (() => {
+      const asset = request.mesh && typeof request.mesh === 'object' ? request.mesh : base.mesh;
+      return {
+        name: isNonEmptyString(asset?.name) ? String(asset.name).trim() : '',
+        type: isNonEmptyString(asset?.type) ? String(asset.type).trim() : '',
+        dataUrl: isNonEmptyString(asset?.dataUrl) ? String(asset.dataUrl) : '',
+      };
+    })(),
   };
 
   const errors = validateState(state, currentConfig);
@@ -1552,6 +1572,7 @@ function serializeForStorage(appState) {
     labels: clone(appState.labels),
     profiles: clone(appState.profiles),
     logo: clone(appState.logo),
+    mesh: clone(appState.mesh),
   };
 }
 
@@ -1806,16 +1827,14 @@ function buildChargeSegments(profile, accent) {
 function segmentDisplayLabel(type, lang = getActiveLanguage(), short = false) {
   const copy = getCopy(lang);
   const labels = {
-    stemming: copy.labels.stemming,
-    column: copy.labels.column,
-    blastbag: copy.labels.blastbag,
-    airdeck: copy.labels.airdeck,
-    subdrill: copy.labels.subdrill,
+    ...copy.labels,
+    ...(state?.labels || {}),
   };
   if (!short) return labels[type] || type;
   const shortLabels = {
     stemming: 'Tamp.',
     column: 'Carga',
+    cartridge: 'Cart.',
     blastbag: 'B.Air',
     airdeck: 'Deck',
     subdrill: 'Sub.',
@@ -1920,11 +1939,11 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
     if (y2 - yCur >= (compact ? 8 : 12)) {
       const labelX = cylX2 + (compact ? 6 : 14);
-      const labelSize = compact ? 7 : 10;
-      const labelValue = `${segmentDisplayLabel(type, lang, compact)} ${formatDecimal(segVal)}m`;
-      const safeLabel = shortText(labelValue, compact ? 14 : 22);
+      const labelValue = `${segmentDisplayLabel(type, lang)} ${formatDecimal(segVal)}m`;
+      const labelMaxWidth = Math.max(0, infoBox.x - labelX - (compact ? 8 : 14));
+      const labelSize = fitFontSize(labelValue, labelMaxWidth, compact ? 7 : 10, `'IBM Plex Sans', sans-serif`, 500, compact ? 5 : 8);
       segmentMarkup.push(`<line x1="${cylX2 + 1}" y1="${midY}" x2="${labelX - 2}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.6"/>`);
-      segmentMarkup.push(`<text x="${labelX}" y="${midY + 1}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="500" dominant-baseline="middle">${escapeXml(safeLabel)}</text>`);
+      segmentMarkup.push(`<text x="${labelX}" y="${midY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="500" dominant-baseline="middle">${escapeXml(labelValue)}</text>`);
     }
     yCur = y2;
   }
@@ -2266,28 +2285,32 @@ function renderLayout(currentConfig) {
 
 function renderGlobalSection(currentConfig) {
   const copy = getCopy();
-  const templateOptions = Object.keys(currentConfig.templates).map((template) => `<option value="${escapeXml(template)}"${template === state.templateName ? ' selected' : ''}>${escapeXml(templateDisplayName(template))}</option>`).join('');
   const logoName = state.logo?.name ? shortText(state.logo.name, 28) : copy.fileChips.logoDefault;
   const meshName = state.mesh?.name ? shortText(state.mesh.name, 28) : copy.fileChips.meshDefault;
   return `
+    ${renderAttachmentRow({
+      label: copy.fieldLabels.logo,
+      buttonLabel: copy.buttons.uploadLogo,
+      inputId: 'logoFile',
+      role: 'logo-file',
+      accept: 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml',
+      chipId: 'logoChip',
+      fileName: logoName,
+    })}
+    ${renderAttachmentRow({
+      label: copy.fieldLabels.mesh,
+      buttonLabel: copy.buttons.uploadMesh,
+      inputId: 'meshFile',
+      role: 'mesh-file',
+      accept: 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml',
+      chipId: 'meshChip',
+      fileName: meshName,
+    })}
     <div class="field">
       <label for="observation">${copy.fieldLabels.observation}</label>
       <textarea id="observation" data-path="observation" placeholder="${escapeXml(copy.fieldPlaceholders.observation)}">${escapeXml(state.observation)}</textarea>
     </div>
-    <div class="image-upload-row">
-      <div class="field">
-        <label for="logoFile">${copy.fieldLabels.logo}</label>
-        <input id="logoFile" data-role="logo-file" type="file" accept="image/png,image/jpeg,image/jpg,image/svg+xml">
-      </div>
-      <span class="file-chip" id="logoChip">${escapeXml(logoName)}</span>
-    </div>
-    <div class="image-upload-row">
-      <div class="field">
-        <label for="meshFile">${copy.fieldLabels.mesh}</label>
-        <input id="meshFile" data-role="mesh-file" type="file" accept="image/png,image/jpeg,image/jpg">
-      </div>
-      <span class="file-chip" id="meshChip">${escapeXml(meshName)}</span>
-    </div>`;
+    `;
 }
 
 function renderLabelSection() {
@@ -2296,6 +2319,7 @@ function renderLabelSection() {
     <div class="form-grid form-grid--three">
       ${renderInput(copy.labels.stemming, 'labels.stemming', state.labels.stemming)}
       ${renderInput(copy.labels.blastbag, 'labels.blastbag', state.labels.blastbag)}
+      ${renderInput(copy.labels.cartridge, 'labels.cartridge', state.labels.cartridge)}
       ${renderInput(copy.labels.airdeck, 'labels.airdeck', state.labels.airdeck)}
       ${renderInput(copy.labels.column, 'labels.column', state.labels.column)}
       ${renderInput(copy.labels.subdrill, 'labels.subdrill', state.labels.subdrill)}
@@ -2507,6 +2531,18 @@ function renderProfileTabs() {
   dom.profileTabs.innerHTML = letters.join('');
 }
 
+function renderAttachmentRow({ label, buttonLabel, inputId, role, accept, chipId, fileName }) {
+  return `
+    <div class="image-upload-row">
+      <div class="field">
+        <label for="${escapeXml(inputId)}">${escapeXml(label)}</label>
+        <button class="ghost-button upload-trigger" type="button" data-action="pick-file" data-target="${escapeXml(inputId)}">${escapeXml(buttonLabel)}</button>
+        <input id="${escapeXml(inputId)}" class="upload-input" data-role="${escapeXml(role)}" type="file" accept="${escapeXml(accept)}">
+      </div>
+      <span class="file-chip" id="${escapeXml(chipId)}">${escapeXml(fileName)}</span>
+    </div>`;
+}
+
 function syncTopbarInputs() {
   if (dom.polygonNameTop) {
     dom.polygonNameTop.value = state.polygonName || '';
@@ -2589,7 +2625,9 @@ function handleInputEvent(event) {
     const path = target.getAttribute('data-path');
     if (!path) return;
 
-    const value = target.tagName === 'SELECT' ? target.value : target.value;
+    const value = target instanceof HTMLInputElement && target.type === 'checkbox'
+      ? target.checked
+      : target.value;
     if (path.startsWith('profiles.')) {
       const [, index, field, itemIndex, itemField] = path.split('.');
       if (!state.profiles[Number(index)]) return;
@@ -2641,6 +2679,8 @@ function handleInputEvent(event) {
       };
       syncMeshChip();
       scheduleUpdate();
+    }).finally(() => {
+      target.value = '';
     });
   }
 
@@ -2660,6 +2700,8 @@ function handleInputEvent(event) {
       };
       syncLogoChip();
       scheduleUpdate();
+    }).finally(() => {
+      target.value = '';
     });
   }
 }
@@ -2668,6 +2710,17 @@ function handleClickEvent(event) {
   const target = event.target;
   if (!(target instanceof HTMLElement)) return;
   const deckAction = target.getAttribute('data-action');
+  if (deckAction === 'pick-file') {
+    const inputId = target.getAttribute('data-target');
+    if (inputId) {
+      const input = document.getElementById(inputId);
+      if (input instanceof HTMLInputElement) {
+        if (typeof input.showPicker === 'function') input.showPicker();
+        else input.click();
+      }
+    }
+    return;
+  }
   if (['add-segment', 'remove-segment', 'move-segment-up', 'move-segment-down'].includes(deckAction)) {
     const profileIndex = Number(target.getAttribute('data-profile-index'));
     const itemIndex = Number(target.getAttribute('data-item-index'));
@@ -2897,14 +2950,10 @@ function setLanguage(nextLanguage) {
 }
 
 function renderShell(currentConfig) {
-  const copy = getCopy();
-  const labelCopy = copy.sections.labels.title;
-  const configCopy = copy.sections.config.title;
-
   if (dom.globalSettingsArea) {
     dom.globalSettingsArea.innerHTML = `
-      <div id="labelFields"></div>
-      <div id="globalFields"></div>`;
+      <div id="globalFields"></div>
+      <div id="labelFields"></div>`;
     dom.labelFields = document.getElementById('labelFields');
     dom.globalFields = document.getElementById('globalFields');
   }

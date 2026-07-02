@@ -12,6 +12,7 @@ Gerar uma lâmina técnica 16:9 a partir de parâmetros operacionais e visuais, 
 - Template visual
 - Observação final
 - Perfis técnicos
+- Logo da lâmina opcional
 - Imagem opcional da malha
 
 ## Regras
@@ -20,6 +21,8 @@ Gerar uma lâmina técnica 16:9 a partir de parâmetros operacionais e visuais, 
 - O número de perfis deve respeitar `min_profiles` e `max_profiles`.
 - Campos numéricos não podem ser negativos.
 - Campos textuais obrigatórios não podem ser vazios.
+- Os anexos opcionais de logo e malha devem ser imagens legíveis; `PNG`, `JPG`, `WEBP` e `SVG` são aceitos.
+- Arquivos de imagem inválidos interrompem a geração com erro explícito.
 - O resultado deve ser identificável por manifesto.
 
 ## Saídas

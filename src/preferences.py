@@ -154,7 +154,11 @@ def _sanitize(value: Any) -> Any:
     if isinstance(value, bytes):
         return {"type": "bytes", "length": len(value)}
     if isinstance(value, dict):
-        return {key: _sanitize(item) for key, item in value.items() if key != "mesh_bytes"}
+        return {
+            key: _sanitize(item)
+            for key, item in value.items()
+            if key not in {"mesh_bytes", "logo_bytes"}
+        }
     if isinstance(value, list):
         return [_sanitize(item) for item in value]
     return value

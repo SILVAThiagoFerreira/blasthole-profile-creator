@@ -654,6 +654,27 @@ body::before {
   min-width: 0;
 }
 
+.sidebar__collapsible-body .image-upload-row .field {
+  position: relative;
+}
+
+.sidebar__collapsible-body .upload-trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  border-style: dashed;
+  border-color: #cfd8e3;
+  background: #fcfcfc;
+  color: var(--accent-blue);
+  letter-spacing: 0.03em;
+}
+
+.sidebar__collapsible-body .upload-trigger:hover {
+  background: #f3f7fb;
+  border-color: #b9cce0;
+}
+
 .sidebar__collapsible-body .file-chip {
   display: inline-flex;
   align-items: center;
@@ -667,6 +688,16 @@ body::before {
   font-size: 0.68rem;
   font-weight: 700;
   white-space: nowrap;
+}
+
+.sidebar__collapsible-body .upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sidebar__collapsible-body .field input[type='file'] {

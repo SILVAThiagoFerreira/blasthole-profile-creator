@@ -6,7 +6,7 @@ from typing import Any
 
 import streamlit as st
 
-from .config import get_default_config, load_config
+from .config import load_config
 from .pipeline import RenderingPipeline
 from .preferences import load_ui_preferences, save_ui_preferences
 
@@ -71,7 +71,19 @@ def _sidebar(config: dict) -> dict:
             st.session_state.profile_count = max(config["validation"]["min_profiles"], st.session_state.profile_count - 1)
             st.rerun()
 
-    mesh_image = st.sidebar.file_uploader("Anexar imagem da malha", type=["png", "jpg", "jpeg"], help="Opcional. Se não anexar, será exibido um painel técnico de referência.")
+    st.sidebar.subheader("Anexos opcionais")
+    logo_image = st.sidebar.file_uploader(
+        "Anexar logo da lâmina",
+        type=["png", "jpg", "jpeg", "webp", "svg"],
+        help="Opcional. PNG, JPG, WEBP ou SVG.",
+        key="logo_image_upload",
+    )
+    mesh_image = st.sidebar.file_uploader(
+        "Anexar imagem da malha",
+        type=["png", "jpg", "jpeg", "webp", "svg"],
+        help="Opcional. PNG, JPG, WEBP ou SVG.",
+        key="mesh_image_upload",
+    )
 
     st.sidebar.subheader("Terminologia editável")
     labels = {
@@ -86,6 +98,7 @@ def _sidebar(config: dict) -> dict:
         "template_name": template_name,
         "polygon_name": polygon_name,
         "observation": observation,
+        "logo_image": logo_image,
         "mesh_image": mesh_image,
         "labels": labels,
     }
@@ -112,6 +125,7 @@ def _build_request(config: dict[str, Any], sidebar: dict[str, Any], profile_inpu
         "labels": sidebar["labels"],
         "profile_count": profile_count,
         "profiles": profile_inputs,
+        "logo_bytes": sidebar["logo_image"].getvalue() if sidebar["logo_image"] else None,
         "mesh_bytes": sidebar["mesh_image"].getvalue() if sidebar["mesh_image"] else None,
     }
 
@@ -236,29 +250,27 @@ def run_app() -> None:
 
         if st.button("Gerar e salvar", type="primary"):
             request = _build_request(config, sidebar, profile_inputs, st.session_state.profile_count)
-            image = pipeline.build_image(request)
-            files = pipeline.export(image, polygon_name=sidebar["polygon_name"])
-            manifest = pipeline.write_manifest(
-                {
-                    "polygon_name": sidebar["polygon_name"],
-                    "template_name": sidebar["template_name"],
-                    "profile_count": st.session_state.profile_count,
-                    "profiles": profile_inputs,
-                },
-                files,
-            )
-            st.session_state.generated_image = image
-            st.session_state.generated_files = files
-            st.session_state.generated_manifest = str(manifest)
             try:
-                save_ui_preferences(config, request)
-            except OSError as exc:
-                st.warning(f"Não foi possível salvar as preferências: {exc}")
-            st.caption("As últimas configurações válidas ficam salvas para a próxima abertura.")
+                image = pipeline.build_image(request)
+                files = pipeline.export(image, polygon_name=sidebar["polygon_name"])
+                manifest = pipeline.write_manifest(request, files)
+                st.session_state.generated_image = image
+                st.session_state.generated_files = files
+                st.session_state.generated_manifest = str(manifest)
+                try:
+                    save_ui_preferences(config, request)
+                except OSError as exc:
+                    st.warning(f"Não foi possível salvar as preferências: {exc}")
+                st.success("Lâmina gerada com sucesso.")
+                st.caption("As últimas configurações válidas ficam salvas para a próxima abertura.")
+            except Exception as exc:
+                st.session_state.generated_image = None
+                st.session_state.generated_files = {}
+                st.session_state.generated_manifest = None
+                st.error(str(exc))
 
         image = st.session_state.generated_image
         if image is not None:
-            st.success("Lâmina gerada com sucesso.")
             st.image(image, caption="Preview 3840x2160", width="stretch")
 
             download_cols = st.columns(4)

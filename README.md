@@ -7,7 +7,7 @@ Site estático para construção de perfil de carga, pronto para GitHub Pages, c
 1. Interface web para montar perfis técnicos.
 2. Preview vetorial em alta resolução no navegador.
 3. Exportação em `SVG`, `PNG`, `JPG` e `PDF`.
-4. Memória persistida no navegador, seed do projeto em `state/user_preferences.json` e logo substituível por upload.
+4. Memória persistida no navegador, seed do projeto em `state/user_preferences.json` e anexos opcionais de logo e imagem da malha, com suporte a `PNG`, `JPG`, `WEBP` e `SVG`.
 5. Base pronta para hospedagem no GitHub Pages.
 
 ## Execução local
@@ -35,8 +35,10 @@ O app Python original continua no repositório como referência, mas o site prin
 - Poligonal
 - Perfis técnicos
 - Observação final
+- Logo oficial opcional
 - Imagem opcional da malha
 - Template visual
+- Terminologia editável da lâmina, incluindo cartuchos/pré-cortes
 
 ## Saídas
 

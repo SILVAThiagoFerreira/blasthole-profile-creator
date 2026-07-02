@@ -8,6 +8,8 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 from src.config import get_layout_config
 
+from .image_assets import load_uploaded_image
+
 
 _LAYOUT = get_layout_config()
 SCALE = max(1, int(_LAYOUT.get("panel_scale", _LAYOUT.get("scale", 1))))
@@ -79,18 +81,13 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
         draw.rectangle((_s(28), _s(64), _s(80), _s(68)), fill=theme.accent_red)
         draw.rounded_rectangle((_s(28), _s(82), _s(170), _s(110)), radius=_s(10), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
         draw.text((_s(40), _s(88)), "ARQUIVO ANEXADO", font=_font(_s(10), bold=True), fill=theme.muted)
-        try:
-            mesh = Image.open(io.BytesIO(mesh_input.uploaded_mesh)).convert("RGBA")
-            frame = (_s(32), _s(128), w - _s(32), h - _s(122))
-            draw.rounded_rectangle(frame, radius=_s(20), fill="#F9FAFB", outline="#E5E7EB", width=_s(1))
-            mesh = ImageOps.contain(mesh, (frame[2] - frame[0] - _s(20), frame[3] - frame[1] - _s(20)))
-            x = frame[0] + ((frame[2] - frame[0]) - mesh.size[0]) // 2
-            y = frame[1] + ((frame[3] - frame[1]) - mesh.size[1]) // 2
-            img.alpha_composite(mesh, (x, y))
-        except Exception:
-            draw.rounded_rectangle((_s(40), _s(140), w - _s(40), h - _s(150)), radius=_s(18), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
-            draw.text((_s(56), _s(170)), "Pré-visualização indisponível", font=_font(_s(14), bold=True), fill=theme.text)
-            draw.text((_s(56), _s(198)), "A imagem será exportada normalmente.", font=_font(_s(12)), fill=theme.muted)
+        mesh = load_uploaded_image(mesh_input.uploaded_mesh, "imagem da malha")
+        frame = (_s(32), _s(128), w - _s(32), h - _s(122))
+        draw.rounded_rectangle(frame, radius=_s(20), fill="#F9FAFB", outline="#E5E7EB", width=_s(1))
+        mesh = ImageOps.contain(mesh, (frame[2] - frame[0] - _s(20), frame[3] - frame[1] - _s(20)))
+        x = frame[0] + ((frame[2] - frame[0]) - mesh.size[0]) // 2
+        y = frame[1] + ((frame[3] - frame[1]) - mesh.size[1]) // 2
+        img.alpha_composite(mesh, (x, y))
         draw.text((_s(28), h - _s(80)), "Imagem anexada pelo usuário.",
                   font=_font(_s(13), bold=True), fill=theme.muted)
         return img

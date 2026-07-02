@@ -23,3 +23,9 @@
 - `inclinacao`: número >= 0
 - `azimute`: número >= 0
 - `densidade`: número >= 0
+
+## Anexos opcionais do formulário
+
+- `logo_bytes`: bytes de uma imagem legível para o logo da lâmina; aceitos `PNG`, `JPG`, `WEBP` e `SVG`
+- `mesh_bytes`: bytes de uma imagem legível para a malha; aceitos `PNG`, `JPG`, `WEBP` e `SVG`
+- Anexos inválidos devem falhar explicitamente na geração, sem fallback silencioso

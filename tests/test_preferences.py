@@ -13,11 +13,12 @@ class PreferencePersistenceTests(unittest.TestCase):
     def test_save_and_load_round_trip(self) -> None:
         cfg = load_config()
         defaults = cfg["defaults"]
+        base_profile = defaults["profiles"][0]
         profiles = [
-            defaults["profiles"][0],
-            defaults["profiles"][1],
-            {**defaults["profiles"][0], "name": "Perfil C"},
-            {**defaults["profiles"][1], "name": "Perfil D"},
+            base_profile,
+            {**base_profile, "name": "Perfil B"},
+            {**base_profile, "name": "Perfil C"},
+            {**base_profile, "name": "Perfil D"},
         ]
         request = {
             "polygon_name": "PP999999 (111-222)",
@@ -27,6 +28,7 @@ class PreferencePersistenceTests(unittest.TestCase):
             "profile_count": 4,
             "labels": defaults["labels"],
             "profiles": profiles,
+            "logo_bytes": b"logo-data",
             "mesh_bytes": b"binary-data",
         }
 
@@ -36,6 +38,7 @@ class PreferencePersistenceTests(unittest.TestCase):
                 saved_path = save_ui_preferences(cfg, request)
                 self.assertEqual(saved_path, path)
                 self.assertTrue(path.exists())
+                self.assertNotIn("logo_bytes", path.read_text(encoding="utf-8"))
                 self.assertNotIn("mesh_bytes", path.read_text(encoding="utf-8"))
                 loaded = load_ui_preferences(cfg)
 
@@ -43,6 +46,13 @@ class PreferencePersistenceTests(unittest.TestCase):
         self.assertEqual(loaded["profile_count"], 4)
         self.assertEqual(len(loaded["profiles"]), 4)
         self.assertEqual(loaded["profiles"][2]["name"], "Perfil C")
+
+    def test_loaded_preferences_keep_cartridge_label(self) -> None:
+        cfg = load_config()
+        loaded = load_ui_preferences(cfg)
+
+        self.assertIn("cartridge", loaded["labels"])
+        self.assertEqual(loaded["labels"]["cartridge"], cfg["defaults"]["labels"]["cartridge"])
 
     def test_invalid_preferences_fall_back_to_defaults(self) -> None:
         cfg = load_config()

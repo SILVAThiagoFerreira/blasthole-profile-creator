@@ -52,6 +52,7 @@ class RenderingPipeline:
             labels=request["labels"],
             mesh_input=mesh_input,
             profiles=profiles,
+            logo_bytes=request.get("logo_bytes"),
         )
 
     def export(self, image: Image.Image, polygon_name: str) -> dict[str, str]:

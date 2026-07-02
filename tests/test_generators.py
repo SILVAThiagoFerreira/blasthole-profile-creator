@@ -183,6 +183,47 @@ class ProfileCardTests(unittest.TestCase):
         )
 
 
+class UploadedAssetTests(unittest.TestCase):
+    def test_invalid_mesh_upload_raises(self) -> None:
+        from generator.mesh import MeshInput, render_mesh_panel
+        from generator.layout import TEMPLATE_PRESETS
+
+        theme = TEMPLATE_PRESETS["Corporate clean"]
+        with self.assertRaises(ValueError):
+            render_mesh_panel(
+                MeshInput(polygon_name="PP170526 (220-210)", uploaded_mesh=b"not-an-image"),
+                theme,
+            )
+
+    def test_svg_logo_and_mesh_render(self) -> None:
+        from generator.layout import TEMPLATE_PRESETS, build_final_image
+        from generator.mesh import MeshInput
+        from generator.profile import ProfileInput
+        from src.config import load_config
+
+        cfg = load_config()
+        base_profile = cfg["defaults"]["profiles"][0]
+        profile = ProfileInput(**base_profile)
+        svg = b"""<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"160\" height=\"80\" viewBox=\"0 0 160 80\">
+  <rect width=\"160\" height=\"80\" fill=\"#FFFFFF\"/>
+  <rect x=\"12\" y=\"12\" width=\"136\" height=\"56\" rx=\"10\" fill=\"#D71920\"/>
+</svg>"""
+        image = build_final_image(
+            polygon_name=cfg["defaults"]["polygon_name"],
+            profile_type=cfg["defaults"]["profile_type"],
+            template_name=cfg["defaults"]["template_name"],
+            observation=cfg["defaults"]["observation"],
+            labels=cfg["defaults"]["labels"],
+            mesh_input=MeshInput(
+                polygon_name=cfg["defaults"]["polygon_name"],
+                uploaded_mesh=svg,
+            ),
+            profiles=[profile],
+            logo_bytes=svg,
+        )
+        self.assertEqual(image.size, (3840, 2160))
+
+
 class FourProfileLayoutTests(unittest.TestCase):
     def test_four_profiles_render_on_canvas(self) -> None:
         from generator.layout import build_final_image
@@ -192,11 +233,12 @@ class FourProfileLayoutTests(unittest.TestCase):
 
         cfg = load_config()
         labels = cfg["defaults"]["labels"]
+        base_profile = cfg["defaults"]["profiles"][0]
         profiles = [
-            ProfileInput(**cfg["defaults"]["profiles"][0]),
-            ProfileInput(**cfg["defaults"]["profiles"][1]),
-            ProfileInput(**cfg["defaults"]["profiles"][0]),
-            ProfileInput(**cfg["defaults"]["profiles"][1]),
+            ProfileInput(**base_profile),
+            ProfileInput(**{**base_profile, "name": "Perfil B"}),
+            ProfileInput(**base_profile),
+            ProfileInput(**{**base_profile, "name": "Perfil D"}),
         ]
         img = build_final_image(
             polygon_name=cfg["defaults"]["polygon_name"],

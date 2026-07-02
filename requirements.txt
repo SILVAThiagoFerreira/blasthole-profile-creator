@@ -3,3 +3,4 @@ pillow
 reportlab
 matplotlib
 cairosvg
+resvg

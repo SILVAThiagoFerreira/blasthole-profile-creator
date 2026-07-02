@@ -8,6 +8,7 @@ from typing import Any
 
 from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont, ImageOps
 
+from .image_assets import load_uploaded_image
 from .mesh import MeshInput, render_mesh_panel
 from .profile import ProfileInput, render_profile_panel
 from src.config import get_layout_config, get_paths_config, get_project_root, load_config
@@ -191,17 +192,16 @@ def _fit_font(draw: ImageDraw.ImageDraw, text: str, max_width: int, start_size: 
 
 
 def _paste_logo(canvas: Image.Image, logo_bytes: bytes, box: tuple[int, int, int, int]) -> None:
-    with Image.open(io.BytesIO(logo_bytes)) as logo:
-        logo = logo.convert("RGBA")
-        bg = Image.new("RGBA", logo.size, (255, 255, 255, 255))
-        diff = ImageChops.difference(logo, bg)
-        bbox = diff.getbbox()
-        if bbox:
-            logo = logo.crop(bbox)
-        logo = ImageOps.contain(logo, (box[2] - box[0], box[3] - box[1]))
-        x = box[0] + ((box[2] - box[0]) - logo.size[0]) // 2
-        y = box[1] + ((box[3] - box[1]) - logo.size[1]) // 2
-        canvas.alpha_composite(logo, (x, y))
+    logo = load_uploaded_image(logo_bytes, "logo da lâmina")
+    bg = Image.new("RGBA", logo.size, (255, 255, 255, 255))
+    diff = ImageChops.difference(logo, bg)
+    bbox = diff.getbbox()
+    if bbox:
+        logo = logo.crop(bbox)
+    logo = ImageOps.contain(logo, (box[2] - box[0], box[3] - box[1]))
+    x = box[0] + ((box[2] - box[0]) - logo.size[0]) // 2
+    y = box[1] + ((box[3] - box[1]) - logo.size[1]) // 2
+    canvas.alpha_composite(logo, (x, y))
 
 
 def _draw_header(canvas: Image.Image, theme: TemplateTheme, polygon_name: str, profile_type: str, logo_bytes: bytes | None) -> None:
