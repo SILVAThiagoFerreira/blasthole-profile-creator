@@ -1966,12 +1966,12 @@ function renderProfileCard(profile, theme, box, compact, index) {
     }
 
     if (y2 - yCur >= (compact ? 8 : 12)) {
-      const labelX = cylX2 + (compact ? 6 : 14);
+      const labelX = infoBox.x + infoBox.w - (compact ? 12 : 16);
       const labelValue = `${segmentDisplayLabel(type, lang)} ${formatDecimal(segVal)}m`;
-      const labelMaxWidth = Math.max(0, infoBox.x - labelX - (compact ? 8 : 14));
+      const labelMaxWidth = Math.max(0, infoBox.w - (compact ? 28 : 36));
       const labelSize = fitFontSize(labelValue, labelMaxWidth, compact ? 7 : 10, `'IBM Plex Sans', sans-serif`, 500, compact ? 5 : 8);
-      segmentMarkup.push(`<line x1="${cylX2 + 1}" y1="${midY}" x2="${labelX - 2}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.6"/>`);
-      segmentMarkup.push(`<text x="${labelX}" y="${midY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="500" dominant-baseline="middle">${escapeXml(labelValue)}</text>`);
+      segmentMarkup.push(`<line x1="${cylX2 + 1}" y1="${midY}" x2="${labelX - 6}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.6"/>`);
+      segmentMarkup.push(`<text x="${labelX}" y="${midY}" text-anchor="end" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="500" dominant-baseline="middle">${escapeXml(labelValue)}</text>`);
     }
     yCur = y2;
   }
@@ -2086,9 +2086,10 @@ function renderProfileCard(profile, theme, box, compact, index) {
         overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${holeBottom - 4}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
         overlay.push(`<circle cx="${cableX}" cy="${holeTop - 4}" r="${compact ? 2 : 3}" fill="${color}"/>`);
         if (!compact && label) {
-          const lblX = cylX2 + 14;
+          const lblX = infoBox.x + infoBox.w - 16;
           const lblY = (holeTop + holeBottom) / 2;
-          overlay.push(`<text x="${lblX}" y="${lblY}" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
+          overlay.push(`<line x1="${cableX}" y1="${lblY}" x2="${lblX - 6}" y2="${lblY}" stroke="${color}" stroke-width="0.6"/>`);
+          overlay.push(`<text x="${lblX}" y="${lblY}" text-anchor="end" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
         }
       };
       if (profile.initiator === 'brinel') {
@@ -2106,10 +2107,10 @@ function renderProfileCard(profile, theme, box, compact, index) {
         overlay.push(`<line x1="${cordelX}" y1="${holeTop - 4}" x2="${cordelX}" y2="${holeBottom - 4}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
         overlay.push(`<circle cx="${cordelX}" cy="${holeTop - 4}" r="${compact ? 2.5 : 3.5}" fill="${cordelColor}"/>`);
         if (cordelTag) {
-          const lblX = cylX2 + (compact ? 8 : 14);
+          const lblX = infoBox.x + infoBox.w - 16;
           const lblY = holeTop + (holeBottom - holeTop) * 0.28;
-          overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
-          overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${cordelTag}</text>`);
+          overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${lblX - 6}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
+          overlay.push(`<text x="${lblX}" y="${lblY + 1}" text-anchor="end" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${cordelTag}</text>`);
         }
       }
       return overlay.join('\n');
