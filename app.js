@@ -78,6 +78,8 @@ const FALLBACK_CONFIG = {
         initiator: 'brinel',
         has_booster: true,
         booster_weight: 450,
+        cordel: 'none',
+        cordel_gramatura: 40,
       },
     ],
   },
@@ -241,6 +243,10 @@ const COPY = {
       hasBooster: 'Reforçador (Booster)',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pré-corte)',
+      cordel: 'Cordel NP',
+      cordelNone: 'Nenhum',
+      cordelNP: 'Cordel NP',
+      cordelGramatura: 'Gramatura (g/m)',
     },
     deckPositions: {
       above_stemming: 'Acima do tampão',
@@ -454,6 +460,10 @@ const COPY = {
       hasBooster: 'Booster',
       boosterWeight: 'Weight (g)',
       cartridgeCount: 'Cartridges (pre-cut)',
+      cordel: 'NP Cord',
+      cordelNone: 'None',
+      cordelNP: 'Cord NP',
+      cordelGramatura: 'Grammage (g/m)',
     },
     deckPositions: {
       above_stemming: 'Above stemming',
@@ -667,6 +677,10 @@ const COPY = {
       hasBooster: 'Reforzador (Booster)',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pre-corte)',
+      cordel: 'Cordel NP',
+      cordelNone: 'Ninguno',
+      cordelNP: 'Cordel NP',
+      cordelGramatura: 'Gramaje (g/m)',
     },
     deckPositions: {
       above_stemming: 'Encima del taco',
@@ -880,6 +894,10 @@ const COPY = {
       hasBooster: '增强器 (Booster)',
       boosterWeight: '重量 (g)',
       cartridgeCount: '药卷 (预裂)',
+      cordel: '导爆索 NP',
+      cordelNone: '无',
+      cordelNP: '导爆索 NP',
+      cordelGramatura: '克重 (g/m)',
     },
     deckPositions: {
       above_stemming: '堵塞上方',
@@ -1149,6 +1167,8 @@ const PROFILE_FIELDS = [
   'initiator',
   'has_booster',
   'booster_weight',
+  'cordel',
+  'cordel_gramatura',
 ];
 
 const DECK_POSITIONS = ['above_stemming', 'mid_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
@@ -1360,6 +1380,11 @@ function createDefaultState(currentConfig, language = currentConfig?.app?.defaul
     ...profile,
     kind: normalizeKind(profile.kind),
     name: copy.defaults.profileNames[index] || `${copy.defaults.profileNamePrefix} ${index + 1}`,
+    initiator: ['none', 'brinel', 'dvt', 'both'].includes(profile.initiator) ? profile.initiator : 'brinel',
+    has_booster: typeof profile.has_booster === 'boolean' ? profile.has_booster : true,
+    booster_weight: normalizeNumber(profile.booster_weight, 450),
+    cordel: ['none', 'np'].includes(profile.cordel) ? profile.cordel : 'none',
+    cordel_gramatura: normalizeNumber(profile.cordel_gramatura, 40),
   }));
   return {
     language: lang,
@@ -1409,6 +1434,8 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.initiator = ['none', 'brinel', 'dvt', 'both'].includes(profile.initiator) ? profile.initiator : (fallback.initiator || 'none');
   profile.has_booster = Boolean(profile.has_booster);
   profile.booster_weight = normalizeNumber(profile.booster_weight, fallback.booster_weight || 450);
+  profile.cordel = ['none', 'np'].includes(profile.cordel) ? profile.cordel : (fallback.cordel || 'none');
+  profile.cordel_gramatura = normalizeNumber(profile.cordel_gramatura, fallback.cordel_gramatura || 40);
 
   if (index >= defaultCount && !isNonEmptyString(source?.name)) {
     profile.name = defaultProfileName(language, index);
@@ -1517,6 +1544,7 @@ function validateState(appState, currentConfig) {
     'inclinacao',
     'azimute',
     'densidade',
+    'cordel_gramatura',
   ];
 
   appState.profiles?.forEach((profile, index) => {
@@ -1960,6 +1988,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ['azimuth', fieldLabel('azimuth', lang), `${formatDecimal(profile.azimute, 1, lang)}°`, 'azimuth'],
     ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
   ];
+  if (cordelTag) metricRows.push(['cordel', fieldLabel('cordel', lang), cordelTag, 'cordel']);
 
   const rowHeight = compact ? 26 : 44;
   const rowStart = infoBox.y + (compact ? 32 : 44);
@@ -2014,7 +2043,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <text x="${badgeCx}" y="${badgeCy + 6}" fill="#FFFFFF" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 18 : 20}" font-weight="700">${escapeXml(badgeLetter)}</text>
 
     <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 36 : 32)}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
-    <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 58 : 58)}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM`)}</text>
+    <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 58 : 58)}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM${cordelTag ? `  •  ${cordelTag}` : ''}`)}</text>
     ${compact ? '' : `<rect x="${tagX}" y="${tagY}" width="${tagWidth + 16}" height="${tagHeight}" rx="8" fill="${accentSoft}"/>
     <text x="${tagX + 8}" y="${tagY + 16}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${tagSize}" font-weight="700">${escapeXml(tagText)}</text>`}
 
@@ -2068,6 +2097,19 @@ function renderProfileCard(profile, theme, box, compact, index) {
       } else if (profile.initiator === 'both') {
         drawCable('#E67E22', compact ? -4 : -6, 'NonEl');
         drawCable('#8E44AD', compact ? 0 : 2, 'Eletrônico');
+      }
+      if (profile.cordel === 'np') {
+        const cordelColor = '#27AE60';
+        const cordelX = cx + (compact ? 2 : 4);
+        const cordelW = compact ? 3 : 4.5;
+        overlay.push(`<line x1="${cordelX}" y1="${holeTop - 4}" x2="${cordelX}" y2="${holeBottom - 4}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
+        overlay.push(`<circle cx="${cordelX}" cy="${holeTop - 4}" r="${compact ? 2.5 : 3.5}" fill="${cordelColor}"/>`);
+        if (cordelTag) {
+          const lblX = cylX2 + (compact ? 8 : 14);
+          const lblY = holeTop + (holeBottom - holeTop) * 0.28;
+          overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
+          overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${cordelTag}</text>`);
+        }
       }
       return overlay.join('\n');
     })()}
@@ -2414,6 +2456,7 @@ function renderProfileEditor(profile, index) {
   const charge = sumSegmentsByType(profile.segments, 'column');
   const bb = sumSegmentsByType(profile.segments, 'blastbag');
   const ad = sumSegmentsByType(profile.segments, 'airdeck');
+  const cordelTag = profile.cordel === 'np' ? `NP ${Math.round(profile.cordel_gramatura)}` : '';
 
   return `
     <div class="segment-editor-area">
@@ -2434,7 +2477,12 @@ function renderProfileEditor(profile, index) {
             { value: 'dvt', label: copy.fieldLabels.initiatorDVT },
             { value: 'both', label: copy.fieldLabels.initiatorBoth },
           ], '')}
+          ${renderSelect(copy.fieldLabels.cordel, `profiles.${index}.cordel`, profile.cordel, [
+            { value: 'none', label: copy.fieldLabels.cordelNone },
+            { value: 'np', label: copy.fieldLabels.cordelNP },
+          ], '')}
           ${renderInput(copy.fieldLabels.boosterWeight, `profiles.${index}.booster_weight`, profile.booster_weight, 'number', { step: 10, min: 0 })}
+          ${renderInput(copy.fieldLabels.cordelGramatura, `profiles.${index}.cordel_gramatura`, profile.cordel_gramatura, 'number', { step: 1, min: 0 })}
         </div>
       </div>
       ${renderSegmentEditor(profile, index)}
@@ -2602,7 +2650,7 @@ function setNestedValue(path, rawValue, target) {
     cursor = key.match(/^\d+$/) ? cursor[Number(key)] : cursor[key];
   }
   const last = parts[parts.length - 1];
-  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade', 'booster_weight'].some((field) => path.endsWith(field));
+  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade', 'booster_weight', 'cordel_gramatura'].some((field) => path.endsWith(field));
   const value = isNumberField ? (rawValue === '' ? Number.NaN : Number(rawValue)) : rawValue;
 
   if (parts.length === 1) {
