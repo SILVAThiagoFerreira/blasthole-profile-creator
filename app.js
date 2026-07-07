@@ -1976,6 +1976,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     yCur = y2;
   }
 
+  const cordelTag = profile.cordel === 'np' ? `NP ${Math.round(profile.cordel_gramatura)}` : '';
   const labels = labelSet();
   const metricRows = [
     ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
