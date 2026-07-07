@@ -2081,24 +2081,24 @@ function renderProfileCard(profile, theme, box, compact, index) {
         overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#E74C3C" stroke-width="0.6"/>`);
         overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#E74C3C" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
       }
-      const drawCable = (color, offsetX, label) => {
+      const labelLaneX = Math.min(cylX2 + (compact ? 42 : 54), infoBox.x - (compact ? 18 : 24));
+      const drawCable = (color, offsetX, label, labelYRatio = 0.5) => {
         const cableX = cx + offsetX;
         overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${holeBottom - 4}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
         overlay.push(`<circle cx="${cableX}" cy="${holeTop - 4}" r="${compact ? 2 : 3}" fill="${color}"/>`);
         if (!compact && label) {
-          const lblX = Math.min(cylX2 + (compact ? 42 : 54), infoBox.x - 24);
-          const lblY = (holeTop + holeBottom) / 2;
-          overlay.push(`<line x1="${cableX}" y1="${lblY}" x2="${lblX - 6}" y2="${lblY}" stroke="${color}" stroke-width="0.6"/>`);
-          overlay.push(`<text x="${lblX}" y="${lblY}" text-anchor="start" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
+          const lblY = holeTop + holeH * labelYRatio;
+          overlay.push(`<line x1="${cableX}" y1="${lblY}" x2="${labelLaneX - 6}" y2="${lblY}" stroke="${color}" stroke-width="0.6"/>`);
+          overlay.push(`<text x="${labelLaneX}" y="${lblY}" text-anchor="start" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
         }
       };
       if (profile.initiator === 'brinel') {
-        drawCable('#E67E22', compact ? -2 : -4, 'NonEl');
+        drawCable('#E67E22', compact ? -2 : -4, 'NonEl', 0.46);
       } else if (profile.initiator === 'dvt') {
-        drawCable('#8E44AD', compact ? -2 : -4, 'Eletrônico');
+        drawCable('#8E44AD', compact ? -2 : -4, 'Eletrônico', 0.58);
       } else if (profile.initiator === 'both') {
-        drawCable('#E67E22', compact ? -4 : -6, 'NonEl');
-        drawCable('#8E44AD', compact ? 0 : 2, 'Eletrônico');
+        drawCable('#E67E22', compact ? -4 : -6, 'NonEl', 0.42);
+        drawCable('#8E44AD', compact ? 0 : 2, 'Eletrônico', 0.62);
       }
       if (profile.cordel === 'np') {
         const cordelColor = '#27AE60';
@@ -2107,10 +2107,9 @@ function renderProfileCard(profile, theme, box, compact, index) {
         overlay.push(`<line x1="${cordelX}" y1="${holeTop - 4}" x2="${cordelX}" y2="${holeBottom - 4}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
         overlay.push(`<circle cx="${cordelX}" cy="${holeTop - 4}" r="${compact ? 2.5 : 3.5}" fill="${cordelColor}"/>`);
         if (cordelTag) {
-          const lblX = Math.min(cylX2 + (compact ? 42 : 54), infoBox.x - 24);
-          const lblY = holeTop + (holeBottom - holeTop) * 0.28;
-          overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${lblX - 6}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
-          overlay.push(`<text x="${lblX}" y="${lblY + 1}" text-anchor="start" fill="${cordelColor}" font-family="${'IBM Plex Sans, sans-serif'}" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${cordelTag}</text>`);
+          const lblY = holeTop + holeH * 0.30;
+          overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${labelLaneX - 6}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
+          overlay.push(`<text x="${labelLaneX}" y="${lblY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${cordelTag}</text>`);
         }
       }
       return overlay.join('\n');
