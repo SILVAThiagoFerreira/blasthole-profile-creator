@@ -13,7 +13,7 @@ class PreferencePersistenceTests(unittest.TestCase):
     def test_save_and_load_round_trip(self) -> None:
         cfg = load_config()
         defaults = cfg["defaults"]
-        base_profile = defaults["profiles"][0]
+        base_profile = {**defaults["profiles"][0], "cordel_gap": 3.0}
         profiles = [
             base_profile,
             {**base_profile, "name": "Perfil B"},
@@ -46,6 +46,7 @@ class PreferencePersistenceTests(unittest.TestCase):
         self.assertEqual(loaded["profile_count"], 4)
         self.assertEqual(len(loaded["profiles"]), 4)
         self.assertEqual(loaded["profiles"][2]["name"], "Perfil C")
+        self.assertEqual(loaded["profiles"][0]["cordel_gap"], 3.0)
 
     def test_loaded_preferences_keep_cartridge_label(self) -> None:
         cfg = load_config()

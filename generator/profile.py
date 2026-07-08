@@ -28,6 +28,9 @@ class ProfileInput:
     inclinacao: float
     azimute: float
     densidade: float
+    cordel: str = "none"
+    cordel_gap: float = 0.0
+    cordel_gramatura: float = 40.0
     air_decks: list[dict] | None = None
     blastbags: list[dict] | None = None
     segments: list[dict] | None = None

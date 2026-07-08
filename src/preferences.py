@@ -25,6 +25,9 @@ PROFILE_FIELDS = (
     "inclinacao",
     "azimute",
     "densidade",
+    "cordel",
+    "cordel_gap",
+    "cordel_gramatura",
 )
 
 

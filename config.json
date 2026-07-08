@@ -49,6 +49,7 @@
       "stemming",
       "air_deck",
       "blastbag",
+      "cordel_gap",
       "inclinacao",
       "azimute",
       "densidade"
@@ -62,9 +63,10 @@
     "profile_count": 1,
     "labels": {
       "stemming": "Tampão",
-      "blastbag": "Blastbag",
+      "blastbag": "Bolsa de Ar",
+      "cartridge": "Cartucho",
       "airdeck": "Deck de ar",
-      "column": "Carga",
+      "column": "Coluna de carga",
       "subdrill": "Subperfuração"
     },
     "profiles": [
@@ -75,6 +77,7 @@
         "altura_banco": 10.0,
         "subperfuracao": 0.6,
         "stemming": 2.3,
+        "cordel_gap": 0.0,
         "air_deck": 0.0,
         "blastbag": 0.0,
         "segments": [

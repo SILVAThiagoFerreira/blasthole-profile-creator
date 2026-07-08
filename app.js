@@ -79,6 +79,7 @@ const FALLBACK_CONFIG = {
         has_booster: true,
         booster_weight: 450,
         cordel: 'none',
+        cordel_gap: 0.0,
         cordel_gramatura: 40,
       },
     ],
@@ -246,6 +247,7 @@ const COPY = {
       cordel: 'Cordel NP',
       cordelNone: 'Nenhum',
       cordelNP: 'Cordel NP',
+      cordelGap: 'Trecho sem cordel (m)',
       cordelGramatura: 'Gramatura (g/m)',
     },
     deckPositions: {
@@ -463,6 +465,7 @@ const COPY = {
       cordel: 'NP Cord',
       cordelNone: 'None',
       cordelNP: 'Cord NP',
+      cordelGap: 'No-cordel segment (m)',
       cordelGramatura: 'Grammage (g/m)',
     },
     deckPositions: {
@@ -680,6 +683,7 @@ const COPY = {
       cordel: 'Cordel NP',
       cordelNone: 'Ninguno',
       cordelNP: 'Cordel NP',
+      cordelGap: 'Tramo sin cordel (m)',
       cordelGramatura: 'Gramaje (g/m)',
     },
     deckPositions: {
@@ -897,6 +901,7 @@ const COPY = {
       cordel: '导爆索 NP',
       cordelNone: '无',
       cordelNP: '导爆索 NP',
+      cordelGap: '无导爆索区段 (m)',
       cordelGramatura: '克重 (g/m)',
     },
     deckPositions: {
@@ -1168,6 +1173,7 @@ const PROFILE_FIELDS = [
   'has_booster',
   'booster_weight',
   'cordel',
+  'cordel_gap',
   'cordel_gramatura',
 ];
 
@@ -1384,6 +1390,7 @@ function createDefaultState(currentConfig, language = currentConfig?.app?.defaul
     has_booster: typeof profile.has_booster === 'boolean' ? profile.has_booster : true,
     booster_weight: normalizeNumber(profile.booster_weight, 450),
     cordel: ['none', 'np'].includes(profile.cordel) ? profile.cordel : 'none',
+    cordel_gap: normalizeNumber(profile.cordel_gap, 0),
     cordel_gramatura: normalizeNumber(profile.cordel_gramatura, 40),
   }));
   return {
@@ -1435,6 +1442,7 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.has_booster = Boolean(profile.has_booster);
   profile.booster_weight = normalizeNumber(profile.booster_weight, fallback.booster_weight || 450);
   profile.cordel = ['none', 'np'].includes(profile.cordel) ? profile.cordel : (fallback.cordel || 'none');
+  profile.cordel_gap = normalizeNumber(profile.cordel_gap, fallback.cordel_gap || 0);
   profile.cordel_gramatura = normalizeNumber(profile.cordel_gramatura, fallback.cordel_gramatura || 40);
 
   if (index >= defaultCount && !isNonEmptyString(source?.name)) {
@@ -1544,6 +1552,7 @@ function validateState(appState, currentConfig) {
     'inclinacao',
     'azimute',
     'densidade',
+    'cordel_gap',
     'cordel_gramatura',
   ];
 
@@ -1976,7 +1985,9 @@ function renderProfileCard(profile, theme, box, compact, index) {
     yCur = y2;
   }
 
-  const cordelTag = profile.cordel === 'np' ? `NP ${Math.round(profile.cordel_gramatura)}` : '';
+  const cordelTag = profile.cordel === 'np'
+    ? `NP ${Math.round(profile.cordel_gramatura)}${normalizeNumber(profile.cordel_gap, 0) > 0 ? ` • sem cordel ${formatDecimal(profile.cordel_gap, 2, lang)} m` : ''}`
+    : '';
   const labels = labelSet();
   const metricRows = [
     ['diameter', fieldLabel('diameter', lang), `${Math.round(profile.diametro_furo)} mm`, 'diameter'],
@@ -2104,10 +2115,19 @@ function renderProfileCard(profile, theme, box, compact, index) {
         const cordelColor = '#27AE60';
         const cordelX = cx + (compact ? 2 : 4);
         const cordelW = compact ? 3 : 4.5;
-        overlay.push(`<line x1="${cordelX}" y1="${holeTop - 4}" x2="${cordelX}" y2="${holeBottom - 4}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
-        overlay.push(`<circle cx="${cordelX}" cy="${holeTop - 4}" r="${compact ? 2.5 : 3.5}" fill="${cordelColor}"/>`);
+        const cordelGap = Math.max(normalizeNumber(profile.cordel_gap, 0), 0);
+        const cordelGapPx = Math.min(holeH, holeH * (cordelGap / Math.max(total, 0.01)));
+        const cordelVisibleTop = Math.min(holeBottom - 4, holeTop + cordelGapPx);
+        const cordelVisibleHeight = Math.max(0, holeBottom - 4 - cordelVisibleTop);
+        overlay.push(`<circle cx="${cordelX}" cy="${holeBottom - 4}" r="${compact ? 2.5 : 3.5}" fill="${cordelColor}"/>`);
+        if (cordelVisibleHeight > 0) {
+          overlay.push(`<line x1="${cordelX}" y1="${holeBottom - 4}" x2="${cordelX}" y2="${cordelVisibleTop}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
+          overlay.push(`<circle cx="${cordelX}" cy="${cordelVisibleTop}" r="${compact ? 2 : 3}" fill="${cordelColor}"/>`);
+        }
         if (cordelTag) {
-          const lblY = holeTop + holeH * 0.30;
+          const lblY = cordelVisibleHeight > 0
+            ? Math.min(holeBottom - 10, cordelVisibleTop + cordelVisibleHeight * 0.35)
+            : holeBottom - 18;
           overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${labelLaneX - 6}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
           overlay.push(`<text x="${labelLaneX}" y="${lblY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${cordelTag}</text>`);
         }
@@ -2380,6 +2400,7 @@ function renderInput(label, path, value, type = 'text', extra = {}) {
   if (extra.min != null) attrs.push(`min="${extra.min}"`);
   if (extra.max != null) attrs.push(`max="${extra.max}"`);
   if (extra.placeholder != null) attrs.push(`placeholder="${escapeXml(extra.placeholder)}"`);
+  if (extra.disabled) attrs.push('disabled');
   return `
     <div class="field">
       <label>${escapeXml(label)}</label>
@@ -2457,7 +2478,9 @@ function renderProfileEditor(profile, index) {
   const charge = sumSegmentsByType(profile.segments, 'column');
   const bb = sumSegmentsByType(profile.segments, 'blastbag');
   const ad = sumSegmentsByType(profile.segments, 'airdeck');
-  const cordelTag = profile.cordel === 'np' ? `NP ${Math.round(profile.cordel_gramatura)}` : '';
+  const cordelTag = profile.cordel === 'np'
+    ? `NP ${Math.round(profile.cordel_gramatura)}${normalizeNumber(profile.cordel_gap, 0) > 0 ? ` • sem cordel ${formatDecimal(profile.cordel_gap, 2)} m` : ''}`
+    : '';
 
   return `
     <div class="segment-editor-area">
@@ -2478,12 +2501,15 @@ function renderProfileEditor(profile, index) {
             { value: 'dvt', label: copy.fieldLabels.initiatorDVT },
             { value: 'both', label: copy.fieldLabels.initiatorBoth },
           ], '')}
-          ${renderSelect(copy.fieldLabels.cordel, `profiles.${index}.cordel`, profile.cordel, [
-            { value: 'none', label: copy.fieldLabels.cordelNone },
-            { value: 'np', label: copy.fieldLabels.cordelNP },
-          ], '')}
+          <div class="field-group field-group--cordel">
+            ${renderSelect(copy.fieldLabels.cordel, `profiles.${index}.cordel`, profile.cordel, [
+              { value: 'none', label: copy.fieldLabels.cordelNone },
+              { value: 'np', label: copy.fieldLabels.cordelNP },
+            ], '')}
+            ${renderInput(copy.fieldLabels.cordelGap, `profiles.${index}.cordel_gap`, profile.cordel_gap, 'number', { step: 0.05, min: 0, disabled: profile.cordel !== 'np' })}
+          </div>
           ${renderInput(copy.fieldLabels.boosterWeight, `profiles.${index}.booster_weight`, profile.booster_weight, 'number', { step: 10, min: 0 })}
-          ${renderInput(copy.fieldLabels.cordelGramatura, `profiles.${index}.cordel_gramatura`, profile.cordel_gramatura, 'number', { step: 1, min: 0 })}
+          ${renderInput(copy.fieldLabels.cordelGramatura, `profiles.${index}.cordel_gramatura`, profile.cordel_gramatura, 'number', { step: 1, min: 0, disabled: profile.cordel !== 'np' })}
         </div>
       </div>
       ${renderSegmentEditor(profile, index)}
@@ -2651,7 +2677,7 @@ function setNestedValue(path, rawValue, target) {
     cursor = key.match(/^\d+$/) ? cursor[Number(key)] : cursor[key];
   }
   const last = parts[parts.length - 1];
-  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade', 'booster_weight', 'cordel_gramatura'].some((field) => path.endsWith(field));
+  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade', 'booster_weight', 'cordel_gap', 'cordel_gramatura'].some((field) => path.endsWith(field));
   const value = isNumberField ? (rawValue === '' ? Number.NaN : Number(rawValue)) : rawValue;
 
   if (parts.length === 1) {

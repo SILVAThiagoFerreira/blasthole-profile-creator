@@ -39,6 +39,7 @@ def validate_profile(profile: dict[str, Any]) -> None:
         "stemming",
         "air_deck",
         "blastbag",
+        "cordel_gap",
         "inclinacao",
         "azimute",
         "densidade",

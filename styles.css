@@ -533,6 +533,18 @@ body::before {
   grid-template-columns: repeat(2, 1fr);
 }
 
+.profile-params .field-group--cordel {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  align-items: start;
+}
+
+.profile-params .field-group--cordel .field {
+  min-width: 0;
+}
+
 .profile-params .field input,
 .profile-params .field select {
   min-height: 32px;
@@ -950,5 +962,9 @@ body::before {
 
   .brand-text {
     display: none;
+  }
+
+  .profile-params .field-group--cordel {
+    grid-template-columns: 1fr;
   }
 }
