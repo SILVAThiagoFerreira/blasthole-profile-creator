@@ -2116,7 +2116,8 @@ function renderProfileCard(profile, theme, box, compact, index) {
         const cordelX = cx + (compact ? 2 : 4);
         const cordelW = compact ? 3 : 4.5;
         const cordelGap = Math.max(normalizeNumber(profile.cordel_gap, 0), 0);
-        const cordelGapPx = Math.min(holeH, holeH * (cordelGap / Math.max(total, 0.01)));
+        const holeDepthMeters = Math.max(normalizeNumber(profile.altura_banco, 0) + Math.max(normalizeNumber(profile.subperfuracao, 0), 0), 0.01);
+        const cordelGapPx = Math.min(holeH, holeH * (cordelGap / holeDepthMeters));
         const cordelVisibleTop = Math.min(holeBottom - 4, holeTop + cordelGapPx);
         const cordelVisibleHeight = Math.max(0, holeBottom - 4 - cordelVisibleTop);
         overlay.push(`<circle cx="${cordelX}" cy="${holeBottom - 4}" r="${compact ? 2.5 : 3.5}" fill="${cordelColor}"/>`);
