@@ -23,6 +23,10 @@
 - `inclinacao`: número >= 0
 - `azimute`: número >= 0
 - `densidade`: número >= 0
+- `segments`: lista ordenada de trechos do furo (`stemming`, `column`, `cartridge`, `blastbag`, `airdeck`)
+- `segments[].height`: altura do trecho em metros, número >= 0
+- `segments[].has_booster`: booleano opcional para marcar reforçador no trecho de carga/cartucho
+- `segments[].cartridge_count`: quantidade de cartuchos no mesmo intervalo quando `type = cartridge`; inteiro de 1 a 6
 
 ## Anexos opcionais do formulário
 

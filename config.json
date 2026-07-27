@@ -82,7 +82,7 @@
         "blastbag": 0.0,
         "segments": [
           { "type": "stemming", "height": 2.3 },
-          { "type": "column", "height": 8.3 }
+          { "type": "column", "height": 8.3, "has_booster": true }
         ],
         "inclinacao": 0.0,
         "azimute": 0.0,

@@ -70,7 +70,7 @@ const FALLBACK_CONFIG = {
         blastbags: [],
         segments: [
           { type: 'stemming', height: 2.3 },
-          { type: 'column', height: 8.3 },
+          { type: 'column', height: 8.3, has_booster: true },
         ],
         inclinacao: 0.0,
         azimute: 0.0,
@@ -1179,6 +1179,8 @@ const PROFILE_FIELDS = [
 
 const DECK_POSITIONS = ['above_stemming', 'mid_stemming', 'below_stemming', 'mid_charge', 'lower_charge'];
 const SEGMENT_TYPES = ['stemming', 'column', 'cartridge', 'blastbag', 'airdeck'];
+const CARTRIDGE_COUNT_MIN = 1;
+const CARTRIDGE_COUNT_MAX = 6;
 
 const DEFAULT_STORAGE_KEY = 'openblast.profile-creator.web.state.v6';
 const DEFAULT_EXPORT_SIZE = [3840, 2160];
@@ -1279,6 +1281,7 @@ function normalizeSegments(items, profile, fallbackSegments = []) {
       type: normalizeSegmentType(item?.type, fallbackItem.type || 'column'),
       height: Math.max(normalizeNumber(item?.height, fallbackItem.height ?? 0), 0),
       has_booster: Boolean(item?.has_booster),
+      cartridge_count: clampInteger(item?.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN),
     };
   }).filter((item) => item.height > 0).slice(0, 24);
 }
@@ -1291,6 +1294,12 @@ function sumSegmentsByType(segments, type) {
 
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
+}
+
+function clampInteger(value, min, max, fallback = min) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return fallback;
+  return clamp(Math.round(parsed), min, max);
 }
 
 function hexToRgb(hex) {
@@ -1582,6 +1591,12 @@ function validateState(appState, currentConfig) {
       profile.segments.forEach((item, itemIndex) => {
         if (!SEGMENT_TYPES.includes(item?.type)) issues.push(copy.validation.required(`${copy.fieldLabels.segmentType} ${itemIndex + 1}`));
         if (!Number.isFinite(item?.height) || item.height < 0) issues.push(copy.validation.nonNegative(`${copy.fieldLabels.segmentHeight} ${itemIndex + 1}`, index + 1));
+        if (item?.type === 'cartridge') {
+          const cartridgeCount = Number(item.cartridge_count);
+          if (!Number.isInteger(cartridgeCount) || cartridgeCount < CARTRIDGE_COUNT_MIN || cartridgeCount > CARTRIDGE_COUNT_MAX) {
+            issues.push(copy.validation.countRange(CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX));
+          }
+        }
       });
     }
   });
@@ -1854,6 +1869,7 @@ function buildChargeSegments(profile, accent) {
     type: item.type,
     value: item.height,
     has_booster: Boolean(item.has_booster),
+    cartridge_count: clampInteger(item.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN),
     color: item.type === 'blastbag' ? '#1F2937' : (item.type === 'stemming' ? '#C8CDD5' : accent),
   }));
   if (sub > 0) segments.push({ key: 'subdrill', type: 'subdrill', value: sub, color: '#4B5563' });
@@ -1969,7 +1985,19 @@ function renderProfileCard(profile, theme, box, compact, index) {
       const innerW = cylW * 0.5;
       const innerH = Math.max(6, y2 - yCur);
       const innerY = yCur;
-      segmentMarkup.push(`<rect ${segAttrs} x="${cx - innerW / 2}" y="${innerY}" width="${innerW}" height="${innerH}" rx="${compact ? 3 : 4}" fill="#E74C3C" stroke="#C0392B" stroke-width="1"/>`);
+      const count = clampInteger(segment.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN);
+      const laneGap = count > 1 ? (compact ? 1.2 : 2) : 0;
+      const maxGroupW = Math.min(cylW - gapX * 2, cylW * (compact ? 0.82 : 0.78));
+      const laneW = Math.max(compact ? 4 : 6, Math.min(innerW, (maxGroupW - laneGap * (count - 1)) / count));
+      const groupW = laneW * count + laneGap * (count - 1);
+      const startX = cx - groupW / 2;
+      const cartridgeRects = [];
+      for (let ci = 0; ci < count; ci += 1) {
+        const cartridgeX = startX + ci * (laneW + laneGap);
+        cartridgeRects.push(`<rect ${segAttrs} x="${cartridgeX}" y="${innerY}" width="${laneW}" height="${innerH}" rx="${compact ? 2 : 3}" fill="#F97316" stroke="#7F1D1D" stroke-width="${compact ? 0.8 : 1.1}"/>`);
+        cartridgeRects.push(`<line x1="${cartridgeX + laneW * 0.28}" y1="${innerY + 1}" x2="${cartridgeX + laneW * 0.28}" y2="${innerY + innerH - 1}" stroke="#FED7AA" stroke-width="${compact ? 0.6 : 0.9}" opacity="0.9"/>`);
+      }
+      segmentMarkup.push(cartridgeRects.join(''));
     } else {
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#6B7280" rx="0"/>`);
     }
@@ -2065,32 +2093,35 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ${segmentMarkup.join('')}
     ${(() => {
       const overlay = [];
-      const boostH = compact ? 8 : 12;
-      const boostW = cylW * 0.40;
+      const boostH = compact ? 9 : 13;
+      const boostW = cylW * 0.54;
       const boostPositions = [];
-      const isContorno = profile.kind === 'contorno';
-      if (!isContorno) {
-        let accY = holeTop;
-        for (let si = 0; si < segmentData.length; si++) {
-          const seg = segmentData[si];
-          const sv = Math.max(seg.value, 0);
-          const segH = holeH * (sv / total);
-          const segEnd = accY + segH;
-          if ((seg.type === 'column' || seg.type === 'cartridge') && seg.has_booster) {
-            boostPositions.push(segEnd - boostH - 2);
-          }
-          accY = segEnd;
+      let accY = holeTop;
+      for (let si = 0; si < segmentData.length; si++) {
+        const seg = segmentData[si];
+        const sv = Math.max(seg.value, 0);
+        const segH = holeH * (sv / total);
+        const segEnd = seg.type === 'subdrill' ? holeBottom : accY + segH;
+        if ((seg.type === 'column' || seg.type === 'cartridge') && seg.has_booster) {
+          boostPositions.push(clamp(segEnd - boostH - 2, holeTop + 1, holeBottom - boostH - 1));
         }
+        accY = segEnd;
       }
       for (const bp of boostPositions) {
         const bx = cx - boostW / 2;
-        overlay.push(`<rect x="${bx}" y="${bp}" width="${boostW}" height="${boostH}" rx="2" fill="#E74C3C" stroke="#C0392B" stroke-width="1"/>`);
+        overlay.push(`<rect x="${bx - 1.5}" y="${bp - 1.5}" width="${boostW + 3}" height="${boostH + 3}" rx="${compact ? 3 : 4}" fill="#FFFFFF" stroke="#111827" stroke-width="${compact ? 1.2 : 1.6}"/>`);
+        overlay.push(`<rect x="${bx}" y="${bp}" width="${boostW}" height="${boostH}" rx="${compact ? 2 : 3}" fill="#FACC15" stroke="#854D0E" stroke-width="${compact ? 0.9 : 1.1}"/>`);
+        overlay.push(`<line x1="${bx + 3}" y1="${bp + boostH / 2}" x2="${bx + boostW - 3}" y2="${bp + boostH / 2}" stroke="#111827" stroke-width="${compact ? 1.1 : 1.4}" stroke-linecap="round"/>`);
       }
       if (!compact && boostPositions.length > 0) {
         const lblX = cylX2 + 14;
-        const lblY = boostPositions[0] + boostH / 2;
-        overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#E74C3C" stroke-width="0.6"/>`);
-        overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#E74C3C" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
+        const lblY = clamp(
+          boostPositions[0] + boostH / 2 + (profile.initiator !== 'none' ? 12 : 0),
+          holeTop + 8,
+          holeBottom - 8,
+        );
+        overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#111827" stroke-width="0.8"/>`);
+        overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#111827" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
       }
       const labelLaneX = Math.min(cylX2 + (compact ? 42 : 54), infoBox.x - (compact ? 18 : 24));
       const drawCable = (color, offsetX, label, labelYRatio = 0.5) => {
@@ -2434,10 +2465,11 @@ function segmentTypeOptions() {
 function renderSegmentEditor(profile, index) {
   const copy = getCopy();
   const typeOpts = segmentTypeOptions();
-  const isContorno = profile.kind === 'contorno';
   const rows = (profile.segments || []).map((item, itemIndex) => {
     const isHighlighted = selectedSegmentKey !== null && selectedSegmentKey === `${item.type}-${itemIndex}`;
-    const showBooster = (item.type === 'column' || item.type === 'cartridge') && !isContorno;
+    const showBooster = item.type === 'column' || item.type === 'cartridge';
+    const showCartridgeCount = item.type === 'cartridge';
+    const cartridgeCount = clampInteger(item.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN);
     return `
     <div class="segment-row${isHighlighted ? ' highlighted' : ''}" data-segment-row="${itemIndex}">
       <div class="field segment-row__type">
@@ -2447,6 +2479,7 @@ function renderSegmentEditor(profile, index) {
         <input data-path="profiles.${index}.segments.${itemIndex}.height" type="number" step="0.05" min="0" value="${escapeXml(String(item.height ?? ''))}">
       </div>
       ${showBooster ? `<div class="segment-row__booster"><label class="booster-toggle" title="Reforçador (Booster)"><input type="checkbox" data-path="profiles.${index}.segments.${itemIndex}.has_booster"${item.has_booster ? ' checked' : ''}><span class="booster-toggle__icon"></span></label></div>` : ''}
+      ${showCartridgeCount ? `<div class="segment-row__cartridges" title="${escapeXml(copy.fieldLabels.cartridgeCount)}"><select aria-label="${escapeXml(copy.fieldLabels.cartridgeCount)}" data-path="profiles.${index}.segments.${itemIndex}.cartridge_count">${Array.from({ length: CARTRIDGE_COUNT_MAX - CARTRIDGE_COUNT_MIN + 1 }, (_, offset) => CARTRIDGE_COUNT_MIN + offset).map((count) => `<option value="${count}"${count === cartridgeCount ? ' selected' : ''}>${count}x</option>`).join('')}</select></div>` : ''}
       <div class="segment-row__btns">
         <button class="segment-row__btn" type="button" data-action="move-segment-up" data-profile-index="${index}" data-item-index="${itemIndex}" title="Subir">&#9650;</button>
         <button class="segment-row__btn" type="button" data-action="move-segment-down" data-profile-index="${index}" data-item-index="${itemIndex}" title="Descer">&#9660;</button>
@@ -2678,7 +2711,7 @@ function setNestedValue(path, rawValue, target) {
     cursor = key.match(/^\d+$/) ? cursor[Number(key)] : cursor[key];
   }
   const last = parts[parts.length - 1];
-  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'inclinacao', 'azimute', 'densidade', 'booster_weight', 'cordel_gap', 'cordel_gramatura'].some((field) => path.endsWith(field));
+  const isNumberField = target?.type === 'number' || ['diametro_furo', 'altura_banco', 'subperfuracao', 'stemming', 'blastbag', 'air_deck', 'height', 'cartridge_count', 'inclinacao', 'azimute', 'densidade', 'booster_weight', 'cordel_gap', 'cordel_gramatura'].some((field) => path.endsWith(field));
   const value = isNumberField ? (rawValue === '' ? Number.NaN : Number(rawValue)) : rawValue;
 
   if (parts.length === 1) {
@@ -2712,9 +2745,13 @@ function handleInputEvent(event) {
         currentProfile[field][Number(itemIndex)][itemField] = target.type === 'number'
           ? (target.value === '' ? Number.NaN : Number(target.value))
           : value;
+        if (field === 'segments' && itemField === 'cartridge_count') {
+          currentProfile[field][Number(itemIndex)][itemField] = clampInteger(value, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN);
+        }
         if (field === 'segments' && itemField === 'type' && value === 'cartridge') {
           const seg = currentProfile.segments[Number(itemIndex)];
           if (seg && (seg.height === 1 || seg.height === 0)) seg.height = 0.6;
+          if (seg) seg.cartridge_count = clampInteger(seg.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN);
         }
         currentProfile.stemming = sumSegmentsByType(currentProfile.segments, 'stemming');
         currentProfile.blastbag = sumSegmentsByType(currentProfile.segments, 'blastbag');
