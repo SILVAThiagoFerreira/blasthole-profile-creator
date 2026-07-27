@@ -527,12 +527,12 @@ body::before {
 }
 
 .booster-toggle input:checked + .booster-toggle__icon {
-  border-color: #E74C3C;
-  background: #FEE2E2;
+  border-color: #E20613;
+  background: #FDE8EA;
 }
 
 .booster-toggle input:checked + .booster-toggle__icon::after {
-  background: #E74C3C;
+  background: #E20613;
 }
 
 .segment-add-row {

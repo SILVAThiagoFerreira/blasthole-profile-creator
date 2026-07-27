@@ -1994,8 +1994,8 @@ function renderProfileCard(profile, theme, box, compact, index) {
       const cartridgeRects = [];
       for (let ci = 0; ci < count; ci += 1) {
         const cartridgeX = startX + ci * (laneW + laneGap);
-        cartridgeRects.push(`<rect ${segAttrs} x="${cartridgeX}" y="${innerY}" width="${laneW}" height="${innerH}" rx="${compact ? 2 : 3}" fill="#F97316" stroke="#7F1D1D" stroke-width="${compact ? 0.8 : 1.1}"/>`);
-        cartridgeRects.push(`<line x1="${cartridgeX + laneW * 0.28}" y1="${innerY + 1}" x2="${cartridgeX + laneW * 0.28}" y2="${innerY + innerH - 1}" stroke="#FED7AA" stroke-width="${compact ? 0.6 : 0.9}" opacity="0.9"/>`);
+        cartridgeRects.push(`<rect ${segAttrs} x="${cartridgeX}" y="${innerY}" width="${laneW}" height="${innerH}" rx="${compact ? 2 : 3}" fill="#FFF8E7" stroke="#374151" stroke-width="${compact ? 0.9 : 1.2}"/>`);
+        cartridgeRects.push(`<line x1="${cartridgeX + laneW * 0.28}" y1="${innerY + 1}" x2="${cartridgeX + laneW * 0.28}" y2="${innerY + innerH - 1}" stroke="#D1D5DB" stroke-width="${compact ? 0.6 : 0.9}" opacity="0.95"/>`);
       }
       segmentMarkup.push(cartridgeRects.join(''));
     } else {
@@ -2110,8 +2110,8 @@ function renderProfileCard(profile, theme, box, compact, index) {
       for (const bp of boostPositions) {
         const bx = cx - boostW / 2;
         overlay.push(`<rect x="${bx - 1.5}" y="${bp - 1.5}" width="${boostW + 3}" height="${boostH + 3}" rx="${compact ? 3 : 4}" fill="#FFFFFF" stroke="#111827" stroke-width="${compact ? 1.2 : 1.6}"/>`);
-        overlay.push(`<rect x="${bx}" y="${bp}" width="${boostW}" height="${boostH}" rx="${compact ? 2 : 3}" fill="#FACC15" stroke="#854D0E" stroke-width="${compact ? 0.9 : 1.1}"/>`);
-        overlay.push(`<line x1="${bx + 3}" y1="${bp + boostH / 2}" x2="${bx + boostW - 3}" y2="${bp + boostH / 2}" stroke="#111827" stroke-width="${compact ? 1.1 : 1.4}" stroke-linecap="round"/>`);
+        overlay.push(`<rect x="${bx}" y="${bp}" width="${boostW}" height="${boostH}" rx="${compact ? 2 : 3}" fill="#E20613" stroke="#7F1D1D" stroke-width="${compact ? 0.9 : 1.1}"/>`);
+        overlay.push(`<line x1="${bx + 3}" y1="${bp + boostH / 2}" x2="${bx + boostW - 3}" y2="${bp + boostH / 2}" stroke="#FFFFFF" stroke-width="${compact ? 1.1 : 1.4}" stroke-linecap="round"/>`);
       }
       if (!compact && boostPositions.length > 0) {
         const lblX = cylX2 + 14;
@@ -2120,8 +2120,8 @@ function renderProfileCard(profile, theme, box, compact, index) {
           holeTop + 8,
           holeBottom - 8,
         );
-        overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#111827" stroke-width="0.8"/>`);
-        overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#111827" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
+        overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#E20613" stroke-width="0.8"/>`);
+        overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#E20613" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
       }
       const labelLaneX = Math.min(cylX2 + (compact ? 42 : 54), infoBox.x - (compact ? 18 : 24));
       const drawCable = (color, offsetX, label, labelYRatio = 0.5) => {
