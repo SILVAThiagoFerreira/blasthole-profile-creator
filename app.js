@@ -1915,12 +1915,15 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const badgeR = compact ? 20 : 22;
   const badgeCx = x + (compact ? 44 : 46);
   const badgeCy = y + (compact ? 46 : 50);
+  const profileTitleY = y + (compact ? 40 : 42);
+  const profileSubtitleY = y + (compact ? 62 : 66);
   const tagText = kindLabel(profile.kind).toUpperCase();
   const tagWidth = measureTextWidth(tagText, tagSize, `'IBM Plex Sans', sans-serif`, 700);
   const tagX = Math.min(x + w - tagWidth - 34, x + (compact ? 320 : 380) - tagWidth / 2 - 8);
-  const tagY = y + (compact ? 22 : 24);
+  const tagY = y + (compact ? 27 : 30);
   const tagHeight = compact ? 22 : 24;
-  const contentTop = compact ? y + 86 : y + 112;
+  const dividerY = y + (compact ? 84 : 96);
+  const contentTop = compact ? y + 90 : y + 112;
   const contentBottomPad = compact ? 22 : 32;
   const drawingBox = compact
     ? { x: x + 18, y: contentTop, w: 92, h: h - (contentTop - y) - contentBottomPad }
@@ -2003,7 +2006,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     }
 
     if (y2 - yCur >= (compact ? 8 : 12)) {
-      const labelX = Math.min(cylX2 + (compact ? 42 : 54), infoBox.x - (compact ? 18 : 24));
+      const labelX = Math.min(cylX2 + (compact ? 48 : 70), infoBox.x - (compact ? 18 : 24));
       const labelValue = `${segmentDisplayLabel(type, lang)} ${formatDecimal(segVal)}m`;
       const labelMaxWidth = Math.max(0, infoBox.x - labelX - (compact ? 12 : 16));
       const labelSize = fitFontSize(labelValue, labelMaxWidth, compact ? 7 : 10, `'IBM Plex Sans', sans-serif`, 500, compact ? 5 : 8);
@@ -2082,12 +2085,12 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="${accent}"/>
     <text x="${badgeCx}" y="${badgeCy + 6}" fill="#FFFFFF" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 18 : 20}" font-weight="700">${escapeXml(badgeLetter)}</text>
 
-    <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 36 : 32)}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
-    <text x="${x + (compact ? 82 : 82)}" y="${y + (compact ? 58 : 58)}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM${cordelTag ? `  •  ${cordelTag}` : ''}`)}</text>
+    <text x="${x + (compact ? 82 : 82)}" y="${profileTitleY}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
+    <text x="${x + (compact ? 82 : 82)}" y="${profileSubtitleY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM${cordelTag ? `  •  ${cordelTag}` : ''}`)}</text>
     ${compact ? '' : `<rect x="${tagX}" y="${tagY}" width="${tagWidth + 16}" height="${tagHeight}" rx="8" fill="${accentSoft}"/>
     <text x="${tagX + 8}" y="${tagY + 16}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${tagSize}" font-weight="700">${escapeXml(tagText)}</text>`}
 
-    <rect x="${x + 18}" y="${y + (compact ? 80 : 92)}" width="${w - 36}" height="3" rx="1.5" fill="${accent}"/>
+    <rect x="${x + 18}" y="${dividerY}" width="${w - 36}" height="3" rx="1.5" fill="${accent}"/>
 
     <rect x="${drawingBox.x}" y="${drawingBox.y}" width="${drawingBox.w}" height="${drawingBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
     ${segmentMarkup.join('')}
@@ -2123,13 +2126,25 @@ function renderProfileCard(profile, theme, box, compact, index) {
         overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#E20613" stroke-width="0.8"/>`);
         overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#E20613" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
       }
-      const labelLaneX = Math.min(cylX2 + (compact ? 42 : 54), infoBox.x - (compact ? 18 : 24));
+      const labelLaneX = Math.min(cylX2 + (compact ? 24 : 36), infoBox.x - (compact ? 18 : 24));
+      const sideLabelYs = [];
+      const reserveSideLabelY = (desiredY) => {
+        const minY = holeTop + (compact ? 10 : 14);
+        const maxY = holeBottom - (compact ? 10 : 14);
+        const offsets = [0, -16, 16, -32, 32, -48, 48];
+        const picked = offsets
+          .map((offset) => clamp(desiredY + offset, minY, maxY))
+          .find((candidate) => sideLabelYs.every((usedY) => Math.abs(candidate - usedY) >= 14))
+          || clamp(desiredY, minY, maxY);
+        sideLabelYs.push(picked);
+        return picked;
+      };
       const drawCable = (color, offsetX, label, labelYRatio = 0.5) => {
         const cableX = cx + offsetX;
         overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${holeBottom - 4}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
         overlay.push(`<circle cx="${cableX}" cy="${holeTop - 4}" r="${compact ? 2 : 3}" fill="${color}"/>`);
         if (!compact && label) {
-          const lblY = holeTop + holeH * labelYRatio;
+          const lblY = reserveSideLabelY(holeTop + holeH * labelYRatio);
           overlay.push(`<line x1="${cableX}" y1="${lblY}" x2="${labelLaneX - 6}" y2="${lblY}" stroke="${color}" stroke-width="0.6"/>`);
           overlay.push(`<text x="${labelLaneX}" y="${lblY}" text-anchor="start" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
         }
@@ -2157,11 +2172,13 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<circle cx="${cordelX}" cy="${cordelVisibleTop}" r="${compact ? 2 : 3}" fill="${cordelColor}"/>`);
         }
         if (cordelTag) {
-          const lblY = cordelVisibleHeight > 0
+          const desiredLblY = cordelVisibleHeight > 0
             ? Math.min(holeBottom - 10, cordelVisibleTop + cordelVisibleHeight * 0.35)
             : holeBottom - 18;
+          const lblY = !compact ? reserveSideLabelY(desiredLblY) : desiredLblY;
+          const sideCordelTag = shortText(cordelTag, compact ? 18 : 24);
           overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${labelLaneX - 6}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
-          overlay.push(`<text x="${labelLaneX}" y="${lblY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${cordelTag}</text>`);
+          overlay.push(`<text x="${labelLaneX}" y="${lblY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${escapeXml(sideCordelTag)}</text>`);
         }
       }
       return overlay.join('\n');
@@ -2459,7 +2476,14 @@ function renderDeckItems(title, addLabel, profileIndex, collection, heightLabel,
 
 function segmentTypeOptions() {
   const types = getCopy().segmentTypes;
-  return SEGMENT_TYPES.map((value) => ({ value, label: types[value] || value }));
+  const compactLabels = {
+    stemming: types.stemming || 'Tampão',
+    column: types.column || 'Carga',
+    cartridge: 'Cart.',
+    blastbag: 'B. Ar',
+    airdeck: types.airdeck || 'Deck',
+  };
+  return SEGMENT_TYPES.map((value) => ({ value, label: compactLabels[value] || types[value] || value }));
 }
 
 function renderSegmentEditor(profile, index) {
