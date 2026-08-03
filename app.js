@@ -1863,7 +1863,10 @@ function buildChargeSegments(profile, accent) {
   const sub = Math.max(profile.subperfuracao, 0);
   const bb = sumSegmentsByType(normalizedSegments, 'blastbag');
   const ad = sumSegmentsByType(normalizedSegments, 'airdeck');
-  const charge = sumSegmentsByType(normalizedSegments, 'column');
+  // Cartuchos são carga explosiva, assim como a coluna de carga. Mantê-los
+  // nesta soma deixa os indicadores e a pré-visualização coerentes.
+  const charge = sumSegmentsByType(normalizedSegments, 'column')
+    + sumSegmentsByType(normalizedSegments, 'cartridge');
   const segments = normalizedSegments.map((item, itemIndex) => ({
     key: `${item.type}-${itemIndex}`,
     type: item.type,
@@ -1943,6 +1946,10 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const holeBottom = bottom - (compact ? 20 : 28);
   const holeH = holeBottom - holeTop;
   const { segments: segmentData, stem, sub, bb, ad, charge } = buildChargeSegments(profile, accent);
+  const cartridgeSegments = segmentData.filter((segment) => segment.type === 'cartridge' && segment.value > 0);
+  const cartridgeMeasure = cartridgeSegments.length
+    ? `${formatDecimal(cartridgeSegments.reduce((sum, segment) => sum + segment.value, 0), 2, lang)} m • ${cartridgeSegments.map((segment) => `${segment.cartridge_count}x`).join(' + ')}`
+    : '';
   const total = Math.max(segmentData.reduce((sum, item) => sum + Math.max(item.value, 0), 0), 0.01);
 
   let yCur = holeTop;
@@ -2005,11 +2012,17 @@ function renderProfileCard(profile, theme, box, compact, index) {
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#6B7280" rx="0"/>`);
     }
 
-    if (y2 - yCur >= (compact ? 8 : 12)) {
+    // Nos cartões compactos não existe espaço horizontal real entre o furo e
+    // a tabela de dados. O rótulo era comprimido a poucos pixels e ficava
+    // ilegível; o tamanho continua disponível no resumo e no editor.
+    if (!compact && y2 - yCur >= 12) {
       const labelX = Math.min(cylX2 + (compact ? 48 : 70), infoBox.x - (compact ? 18 : 24));
-      const labelValue = `${segmentDisplayLabel(type, lang)} ${formatDecimal(segVal)}m`;
+      const cartridgeCount = type === 'cartridge'
+        ? clampInteger(segment.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN)
+        : null;
+      const labelValue = `${segmentDisplayLabel(type, lang)} ${formatDecimal(segVal)}m${cartridgeCount ? ` • ${cartridgeCount}x` : ''}`;
       const labelMaxWidth = Math.max(0, infoBox.x - labelX - (compact ? 12 : 16));
-      const labelSize = fitFontSize(labelValue, labelMaxWidth, compact ? 7 : 10, `'IBM Plex Sans', sans-serif`, 500, compact ? 5 : 8);
+      const labelSize = fitFontSize(labelValue, labelMaxWidth, 10, `'IBM Plex Sans', sans-serif`, 500, 9);
       segmentMarkup.push(`<line x1="${cylX2 + 1}" y1="${midY}" x2="${labelX - 6}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.6"/>`);
       segmentMarkup.push(`<text x="${labelX}" y="${midY}" text-anchor="start" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="500" dominant-baseline="middle">${escapeXml(labelValue)}</text>`);
     }
@@ -2025,6 +2038,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ['height', fieldLabel('height', lang), `${formatDecimal(profile.altura_banco, 2, lang)} m`, 'height'],
     ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
     ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
+    ...(cartridgeMeasure ? [['cartridge', labels.cartridge, cartridgeMeasure, 'column']] : []),
     ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
     ['airdeck', labels.airdeck, `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
     ['inclination', fieldLabel('inclination', lang), `${formatDecimal(profile.inclinacao, 1, lang)}°`, 'inclination'],
@@ -2033,7 +2047,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
   ];
   if (cordelTag) metricRows.push(['cordel', fieldLabel('cordel', lang), cordelTag, 'cordel']);
 
-  const rowHeight = compact ? 26 : 44;
+  const rowHeight = compact ? 26 : (metricRows.length > 9 ? 39 : 44);
   const rowStart = infoBox.y + (compact ? 32 : 44);
   const rowsMarkup = metricRows.map((row, idx) => renderMetricRow({
     x: infoBox.x + 8,
@@ -2533,7 +2547,8 @@ function renderProfileEditor(profile, index) {
   })();
   const accent = KIND_ACCENTS[profile.kind]?.accent || KIND_ACCENTS.personalizado.accent;
   const stem = sumSegmentsByType(profile.segments, 'stemming');
-  const charge = sumSegmentsByType(profile.segments, 'column');
+  const charge = sumSegmentsByType(profile.segments, 'column')
+    + sumSegmentsByType(profile.segments, 'cartridge');
   const bb = sumSegmentsByType(profile.segments, 'blastbag');
   const ad = sumSegmentsByType(profile.segments, 'airdeck');
   const cordelTag = profile.cordel === 'np'
@@ -2592,7 +2607,8 @@ function renderAutoCalcSummary(profile, lang) {
   const copy = getCopy(lang);
   const labels = copy.labels;
   const stem = sumSegmentsByType(profile.segments, 'stemming');
-  const charge = sumSegmentsByType(profile.segments, 'column');
+  const charge = sumSegmentsByType(profile.segments, 'column')
+    + sumSegmentsByType(profile.segments, 'cartridge');
   const sub = Math.max(profile.subperfuracao, 0);
   const bb = sumSegmentsByType(profile.segments, 'blastbag');
   const ad = sumSegmentsByType(profile.segments, 'airdeck');
@@ -2757,6 +2773,7 @@ function handleInputEvent(event) {
   if (target.matches('[data-path]')) {
     const path = target.getAttribute('data-path');
     if (!path) return;
+    let requiresFormRender = false;
 
     const value = target instanceof HTMLInputElement && target.type === 'checkbox'
       ? target.checked
@@ -2777,6 +2794,7 @@ function handleInputEvent(event) {
           if (seg && (seg.height === 1 || seg.height === 0)) seg.height = 0.6;
           if (seg) seg.cartridge_count = clampInteger(seg.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN);
         }
+        requiresFormRender = field === 'segments' && itemField === 'type';
         currentProfile.stemming = sumSegmentsByType(currentProfile.segments, 'stemming');
         currentProfile.blastbag = sumSegmentsByType(currentProfile.segments, 'blastbag');
         currentProfile.air_deck = sumSegmentsByType(currentProfile.segments, 'airdeck');
@@ -2797,6 +2815,10 @@ function handleInputEvent(event) {
     } else if (path === 'profileType') {
       state.profileType = value;
     }
+    // A mudança de tipo altera os controles condicionais da linha (por
+    // exemplo, o seletor 1x–6x do cartucho). Renderize imediatamente para que
+    // o controle apareça sem precisar mover o segmento.
+    if (requiresFormRender) renderForms();
     scheduleUpdate();
   }
 
