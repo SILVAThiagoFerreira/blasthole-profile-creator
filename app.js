@@ -1954,6 +1954,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
   let yCur = holeTop;
   const segmentMarkup = [];
+  const measurementItems = [];
   const cL = compact ? 1 : 2;
   const gapX = compact ? 1 : 2;
   for (const segment of segmentData) {
@@ -2012,22 +2013,29 @@ function renderProfileCard(profile, theme, box, compact, index) {
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#6B7280" rx="0"/>`);
     }
 
-    // Nos cartões compactos não existe espaço horizontal real entre o furo e
-    // a tabela de dados. O rótulo era comprimido a poucos pixels e ficava
-    // ilegível; o tamanho continua disponível no resumo e no editor.
-    if (!compact && y2 - yCur >= 12) {
-      const labelX = Math.min(cylX2 + (compact ? 48 : 70), infoBox.x - (compact ? 18 : 24));
-      const cartridgeCount = type === 'cartridge'
-        ? clampInteger(segment.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN)
-        : null;
-      const labelValue = `${segmentDisplayLabel(type, lang)} ${formatDecimal(segVal)}m${cartridgeCount ? ` • ${cartridgeCount}x` : ''}`;
-      const labelMaxWidth = Math.max(0, infoBox.x - labelX - (compact ? 12 : 16));
-      const labelSize = fitFontSize(labelValue, labelMaxWidth, 10, `'IBM Plex Sans', sans-serif`, 500, 9);
-      segmentMarkup.push(`<line x1="${cylX2 + 1}" y1="${midY}" x2="${labelX - 6}" y2="${midY}" stroke="${theme.muted}" stroke-width="0.6"/>`);
-      segmentMarkup.push(`<text x="${labelX}" y="${midY}" text-anchor="start" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${labelSize}" font-weight="500" dominant-baseline="middle">${escapeXml(labelValue)}</text>`);
-    }
+    measurementItems.push({ type, value: segVal, cartridgeCount: type === 'cartridge'
+      ? clampInteger(segment.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN)
+      : null, y1: yCur, y2, midY });
     yCur = y2;
   }
+
+  // Faixa de cotas independente, dentro da área de ilustração. Ela preserva
+  // a leitura de cada trecho sem invadir a tabela técnica ou os cabos.
+  const measureX = cylX2 + (compact ? 7 : 12);
+  const measureLabelX = right - (compact ? 2 : 4);
+  const measureLabelWidth = Math.max(12, measureLabelX - measureX - 5);
+  const measurementMarkup = measurementItems.map((item) => {
+    const height = item.y2 - item.y1;
+    const canShowLabel = height >= (compact ? 22 : 18);
+    const label = compact
+      ? `${formatDecimal(item.value)}m${item.cartridgeCount ? `·${item.cartridgeCount}x` : ''}`
+      : `${segmentDisplayLabel(item.type, lang, true)} ${formatDecimal(item.value)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}`;
+    const fontSize = canShowLabel
+      ? fitFontSize(label, measureLabelWidth, compact ? 7 : 9, `'IBM Plex Sans', sans-serif`, 600, compact ? 5.5 : 7)
+      : 0;
+    const cap = compact ? 2.5 : 4;
+    return `<g class="segment-measurement" pointer-events="none"><line x1="${measureX}" y1="${item.y1}" x2="${measureX}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - cap}" y1="${item.y1}" x2="${measureX + cap}" y2="${item.y1}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - cap}" y1="${item.y2}" x2="${measureX + cap}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/>${canShowLabel ? `<text x="${measureLabelX}" y="${item.midY}" text-anchor="end" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${fontSize}" font-weight="600" dominant-baseline="middle">${escapeXml(label)}</text>` : ''}</g>`;
+  }).join('');
 
   const cordelTag = profile.cordel === 'np'
     ? `NP ${Math.round(profile.cordel_gramatura)}${normalizeNumber(profile.cordel_gap, 0) > 0 ? ` • sem cordel ${formatDecimal(profile.cordel_gap, 2, lang)} m` : ''}`
@@ -2197,6 +2205,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
       }
       return overlay.join('\n');
     })()}
+    ${measurementMarkup}
     <rect x="${cylX1}" y="${holeTop}" width="${cylW}" height="${holeBottom - holeTop}" rx="${compact ? 12 : 14}" fill="none" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeTop + 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#F0F2F5" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeBottom - 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#2D3748" stroke="${theme.title}" stroke-width="2"/>
