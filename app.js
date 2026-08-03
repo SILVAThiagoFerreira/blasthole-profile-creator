@@ -2022,19 +2022,26 @@ function renderProfileCard(profile, theme, box, compact, index) {
   // Faixa de cotas independente, dentro da área de ilustração. Ela preserva
   // a leitura de cada trecho sem invadir a tabela técnica ou os cabos.
   const measureX = cylX2 + (compact ? 7 : 12);
-  const measureLabelX = right - (compact ? 2 : 4);
-  const measureLabelWidth = Math.max(12, measureLabelX - measureX - 5);
+  const measureCap = compact ? 2.5 : 4;
+  // O texto começa depois do terminal da régua e termina antes dos dados.
+  const measureLabelX = measureX + measureCap + (compact ? 3 : 5);
+  const measureLabelWidth = Math.max(0, infoBox.x - (compact ? 6 : 12) - measureLabelX);
   const measurementMarkup = measurementItems.map((item) => {
     const height = item.y2 - item.y1;
     const canShowLabel = height >= (compact ? 22 : 18);
-    const label = compact
+    const detailedLabel = compact
       ? `${formatDecimal(item.value)}m${item.cartridgeCount ? `·${item.cartridgeCount}x` : ''}`
       : `${segmentDisplayLabel(item.type, lang, true)} ${formatDecimal(item.value)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}`;
-    const fontSize = canShowLabel
-      ? fitFontSize(label, measureLabelWidth, compact ? 7 : 9, `'IBM Plex Sans', sans-serif`, 600, compact ? 5.5 : 7)
+    const shortLabel = `${formatDecimal(item.value)}m${item.cartridgeCount ? `·${item.cartridgeCount}x` : ''}`;
+    const minFontSize = compact ? 5.5 : 7;
+    const label = measureTextWidth(detailedLabel, minFontSize, `'IBM Plex Sans', sans-serif`, 600) <= measureLabelWidth
+      ? detailedLabel
+      : shortLabel;
+    const labelFits = measureTextWidth(label, minFontSize, `'IBM Plex Sans', sans-serif`, 600) <= measureLabelWidth;
+    const fontSize = canShowLabel && labelFits
+      ? fitFontSize(label, measureLabelWidth, compact ? 7 : 9, `'IBM Plex Sans', sans-serif`, 600, minFontSize)
       : 0;
-    const cap = compact ? 2.5 : 4;
-    return `<g class="segment-measurement" pointer-events="none"><line x1="${measureX}" y1="${item.y1}" x2="${measureX}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - cap}" y1="${item.y1}" x2="${measureX + cap}" y2="${item.y1}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - cap}" y1="${item.y2}" x2="${measureX + cap}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/>${canShowLabel ? `<text x="${measureLabelX}" y="${item.midY}" text-anchor="end" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${fontSize}" font-weight="600" dominant-baseline="middle">${escapeXml(label)}</text>` : ''}</g>`;
+    return `<g class="segment-measurement" pointer-events="none"><line x1="${measureX}" y1="${item.y1}" x2="${measureX}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - measureCap}" y1="${item.y1}" x2="${measureX + measureCap}" y2="${item.y1}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - measureCap}" y1="${item.y2}" x2="${measureX + measureCap}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/>${fontSize ? `<text x="${measureLabelX}" y="${item.midY}" text-anchor="start" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${fontSize}" font-weight="600" dominant-baseline="middle">${escapeXml(label)}</text>` : ''}</g>`;
   }).join('');
 
   const cordelTag = profile.cordel === 'np'
