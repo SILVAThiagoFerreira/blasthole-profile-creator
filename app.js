@@ -2125,35 +2125,47 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ${segmentMarkup.join('')}
     ${(() => {
       const overlay = [];
-      const boostH = compact ? 9 : 13;
-      const boostW = cylW * 0.54;
-      const boostPositions = [];
+      // Reforçador: cartucho cilíndrico ilustrado como retângulo vertical
+      // vermelho. A proporção segue o produto real: 129,5 mm × Ø59,1 mm.
+      const boosterDiameterMm = 59.1;
+      const boosterHeightMm = 129.5;
+      const naturalBoosterWidth = clamp(
+        cylW * (boosterDiameterMm / Math.max(normalizeNumber(profile.diametro_furo, 140), 1)),
+        compact ? 7 : 9,
+        cylW * 0.72,
+      );
+      const naturalBoosterHeight = naturalBoosterWidth * (boosterHeightMm / boosterDiameterMm);
+      const boosters = [];
       let accY = holeTop;
       for (let si = 0; si < segmentData.length; si++) {
         const seg = segmentData[si];
         const sv = Math.max(seg.value, 0);
         const segH = holeH * (sv / total);
+        const segStart = accY;
         const segEnd = seg.type === 'subdrill' ? holeBottom : accY + segH;
         if ((seg.type === 'column' || seg.type === 'cartridge') && seg.has_booster) {
-          boostPositions.push(clamp(segEnd - boostH - 2, holeTop + 1, holeBottom - boostH - 1));
+          const safeMargin = compact ? 2 : 3;
+          const availableHeight = Math.max(0, segEnd - segStart - safeMargin * 2);
+          const scale = Math.min(1, availableHeight / naturalBoosterHeight);
+          const boostH = naturalBoosterHeight * scale;
+          const boostW = naturalBoosterWidth * scale;
+          if (boostH >= (compact ? 5 : 7) && boostW >= (compact ? 3 : 4)) {
+            boosters.push({
+              x: cx - boostW / 2,
+              y: segEnd - safeMargin - boostH,
+              width: boostW,
+              height: boostH,
+            });
+          }
         }
         accY = segEnd;
       }
-      for (const bp of boostPositions) {
-        const bx = cx - boostW / 2;
-        overlay.push(`<rect x="${bx - 1.5}" y="${bp - 1.5}" width="${boostW + 3}" height="${boostH + 3}" rx="${compact ? 3 : 4}" fill="#FFFFFF" stroke="#111827" stroke-width="${compact ? 1.2 : 1.6}"/>`);
-        overlay.push(`<rect x="${bx}" y="${bp}" width="${boostW}" height="${boostH}" rx="${compact ? 2 : 3}" fill="#E20613" stroke="#7F1D1D" stroke-width="${compact ? 0.9 : 1.1}"/>`);
-        overlay.push(`<line x1="${bx + 3}" y1="${bp + boostH / 2}" x2="${bx + boostW - 3}" y2="${bp + boostH / 2}" stroke="#FFFFFF" stroke-width="${compact ? 1.1 : 1.4}" stroke-linecap="round"/>`);
+      if (boosters.length > 0) {
+        overlay.push(`<defs><linearGradient id="booster-red-${index}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#FF5A63"/><stop offset="45%" stop-color="#E30613"/><stop offset="100%" stop-color="#A80E18"/></linearGradient></defs>`);
       }
-      if (!compact && boostPositions.length > 0) {
-        const lblX = cylX2 + 14;
-        const lblY = clamp(
-          boostPositions[0] + boostH / 2 + (profile.initiator !== 'none' ? 12 : 0),
-          holeTop + 8,
-          holeBottom - 8,
-        );
-        overlay.push(`<line x1="${cx}" y1="${lblY}" x2="${lblX - 2}" y2="${lblY}" stroke="#E20613" stroke-width="0.8"/>`);
-        overlay.push(`<text x="${lblX}" y="${lblY + 1}" fill="#E20613" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700" dominant-baseline="middle">Reforçador ${profile.booster_weight}g</text>`);
+      for (const booster of boosters) {
+        overlay.push(`<rect x="${booster.x}" y="${booster.y}" width="${booster.width}" height="${booster.height}" rx="${compact ? 1.2 : 1.8}" fill="url(#booster-red-${index})" stroke="#8C1118" stroke-width="${compact ? 0.7 : 0.9}"/>`);
+        overlay.push(`<rect x="${booster.x + booster.width * 0.18}" y="${booster.y + 2}" width="${Math.max(0.8, booster.width * 0.13)}" height="${Math.max(0, booster.height - 4)}" rx="1" fill="#FFB3B8" opacity="0.5"/>`);
       }
       const labelLaneX = Math.min(cylX2 + (compact ? 24 : 36), infoBox.x - (compact ? 18 : 24));
       const sideLabelYs = [];
