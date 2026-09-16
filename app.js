@@ -1820,6 +1820,16 @@ function iconDensity(x, y, size, color) {
   return `<g fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M${cx} ${y + 3} C${cx + 8} ${y + 14}, ${cx + 8} ${y + 20}, ${cx} ${y + size - 3} C${cx - 8} ${y + 20}, ${cx - 8} ${y + 14}, ${cx} ${y + 3} Z" fill="${color}" stroke="none"/></g>`;
 }
 
+function iconInitiator(x, y, size, color) {
+  const cx = x + size / 2;
+  const cy = y + size / 2;
+  return `<g fill="none" stroke="${color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M${cx} ${y + 3} V${y + size - 3}"/><circle cx="${cx}" cy="${cy}" r="${Math.max(3, size / 4)}" fill="#FFFFFF"/></g>`;
+}
+
+function iconBooster(x, y, size, color) {
+  return `<g fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round"><rect x="${x + 4}" y="${y + 3}" width="${size - 8}" height="${size - 6}" rx="3" fill="${color}"/><path d="M${x + 7} ${y + 6} V${y + size - 6}" stroke="#FFFFFF" stroke-width="1.2" opacity="0.75"/></g>`;
+}
+
 function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alternate, compact }) {
   const rowFill = alternate ? '#F9FAFB' : 'transparent';
   const iconSize = compact ? 16 : 26;
@@ -1845,6 +1855,8 @@ function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alterna
     azimuth: iconAzimuth(iconX, iconY, iconSize, color),
     density: iconDensity(iconX, iconY, iconSize, color),
     column: iconStem(iconX, iconY, iconSize, color),
+    initiator: iconInitiator(iconX, iconY, iconSize, color),
+    booster: iconBooster(iconX, iconY, iconSize, color),
   };
 
   return `
@@ -1880,24 +1892,6 @@ function buildChargeSegments(profile, accent) {
   return { segments, stem, sub, bb, ad, charge };
 }
 
-function segmentDisplayLabel(type, lang = getActiveLanguage(), short = false) {
-  const copy = getCopy(lang);
-  const labels = {
-    ...copy.labels,
-    ...(state?.labels || {}),
-  };
-  if (!short) return labels[type] || type;
-  const shortLabels = {
-    stemming: 'Tamp.',
-    column: 'Carga',
-    cartridge: 'Cart.',
-    blastbag: 'B.Air',
-    airdeck: 'Deck',
-    subdrill: 'Sub.',
-  };
-  return shortLabels[type] || labels[type] || type;
-}
-
 function renderProfileCard(profile, theme, box, compact, index) {
   const lang = getActiveLanguage();
   const copy = getCopy(lang);
@@ -1914,17 +1908,11 @@ function renderProfileCard(profile, theme, box, compact, index) {
 
   const titleSize = compact ? 17 : 20;
   const subSize = compact ? 10 : 12;
-  const tagSize = compact ? 9 : 11;
   const badgeR = compact ? 20 : 22;
   const badgeCx = x + (compact ? 44 : 46);
   const badgeCy = y + (compact ? 46 : 50);
   const profileTitleY = y + (compact ? 40 : 42);
   const profileSubtitleY = y + (compact ? 62 : 66);
-  const tagText = kindLabel(profile.kind).toUpperCase();
-  const tagWidth = measureTextWidth(tagText, tagSize, `'IBM Plex Sans', sans-serif`, 700);
-  const tagX = Math.min(x + w - tagWidth - 34, x + (compact ? 320 : 380) - tagWidth / 2 - 8);
-  const tagY = y + (compact ? 27 : 30);
-  const tagHeight = compact ? 22 : 24;
   const dividerY = y + (compact ? 84 : 96);
   const contentTop = compact ? y + 90 : y + 112;
   const contentBottomPad = compact ? 22 : 32;
@@ -1942,19 +1930,29 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const cylW = compact ? 34 : 60;
   const cylX1 = cx - cylW / 2;
   const cylX2 = cx + cylW / 2;
-  const holeTop = top + (compact ? 20 : 28);
+  const holeTop = top + (compact ? 24 : 34);
   const holeBottom = bottom - (compact ? 20 : 28);
   const holeH = holeBottom - holeTop;
-  const { segments: segmentData, stem, sub, bb, ad, charge } = buildChargeSegments(profile, accent);
+  const collarY = holeTop - (compact ? 10 : 14);
+  const { segments: segmentData, stem, bb, ad, charge } = buildChargeSegments(profile, accent);
   const cartridgeSegments = segmentData.filter((segment) => segment.type === 'cartridge' && segment.value > 0);
   const cartridgeMeasure = cartridgeSegments.length
     ? `${formatDecimal(cartridgeSegments.reduce((sum, segment) => sum + segment.value, 0), 2, lang)} m • ${cartridgeSegments.map((segment) => `${segment.cartridge_count}x`).join(' + ')}`
     : '';
+  const hasBooster = segmentData.some((segment) => (segment.type === 'column' || segment.type === 'cartridge') && segment.has_booster);
+  const trimParenthetical = (value) => String(value || '').replace(/\s*\([^)]*\)$/, '');
+  const initiatorLabels = {
+    none: copy.fieldLabels.initiatorNone,
+    brinel: trimParenthetical(copy.fieldLabels.initiatorBrinel),
+    dvt: copy.fieldLabels.initiatorDVT,
+    both: trimParenthetical(copy.fieldLabels.initiatorBoth),
+  };
+  const initiatorLabel = initiatorLabels[profile.initiator] || copy.fieldLabels.initiatorNone;
+  const boosterLabel = trimParenthetical(copy.fieldLabels.hasBooster);
   const total = Math.max(segmentData.reduce((sum, item) => sum + Math.max(item.value, 0), 0), 0.01);
 
   let yCur = holeTop;
   const segmentMarkup = [];
-  const measurementItems = [];
   const cL = compact ? 1 : 2;
   const gapX = compact ? 1 : 2;
   for (const segment of segmentData) {
@@ -1962,7 +1960,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
     if (segVal <= 0) continue;
     const segH = Math.max(1, holeH * (segVal / total));
     const y2 = type === 'subdrill' ? holeBottom : yCur + segH;
-    const midY = (yCur + y2) / 2;
     const segAttrs = `data-profile="${index}" data-segment-key="${key}" data-segment-type="${type}" style="cursor:pointer"`;
     if (type === 'stemming') {
       let dots = '';
@@ -2013,36 +2010,8 @@ function renderProfileCard(profile, theme, box, compact, index) {
       segmentMarkup.push(`<rect ${segAttrs} x="${cylX1}" y="${yCur}" width="${cylW}" height="${y2 - yCur}" fill="#6B7280" rx="0"/>`);
     }
 
-    measurementItems.push({ type, value: segVal, cartridgeCount: type === 'cartridge'
-      ? clampInteger(segment.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN)
-      : null, y1: yCur, y2, midY });
     yCur = y2;
   }
-
-  // Faixa de cotas independente, dentro da área de ilustração. Ela preserva
-  // a leitura de cada trecho sem invadir a tabela técnica ou os cabos.
-  const measureX = cylX2 + (compact ? 7 : 12);
-  const measureCap = compact ? 2.5 : 4;
-  // O texto começa depois do terminal da régua e termina antes dos dados.
-  const measureLabelX = measureX + measureCap + (compact ? 3 : 5);
-  const measureLabelWidth = Math.max(0, infoBox.x - (compact ? 6 : 12) - measureLabelX);
-  const measurementMarkup = measurementItems.map((item) => {
-    const height = item.y2 - item.y1;
-    const canShowLabel = height >= (compact ? 22 : 18);
-    const detailedLabel = compact
-      ? `${formatDecimal(item.value)}m${item.cartridgeCount ? `·${item.cartridgeCount}x` : ''}`
-      : `${segmentDisplayLabel(item.type, lang, true)} ${formatDecimal(item.value)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}`;
-    const shortLabel = `${formatDecimal(item.value)}m${item.cartridgeCount ? `·${item.cartridgeCount}x` : ''}`;
-    const minFontSize = compact ? 5.5 : 7;
-    const label = measureTextWidth(detailedLabel, minFontSize, `'IBM Plex Sans', sans-serif`, 600) <= measureLabelWidth
-      ? detailedLabel
-      : shortLabel;
-    const labelFits = measureTextWidth(label, minFontSize, `'IBM Plex Sans', sans-serif`, 600) <= measureLabelWidth;
-    const fontSize = canShowLabel && labelFits
-      ? fitFontSize(label, measureLabelWidth, compact ? 7 : 9, `'IBM Plex Sans', sans-serif`, 600, minFontSize)
-      : 0;
-    return `<g class="segment-measurement" pointer-events="none"><line x1="${measureX}" y1="${item.y1}" x2="${measureX}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - measureCap}" y1="${item.y1}" x2="${measureX + measureCap}" y2="${item.y1}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - measureCap}" y1="${item.y2}" x2="${measureX + measureCap}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/>${fontSize ? `<text x="${measureLabelX}" y="${item.midY}" text-anchor="start" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${fontSize}" font-weight="600" dominant-baseline="middle">${escapeXml(label)}</text>` : ''}</g>`;
-  }).join('');
 
   const cordelTag = profile.cordel === 'np'
     ? `NP ${Math.round(profile.cordel_gramatura)}${normalizeNumber(profile.cordel_gap, 0) > 0 ? ` • sem cordel ${formatDecimal(profile.cordel_gap, 2, lang)} m` : ''}`
@@ -2053,16 +2022,21 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ['height', fieldLabel('height', lang), `${formatDecimal(profile.altura_banco, 2, lang)} m`, 'height'],
     ['subdrill', labels.subdrill, `${formatDecimal(profile.subperfuracao)} m`, 'subdrill'],
     ['stemming', labels.stemming, `${formatDecimal(stem)} m`, 'stemming'],
+    ['charge', labels.column, `${formatDecimal(charge)} m`, 'column'],
     ...(cartridgeMeasure ? [['cartridge', labels.cartridge, cartridgeMeasure, 'column']] : []),
-    ['blastbag', labels.blastbag, `${formatDecimal(profile.blastbag)} m`, 'blastbag'],
-    ['airdeck', labels.airdeck, `${formatDecimal(profile.air_deck)} m`, 'airdeck'],
+    ...(bb > 0 ? [['blastbag', labels.blastbag, `${formatDecimal(bb)} m`, 'blastbag']] : []),
+    ...(ad > 0 ? [['airdeck', labels.airdeck, `${formatDecimal(ad)} m`, 'airdeck']] : []),
+    ['initiator', copy.fieldLabels.initiator, initiatorLabel, 'initiator'],
+    ...(hasBooster ? [['booster', boosterLabel, `${formatDecimal(profile.booster_weight, 0, lang)} g`, 'booster']] : []),
+    ...(cordelTag ? [['cordel', copy.fieldLabels.cordel, cordelTag, 'cordel']] : []),
     ['inclination', fieldLabel('inclination', lang), `${formatDecimal(profile.inclinacao, 1, lang)}°`, 'inclination'],
     ['azimuth', fieldLabel('azimuth', lang), `${formatDecimal(profile.azimute, 1, lang)}°`, 'azimuth'],
     ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
   ];
-  if (cordelTag) metricRows.push(['cordel', fieldLabel('cordel', lang), cordelTag, 'cordel']);
 
-  const rowHeight = compact ? 26 : (metricRows.length > 9 ? 39 : 44);
+  const rowHeight = compact
+    ? Math.min(26, Math.max(20, (infoBox.h - 36) / metricRows.length))
+    : (metricRows.length > 9 ? 39 : 44);
   const rowStart = infoBox.y + (compact ? 32 : 44);
   const rowsMarkup = metricRows.map((row, idx) => renderMetricRow({
     x: infoBox.x + 8,
@@ -2078,32 +2052,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
     compact,
   })).join('');
 
-  const chips = compact
-    ? []
-    : [
-      [labels.stemming, `${formatDecimal(stem)} m`],
-      [labels.column, `${formatDecimal(charge)} m`],
-      [labels.subdrill, `${formatDecimal(sub)} m`],
-      [labels.blastbag, `${formatDecimal(bb)} m`],
-    ];
-
-  const chipFont = compact ? 9 : 11;
-  const chipY = infoBox.y + infoBox.h - 42;
-  let chipX = infoBox.x + 12;
-  const chipMarkup = [];
-  for (const [chipLabel, chipVal] of chips) {
-    const text = `${chipLabel}: ${chipVal}`;
-    const textWidth = measureTextWidth(text, chipFont, `'IBM Plex Sans', sans-serif`, 700);
-    const chipW = textWidth + (compact ? 18 : 20);
-    if (chipX + chipW > infoBox.x + infoBox.w - 8) break;
-    chipMarkup.push(`
-      <g>
-        <rect x="${chipX}" y="${chipY}" width="${chipW}" height="${compact ? 24 : 28}" rx="10" fill="#F8FAFC" stroke="#E5E7EB"/>
-        <text x="${chipX + 8}" y="${chipY + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${chipFont}" font-weight="700">${escapeXml(text)}</text>
-      </g>`);
-    chipX += chipW + 8;
-  }
-
   return `
     <g filter="url(#shadow)">
       <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
@@ -2115,13 +2063,13 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <text x="${badgeCx}" y="${badgeCy + 6}" fill="#FFFFFF" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 18 : 20}" font-weight="700">${escapeXml(badgeLetter)}</text>
 
     <text x="${x + (compact ? 82 : 82)}" y="${profileTitleY}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
-    <text x="${x + (compact ? 82 : 82)}" y="${profileSubtitleY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM${cordelTag ? `  •  ${cordelTag}` : ''}`)}</text>
-    ${compact ? '' : `<rect x="${tagX}" y="${tagY}" width="${tagWidth + 16}" height="${tagHeight}" rx="8" fill="${accentSoft}"/>
-    <text x="${tagX + 8}" y="${tagY + 16}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${tagSize}" font-weight="700">${escapeXml(tagText)}</text>`}
+    <text x="${x + (compact ? 82 : 82)}" y="${profileSubtitleY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM`)}</text>
 
     <rect x="${x + 18}" y="${dividerY}" width="${w - 36}" height="3" rx="1.5" fill="${accent}"/>
 
     <rect x="${drawingBox.x}" y="${drawingBox.y}" width="${drawingBox.w}" height="${drawingBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
+    <line x1="${left + 12}" y1="${collarY}" x2="${right - 12}" y2="${collarY}" stroke="#CBD5E1" stroke-width="1.4"/>
+    <line x1="${left + 18}" y1="${collarY + (compact ? 4 : 5)}" x2="${right - 18}" y2="${collarY + (compact ? 4 : 5)}" stroke="#EEF2F7" stroke-width="1" stroke-dasharray="2 5"/>
     ${segmentMarkup.join('')}
     ${(() => {
       const overlay = [];
@@ -2167,36 +2115,19 @@ function renderProfileCard(profile, theme, box, compact, index) {
         overlay.push(`<rect x="${booster.x}" y="${booster.y}" width="${booster.width}" height="${booster.height}" rx="${compact ? 1.2 : 1.8}" fill="url(#booster-red-${index})" stroke="#8C1118" stroke-width="${compact ? 0.7 : 0.9}"/>`);
         overlay.push(`<rect x="${booster.x + booster.width * 0.18}" y="${booster.y + 2}" width="${Math.max(0.8, booster.width * 0.13)}" height="${Math.max(0, booster.height - 4)}" rx="1" fill="#FFB3B8" opacity="0.5"/>`);
       }
-      const labelLaneX = Math.min(cylX2 + (compact ? 24 : 36), infoBox.x - (compact ? 18 : 24));
-      const sideLabelYs = [];
-      const reserveSideLabelY = (desiredY) => {
-        const minY = holeTop + (compact ? 10 : 14);
-        const maxY = holeBottom - (compact ? 10 : 14);
-        const offsets = [0, -16, 16, -32, 32, -48, 48];
-        const picked = offsets
-          .map((offset) => clamp(desiredY + offset, minY, maxY))
-          .find((candidate) => sideLabelYs.every((usedY) => Math.abs(candidate - usedY) >= 14))
-          || clamp(desiredY, minY, maxY);
-        sideLabelYs.push(picked);
-        return picked;
-      };
-      const drawCable = (color, offsetX, label, labelYRatio = 0.5) => {
+      const drawCable = (color, offsetX) => {
         const cableX = cx + offsetX;
-        overlay.push(`<line x1="${cableX}" y1="${holeTop - 4}" x2="${cableX}" y2="${holeBottom - 4}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
-        overlay.push(`<circle cx="${cableX}" cy="${holeTop - 4}" r="${compact ? 2 : 3}" fill="${color}"/>`);
-        if (!compact && label) {
-          const lblY = reserveSideLabelY(holeTop + holeH * labelYRatio);
-          overlay.push(`<line x1="${cableX}" y1="${lblY}" x2="${labelLaneX - 6}" y2="${lblY}" stroke="${color}" stroke-width="0.6"/>`);
-          overlay.push(`<text x="${labelLaneX}" y="${lblY}" text-anchor="start" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="600" dominant-baseline="middle">${label}</text>`);
-        }
+        const cableStartY = collarY - (compact ? 5 : 7);
+        overlay.push(`<line x1="${cableX}" y1="${cableStartY}" x2="${cableX}" y2="${holeBottom - 4}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
+        overlay.push(`<circle cx="${cableX}" cy="${cableStartY}" r="${compact ? 2.5 : 3.5}" fill="#FFFFFF" stroke="${color}" stroke-width="${compact ? 1.2 : 1.5}"/>`);
       };
       if (profile.initiator === 'brinel') {
-        drawCable('#E67E22', compact ? -2 : -4, 'NonEl', 0.46);
+        drawCable('#E67E22', compact ? -2 : -4);
       } else if (profile.initiator === 'dvt') {
-        drawCable('#8E44AD', compact ? -2 : -4, 'Eletrônico', 0.58);
+        drawCable('#8E44AD', compact ? -2 : -4);
       } else if (profile.initiator === 'both') {
-        drawCable('#E67E22', compact ? -4 : -6, 'NonEl', 0.42);
-        drawCable('#8E44AD', compact ? 0 : 2, 'Eletrônico', 0.62);
+        drawCable('#E67E22', compact ? -4 : -6);
+        drawCable('#8E44AD', compact ? 0 : 2);
       }
       if (profile.cordel === 'np') {
         const cordelColor = '#27AE60';
@@ -2212,35 +2143,17 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<line x1="${cordelX}" y1="${holeBottom - 4}" x2="${cordelX}" y2="${cordelVisibleTop}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
           overlay.push(`<circle cx="${cordelX}" cy="${cordelVisibleTop}" r="${compact ? 2 : 3}" fill="${cordelColor}"/>`);
         }
-        if (cordelTag) {
-          const desiredLblY = cordelVisibleHeight > 0
-            ? Math.min(holeBottom - 10, cordelVisibleTop + cordelVisibleHeight * 0.35)
-            : holeBottom - 18;
-          const lblY = !compact ? reserveSideLabelY(desiredLblY) : desiredLblY;
-          const sideCordelTag = shortText(cordelTag, compact ? 18 : 24);
-          overlay.push(`<line x1="${cordelX}" y1="${lblY}" x2="${labelLaneX - 6}" y2="${lblY}" stroke="${cordelColor}" stroke-width="0.6"/>`);
-          overlay.push(`<text x="${labelLaneX}" y="${lblY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="700" dominant-baseline="middle">${escapeXml(sideCordelTag)}</text>`);
-        }
       }
       return overlay.join('\n');
     })()}
-    ${measurementMarkup}
     <rect x="${cylX1}" y="${holeTop}" width="${cylW}" height="${holeBottom - holeTop}" rx="${compact ? 12 : 14}" fill="none" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeTop + 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#F0F2F5" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeBottom - 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#2D3748" stroke="${theme.title}" stroke-width="2"/>
-    ${!compact ? `
-    <line x1="${left - 12}" y1="${holeTop}" x2="${left - 12}" y2="${holeBottom}" stroke="${theme.muted}" stroke-width="0.8"/>
-    <line x1="${left - 16}" y1="${holeTop}" x2="${left - 8}" y2="${holeTop}" stroke="${theme.muted}" stroke-width="0.8"/>
-    <line x1="${left - 16}" y1="${holeBottom}" x2="${left - 8}" y2="${holeBottom}" stroke="${theme.muted}" stroke-width="0.8"/>
-    <text x="${left - 18}" y="${(holeTop + holeBottom) / 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="8" font-weight="600" text-anchor="end" transform="rotate(-90, ${left - 18}, ${(holeTop + holeBottom) / 2})">${formatDecimal(profile.altura_banco, 2, lang)} m</text>
-    ` : ''}
-    <text x="${left + 2}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 9}" font-weight="600">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>
 
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 5}" fill="${accent}" rx="2.5"/>
     <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
     ${rowsMarkup}
-    ${chipMarkup.join('')}
   `;
 }
 
@@ -2645,7 +2558,7 @@ function renderAutoCalcSummary(profile, lang) {
       <span class="auto-calc-chip" style="border-left: 3px solid var(--accent-blue);"><strong>H:</strong> ${formatDecimal(profile.altura_banco)}</span>
       <span class="auto-calc-chip" style="border-left: 3px solid var(--accent-blue);"><strong>C:</strong> ${formatDecimal(charge)}</span>
       <span class="auto-calc-chip" style="border-left: 3px solid #C8CDD5;"><strong>S:</strong> ${formatDecimal(stem)}</span>
-      <span class="auto-calc-chip" style="border-left: 3px solid #2F343B;"><strong>BB:</strong> ${formatDecimal(bb)}</span>
+      ${bb > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid #2F343B;"><strong>BB:</strong> ${formatDecimal(bb)}</span>` : ''}
       ${ad > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid var(--accent-orange);"><strong>AD:</strong> ${formatDecimal(ad)}</span>` : ''}
       ${sub > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid #4B5563;"><strong>Sub:</strong> ${formatDecimal(sub)}</span>` : ''}
     </div>`;
