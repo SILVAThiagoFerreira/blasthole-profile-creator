@@ -1836,10 +1836,10 @@ function renderMetricRow({ x, y, w, h, label, value, kind, color, theme, alterna
   const iconX = x + 10;
   const iconY = y + (h - iconSize) / 2;
   const labelX = x + 46;
-  const labelY = y + (compact ? 14 : 16);
-  const valueFont = compact ? 11 : 13;
-  const labelFont = compact ? 9 : 11;
-  const valueY = y + (compact ? 18 : 26);
+  const labelY = y + (compact ? h / 2 + 3 : 16);
+  const valueFont = compact ? 12 : 13;
+  const labelFont = compact ? 10 : 11;
+  const valueY = y + (compact ? h / 2 + 3 : 26);
   const rightValue = value;
   const valueWidth = measureTextWidth(rightValue, valueFont, `'IBM Plex Sans', sans-serif`, 700);
   const valueX = x + w - 14 - valueWidth;
@@ -1931,18 +1931,20 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const dividerY = y + (compact ? 84 : 96);
   const contentTop = compact ? y + 90 : y + 112;
   const contentBottomPad = compact ? 22 : 32;
+  const compactDrawingW = w >= 700 ? 250 : 210;
+  const compactInfoX = w >= 700 ? 282 : 244;
   const drawingBox = compact
-    ? { x: x + 18, y: contentTop, w: 92, h: h - (contentTop - y) - contentBottomPad }
+    ? { x: x + 18, y: contentTop, w: compactDrawingW, h: h - (contentTop - y) - contentBottomPad }
     : { x: x + 34, y: y + 112, w: 160, h: h - 220 };
   const infoBox = compact
-    ? { x: x + 160, y: contentTop, w: w - 184, h: h - (contentTop - y) - contentBottomPad }
+    ? { x: x + compactInfoX, y: contentTop, w: w - compactInfoX - 24, h: h - (contentTop - y) - contentBottomPad }
     : { x: x + 296, y: y + 112, w: w - 324, h: h - 220 };
   const left = drawingBox.x;
   const top = drawingBox.y;
   const right = drawingBox.x + drawingBox.w;
   const bottom = drawingBox.y + drawingBox.h;
   const cx = left + drawingBox.w / 2;
-  const cylW = compact ? 34 : 60;
+  const cylW = compact ? 40 : 60;
   const cylX1 = cx - cylW / 2;
   const cylX2 = cx + cylW / 2;
   const holeTop = top + (compact ? 24 : 34);
@@ -2044,18 +2046,57 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const measureCap = compact ? 2.5 : 4;
   const measureLabelX = measureX + measureCap + (compact ? 3 : 5);
   const measureLabelWidth = Math.max(0, infoBox.x - (compact ? 6 : 12) - measureLabelX);
+  const labelMinY = holeTop + 8;
+  const labelMaxY = holeBottom - 8;
+  const labelCount = measurementItems.length;
+  measurementItems.forEach((item) => {
+    item.sourceMidY = item.midY;
+  });
+  if (labelCount > 1 && labelMaxY > labelMinY) {
+    const requestedGap = compact ? 14 : 15;
+    const gap = Math.min(requestedGap, (labelMaxY - labelMinY) / (labelCount - 1));
+    let positions = measurementItems.map((item) => clamp(item.midY, labelMinY, labelMaxY));
+    if (gap < requestedGap) {
+      positions = measurementItems.map((_, itemIndex) => labelMinY + gap * itemIndex);
+    } else {
+      for (let itemIndex = 1; itemIndex < positions.length; itemIndex += 1) {
+        positions[itemIndex] = Math.max(positions[itemIndex], positions[itemIndex - 1] + gap);
+      }
+      if (positions[positions.length - 1] > labelMaxY) {
+        positions[positions.length - 1] = labelMaxY;
+        for (let itemIndex = positions.length - 2; itemIndex >= 0; itemIndex -= 1) {
+          positions[itemIndex] = Math.min(positions[itemIndex], positions[itemIndex + 1] - gap);
+        }
+        if (positions[0] < labelMinY) {
+          positions = measurementItems.map((_, itemIndex) => labelMinY + gap * itemIndex);
+        }
+      }
+    }
+    measurementItems.forEach((item, itemIndex) => {
+      item.midY = positions[itemIndex];
+    });
+  }
+  measurementItems.forEach((item, itemIndex) => {
+    const previousGap = itemIndex > 0 ? item.midY - measurementItems[itemIndex - 1].midY : Infinity;
+    const nextGap = itemIndex < labelCount - 1 ? measurementItems[itemIndex + 1].midY - item.midY : Infinity;
+    const nearestGap = Math.min(previousGap, nextGap);
+    item.labelMaxFontSize = Number.isFinite(nearestGap)
+      ? Math.min(11.5, nearestGap / 1.3)
+      : 11.5;
+    item.labelMaxFontSize = Math.max(compact ? 8 : 8.5, item.labelMaxFontSize);
+  });
   const measurementMarkup = measurementItems.map((item) => {
     const segmentHeight = item.y2 - item.y1;
     const detailedLabel = `${segmentDisplayLabel(item.type, lang)} ${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}`;
     const shortLabel = `${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}`;
-    const minFontSize = compact ? 6.5 : 8.5;
+    const minFontSize = compact ? Math.min(9.5, item.labelMaxFontSize) : 8.5;
     const label = measureTextWidth(detailedLabel, minFontSize, `'IBM Plex Sans', sans-serif`, 600) <= measureLabelWidth
       ? detailedLabel
       : shortLabel;
-    const canShowLabel = segmentHeight >= (compact ? 8 : 14)
+    const canShowLabel = segmentHeight > 0
       && measureTextWidth(label, minFontSize, `'IBM Plex Sans', sans-serif`, 600) <= measureLabelWidth;
     const fontSize = canShowLabel
-      ? fitFontSize(label, measureLabelWidth, compact ? 8.5 : 11.5, `'IBM Plex Sans', sans-serif`, 600, minFontSize)
+      ? fitFontSize(label, measureLabelWidth, item.labelMaxFontSize, `'IBM Plex Sans', sans-serif`, 600, minFontSize)
       : 0;
 
     return `<g class="segment-measurement" pointer-events="none"><line x1="${measureX}" y1="${item.y1}" x2="${measureX}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - measureCap}" y1="${item.y1}" x2="${measureX + measureCap}" y2="${item.y1}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/><line x1="${measureX - measureCap}" y1="${item.y2}" x2="${measureX + measureCap}" y2="${item.y2}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.9}"/>${fontSize ? `<text x="${measureLabelX}" y="${item.midY}" text-anchor="start" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${fontSize}" font-weight="600" dominant-baseline="middle">${escapeXml(label)}</text>` : ''}</g>`;
@@ -2224,7 +2265,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<line x1="${cordelX}" y1="${holeBottom - 4}" x2="${cordelX}" y2="${cordelVisibleTop}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
           overlay.push(`<circle cx="${cordelX}" cy="${cordelVisibleTop}" r="${compact ? 2 : 3}" fill="${cordelColor}"/>`);
         }
-        if (cordelTag) {
+        if (cordelTag && !compact) {
           const desiredLabelY = cordelVisibleHeight > 0
             ? Math.min(holeBottom - 10, cordelVisibleTop + cordelVisibleHeight * 0.35)
             : holeBottom - 18;
@@ -2233,6 +2274,19 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<line x1="${cordelX}" y1="${labelY}" x2="${labelLaneX - 5}" y2="${labelY}" stroke="${cordelColor}" stroke-width="0.7"/>`);
           overlay.push(`<text x="${labelLaneX}" y="${labelY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 10.5}" font-weight="700" dominant-baseline="middle">${escapeXml(sideTag)}</text>`);
         }
+      }
+      if (compact && profile.initiator !== 'none') {
+        const compactInitiatorText = '<text x="' + (right - 8) + '" y="' + (top + 10) + '" text-anchor="end" fill="' + theme.muted + '" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700">' + escapeXml(initiatorLabel) + '</text>';
+        overlay.push(compactInitiatorText);
+      }
+      if (compact && cordelTag) {
+        const compactCordelText = '<text x="' + (right - 8) + '" y="' + (bottom - 4) + '" text-anchor="end" fill="#27AE60" font-family="IBM Plex Sans, sans-serif" font-size="8.5" font-weight="700">' + escapeXml(cordelTag) + '</text>';
+        overlay.push(compactCordelText);
+      }
+      for (const item of measurementItems) {
+        if (Math.abs(item.midY - item.sourceMidY) < 1.5) continue;
+        const leader = '<line x1="' + (measureX + measureCap + 1) + '" y1="' + item.sourceMidY + '" x2="' + (measureLabelX - 3) + '" y2="' + item.midY + '" stroke="' + theme.muted + '" stroke-width="0.65" opacity="0.55"/>';
+        overlay.push(leader);
       }
       return overlay.join('\n');
     })()}
@@ -2379,10 +2433,10 @@ function renderLayout(currentConfig) {
   const mainTop = headerH + 28;
   const bottom = 32;
   const panelGap = 32;
-  const meshW = 500;
+  const compact = state.profileCount >= 3;
+  const meshW = compact ? 340 : 500;
   const mainH = viewH - mainTop - bottom;
   const profileAreaW = viewW - (margin * 2) - meshW - panelGap;
-  const compact = state.profileCount >= 3;
   const observationH = 160;
   const meshH = mainH - observationH - panelGap;
   const cards = [];
@@ -2403,11 +2457,15 @@ function renderLayout(currentConfig) {
     const rows = 2;
     const cardW = (profileAreaW - panelGap) / cols;
     const cardH2 = (mainH - panelGap) / rows;
+    const profileStartX = margin + meshW + panelGap;
     let index = 0;
     for (let row = 0; row < rows; row += 1) {
       for (let col = 0; col < cols; col += 1) {
         if (index >= state.profileCount) break;
-        cards.push({ type: 'profile', x: margin + meshW + panelGap + col * (cardW + panelGap), y: mainTop + row * (cardH2 + panelGap), w: cardW, h: cardH2, index });
+        const cardX = state.profileCount === 3 && row === 1
+          ? profileStartX + (profileAreaW - cardW) / 2
+          : profileStartX + col * (cardW + panelGap);
+        cards.push({ type: 'profile', x: cardX, y: mainTop + row * (cardH2 + panelGap), w: cardW, h: cardH2, index });
         index += 1;
       }
     }
