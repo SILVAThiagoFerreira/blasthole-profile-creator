@@ -181,6 +181,7 @@ const COPY = {
       addProfile: 'Adicionar perfil',
       uploadLogo: 'Anexar logo',
       uploadMesh: 'Anexar imagem da malha',
+      removeMesh: 'Remover imagem',
     },
     preview: {
       eyebrow: 'Pré-visualização',
@@ -401,6 +402,7 @@ const COPY = {
       addProfile: 'Add profile',
       uploadLogo: 'Upload logo',
       uploadMesh: 'Upload mesh image',
+      removeMesh: 'Remove image',
     },
     preview: {
       eyebrow: 'Preview',
@@ -621,6 +623,7 @@ const COPY = {
       addProfile: 'Agregar perfil',
       uploadLogo: 'Adjuntar logo',
       uploadMesh: 'Adjuntar imagen de la malla',
+      removeMesh: 'Quitar imagen',
     },
     preview: {
       eyebrow: 'Vista previa',
@@ -841,6 +844,7 @@ const COPY = {
       addProfile: '添加剖面',
       uploadLogo: '上传标志',
       uploadMesh: '上传网格图片',
+      removeMesh: '移除图片',
     },
     preview: {
       eyebrow: '预览',
@@ -2331,8 +2335,13 @@ function renderMeshPanel(theme, box) {
   const bodyY = y + 62;
 
   if (state.mesh?.dataUrl) {
+    const removeW = 150;
     return `${titleMarkup}
-      <image href="${state.mesh.dataUrl}" x="${x}" y="${bodyY}" width="${w}" height="${h - 62}" preserveAspectRatio="xMidYMid meet"/>`;
+      <image href="${state.mesh.dataUrl}" x="${x}" y="${bodyY}" width="${w}" height="${h - 62}" preserveAspectRatio="xMidYMid meet"/>
+      <g data-preview-only="1" data-action="clear-mesh" style="cursor:pointer">
+        <rect x="${x + w - removeW - 8}" y="${bodyY + 8}" width="${removeW}" height="30" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+        <text x="${x + w - removeW / 2 - 8}" y="${bodyY + 28}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${escapeXml(copy.buttons.removeMesh)}</text>
+      </g>`;
   }
 
   const bodyH = h - 62;
@@ -2685,6 +2694,12 @@ function handleSVGClick(event) {
     document.getElementById('meshFile')?.click();
     return;
   }
+  if (target.closest('[data-action="clear-mesh"]')) {
+    state.mesh = { name: '', type: '', dataUrl: '' };
+    syncMeshChip();
+    scheduleUpdate();
+    return;
+  }
   const rect = target.closest('rect[data-segment-key]');
   if (!rect) return;
   const profileIdx = Number(rect.getAttribute('data-profile'));
@@ -3015,7 +3030,8 @@ async function updatePreview(force = false) {
   }
 
   const svg = renderLayout(config);
-  lastValidSvg = svg;
+  // Controles de preview (ex.: remover malha) ficam fora da exportação.
+  lastValidSvg = svg.replace(/<g data-preview-only[\s\S]*?<\/g>/g, '');
   lastValidState = clone(state);
   dom.previewCanvas.innerHTML = svg;
   showValidation([],
