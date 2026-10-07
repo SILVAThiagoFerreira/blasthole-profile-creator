@@ -1950,7 +1950,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const right = drawingBox.x + drawingBox.w;
   const bottom = drawingBox.y + drawingBox.h;
   const cx = left + drawingBox.w / 2;
-  const cylW = compact ? 50 : 60;
+  const cylW = compact ? 34 : 60;
   const cylX1 = cx - cylW / 2;
   const cylX2 = cx + cylW / 2;
   const holeTop = top + (compact ? 24 : 34);
