@@ -2335,16 +2335,17 @@ function renderMeshPanel(theme, box) {
       <image href="${state.mesh.dataUrl}" x="${x}" y="${bodyY}" width="${w}" height="${h - 62}" preserveAspectRatio="xMidYMid meet"/>`;
   }
 
-  const bodyH = h - 62 - 34;
+  const bodyH = h - 62;
   const cx = x + w / 2;
   const cy = bodyY + bodyH / 2 - 30;
   return `${titleMarkup}
+    <g data-action="attach-mesh" style="cursor:pointer">
     <rect x="${x}" y="${bodyY}" width="${w}" height="${bodyH}" rx="14" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="6 6"/>
     <circle cx="${cx}" cy="${cy}" r="30" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
     <path d="M${cx} ${cy + 12} V${cy - 12} M${cx - 8} ${cy - 4} L${cx} ${cy - 12} L${cx + 8} ${cy - 4}" fill="none" stroke="#94A3B8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
     <text x="${cx}" y="${cy + 64}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="700">${escapeXml(copy.svg.meshPrompt)}</text>
     <text x="${cx}" y="${cy + 90}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13">${escapeXml(copy.svg.meshNoAttachment)}</text>
-    <text x="${x}" y="${bodyY + bodyH + 24}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13">${escapeXml(copy.svg.referenceModeDesc)}</text>`;
+    </g>`;
 }
 
 function renderHeader(theme, box) {
@@ -2680,6 +2681,10 @@ function renderAutoCalcSummary(profile, lang) {
 function handleSVGClick(event) {
   const target = event.target;
   if (!(target instanceof SVGElement)) return;
+  if (target.closest('[data-action="attach-mesh"]')) {
+    document.getElementById('meshFile')?.click();
+    return;
+  }
   const rect = target.closest('rect[data-segment-key]');
   if (!rect) return;
   const profileIdx = Number(rect.getAttribute('data-profile'));
