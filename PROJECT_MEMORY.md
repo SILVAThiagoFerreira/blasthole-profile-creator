@@ -1,6 +1,6 @@
 # Project Memory
 
-- Título do projeto: Blasthole Profile Creator.
+- Título do projeto: Criador de Perfil de Carga.
 
 ## Comportamento Atual
 

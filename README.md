@@ -1,4 +1,4 @@
-# Blasthole Profile Creator
+# Criador de Perfil de Carga
 
 Site estático para construção de perfil de carga, pronto para GitHub Pages, com preview vetorial e exportação local.
 

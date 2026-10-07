@@ -1,6 +1,6 @@
 const FALLBACK_CONFIG = {
   app: {
-    title: 'Blasthole Profile Studio',
+    title: 'Criador de Perfil de Carga',
     subtitle: 'Workspace técnico para perfis de carga.',
     default_profile_type: 'DOCUMENTO DE USO TÉCNICO',
     default_language: 'pt-BR',
@@ -137,11 +137,11 @@ const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'es', 'en', 'zh-CN'];
 const COPY = {
   'pt-BR': {
     meta: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       description: 'Workspace profissional para criação, validação e exportação local de perfis de carga.',
     },
     brand: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -307,7 +307,7 @@ const COPY = {
       saveFailure: 'Não foi possível salvar a memória local.',
     },
     svg: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       desc: 'Perfil de carga editável com composição vetorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: '',
@@ -319,6 +319,7 @@ const COPY = {
       referenceModeDesc: 'Somente imagem anexada, sem geração sintética da malha.',
       dataTitle: 'DADOS TÉCNICOS',
       dataTitleCompact: 'DADOS',
+      groups: { hole: 'Furo e carga', initiation: 'Iniciação e reforço', orientation: 'Orientação e densidade' },
       bench: 'BANCO',
       benchUnit: 'M',
       footerLegend: {
@@ -355,11 +356,11 @@ const COPY = {
   },
   en: {
     meta: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       description: 'Professional workspace for creating, validating, and exporting charge profiles locally.',
     },
     brand: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -525,7 +526,7 @@ const COPY = {
       saveFailure: 'Could not save local memory.',
     },
     svg: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       desc: 'Editable charge profile with vector composition.',
       headerTitle: 'CHARGE PROFILE',
       headerBadge: '',
@@ -537,6 +538,7 @@ const COPY = {
       referenceModeDesc: 'Attached image only, no synthetic mesh generation.',
       dataTitle: 'TECHNICAL DATA',
       dataTitleCompact: 'DATA',
+      groups: { hole: 'Hole and charge', initiation: 'Initiation and booster', orientation: 'Orientation and density' },
       bench: 'BENCH',
       benchUnit: 'M',
       footerLegend: {
@@ -573,11 +575,11 @@ const COPY = {
   },
   es: {
     meta: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       description: 'Workspace profesional para crear, validar y exportar perfiles de carga localmente.',
     },
     brand: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -743,7 +745,7 @@ const COPY = {
       saveFailure: 'No fue posible guardar la memoria local.',
     },
     svg: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       desc: 'Perfil de carga editable con composición vectorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: '',
@@ -755,6 +757,7 @@ const COPY = {
       referenceModeDesc: 'Solo imagen adjunta, sin generación sintética de malla.',
       dataTitle: 'DATOS TÉCNICOS',
       dataTitleCompact: 'DATOS',
+      groups: { hole: 'Barreno y carga', initiation: 'Iniciación y refuerzo', orientation: 'Orientación y densidad' },
       bench: 'BANCO',
       benchUnit: 'M',
       footerLegend: {
@@ -791,11 +794,11 @@ const COPY = {
   },
   'zh-CN': {
     meta: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       description: '用于本地创建、验证并导出装药剖面的专业工作区。',
     },
     brand: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -961,7 +964,7 @@ const COPY = {
       saveFailure: '无法保存本地记忆。',
     },
     svg: {
-      title: 'Blasthole Profile Studio',
+      title: 'Criador de Perfil de Carga',
       desc: '可编辑的装药剖面，采用矢量组成。',
       headerTitle: '装药剖面',
       headerBadge: '',
@@ -973,6 +976,7 @@ const COPY = {
       referenceModeDesc: '仅使用附加图片，不生成合成网格。',
       dataTitle: '技术数据',
       dataTitleCompact: '数据',
+      groups: { hole: '炮孔与装药', initiation: '起爆与增强件', orientation: '方位与密度' },
       bench: '台阶',
       benchUnit: 'M',
       footerLegend: {
@@ -1944,7 +1948,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const right = drawingBox.x + drawingBox.w;
   const bottom = drawingBox.y + drawingBox.h;
   const cx = left + drawingBox.w / 2;
-  const cylW = compact ? 40 : 60;
+  const cylW = compact ? 50 : 60;
   const cylX1 = cx - cylW / 2;
   const cylX2 = cx + cylW / 2;
   const holeTop = top + (compact ? 24 : 34);
@@ -2131,29 +2135,55 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ['density', fieldLabel('density', lang), `${formatDecimal(profile.densidade, 2, lang)} g/cm3`, 'density'],
   ];
 
+  const metricGroups = [
+    { title: copy.svg.groups.hole, keys: ['diameter', 'height', 'subdrill', 'stemming', 'blastbag', 'airdeck', 'charge', 'cartridge'] },
+    { title: copy.svg.groups.initiation, keys: ['initiator', 'booster', 'cordel'] },
+    { title: copy.svg.groups.orientation, keys: ['inclination', 'azimuth', 'density'] },
+  ]
+    .map((group) => ({ ...group, rows: metricRows.filter((row) => group.keys.includes(row[0])) }))
+    .filter((group) => group.rows.length);
+  const headerOffset = compact ? 36 : 46;
+  const groupHeadH = compact ? 0 : 22;
+  const groupGap = compact ? 6 : 10;
+  const availableRowsH = infoBox.h - headerOffset - 12 - metricGroups.length * (groupHeadH + groupGap);
   const rowHeight = compact
-    ? Math.min(26, Math.max(20, (infoBox.h - 36) / metricRows.length))
-    : (metricRows.length > 9 ? 39 : 44);
-  const rowStart = infoBox.y + (compact ? 32 : 44);
-  const rowsMarkup = metricRows.map((row, idx) => renderMetricRow({
-    x: infoBox.x + 8,
-    y: rowStart + idx * rowHeight,
-    w: infoBox.w - 16,
-    h: rowHeight,
-    label: row[1],
-    value: row[2],
-    kind: row[3],
-    color: accent,
-    theme,
-    alternate: idx % 2 === 1,
-    compact,
-  })).join('');
+    ? Math.min(26, Math.max(18, availableRowsH / metricRows.length))
+    : Math.min(44, Math.max(30, availableRowsH / metricRows.length));
+  let cursorY = infoBox.y + headerOffset;
+  let rowIndex = 0;
+  const rowsMarkup = metricGroups.map((group, groupIndex) => {
+    const groupLabel = compact
+      ? ''
+      : `<text x="${infoBox.x + 16}" y="${cursorY + 16}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="12" font-weight="700" letter-spacing="0.06em">${escapeXml(group.title.toUpperCase())}</text>`;
+    cursorY += groupHeadH;
+    const rows = group.rows.map((row) => {
+      const markup = renderMetricRow({
+        x: infoBox.x + 8,
+        y: cursorY,
+        w: infoBox.w - 16,
+        h: rowHeight,
+        label: row[1],
+        value: row[2],
+        kind: row[3],
+        color: accent,
+        theme,
+        alternate: rowIndex % 2 === 1,
+        compact,
+      });
+      cursorY += rowHeight;
+      rowIndex += 1;
+      return markup;
+    }).join('');
+    const isLast = groupIndex === metricGroups.length - 1;
+    const divider = compact && !isLast
+      ? `<line x1="${infoBox.x + 12}" y1="${cursorY + groupGap / 2}" x2="${infoBox.x + infoBox.w - 12}" y2="${cursorY + groupGap / 2}" stroke="#D1D5DB" stroke-width="0.8"/>`
+      : '';
+    cursorY += groupGap;
+    return groupLabel + rows + divider;
+  }).join('');
 
   return `
-    <g filter="url(#shadow)">
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
-    </g>
-    <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="18" fill="none" stroke="#FFFFFF"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
     <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${accentSoft}"/>
 
     <circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="${accent}"/>
@@ -2275,14 +2305,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<text x="${labelLaneX}" y="${labelY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 10.5}" font-weight="700" dominant-baseline="middle">${escapeXml(sideTag)}</text>`);
         }
       }
-      if (compact && profile.initiator !== 'none') {
-        const compactInitiatorText = '<text x="' + (right - 8) + '" y="' + (top + 10) + '" text-anchor="end" fill="' + theme.muted + '" font-family="IBM Plex Sans, sans-serif" font-size="9" font-weight="700">' + escapeXml(initiatorLabel) + '</text>';
-        overlay.push(compactInitiatorText);
-      }
-      if (compact && cordelTag) {
-        const compactCordelText = '<text x="' + (right - 8) + '" y="' + (bottom - 4) + '" text-anchor="end" fill="#27AE60" font-family="IBM Plex Sans, sans-serif" font-size="8.5" font-weight="700">' + escapeXml(cordelTag) + '</text>';
-        overlay.push(compactCordelText);
-      }
       for (const item of measurementItems) {
         if (Math.abs(item.midY - item.sourceMidY) < 1.5) continue;
         const leader = '<line x1="' + (measureX + measureCap + 1) + '" y1="' + item.sourceMidY + '" x2="' + (measureLabelX - 3) + '" y2="' + item.midY + '" stroke="' + theme.muted + '" stroke-width="0.65" opacity="0.55"/>';
@@ -2294,11 +2316,11 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <rect x="${cylX1}" y="${holeTop}" width="${cylW}" height="${holeBottom - holeTop}" rx="${compact ? 12 : 14}" fill="none" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeTop + 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#F0F2F5" stroke="${theme.title}" stroke-width="2"/>
     <ellipse cx="${cx}" cy="${holeBottom - 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#2D3748" stroke="${theme.title}" stroke-width="2"/>
-    <text x="${left + 2}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8.5 : 10.5}" font-weight="600">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>
+    ${compact ? '' : `<text x="${left + 2}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-weight="600">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>`}
 
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
     <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 5}" fill="${accent}" rx="2.5"/>
-    <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 16 : 18)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
+    <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 24 : 26)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
     ${rowsMarkup}
   `;
 }
@@ -2308,10 +2330,7 @@ function renderMeshPanel(theme, box) {
   const { x, y, w, h } = box;
   if (state.mesh?.dataUrl) {
     return `
-      <g filter="url(#shadow)">
-        <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
-      </g>
-      <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="18" fill="none" stroke="#FFFFFF"/>
+      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
       <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${theme.accent_red}"/>
       <text x="${x + 26}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="18" font-weight="700">${copy.svg.meshTitle}</text>
       <rect x="${x + 26}" y="${y + 58}" width="48" height="3" rx="1.5" fill="${theme.accent_red}"/>
@@ -2331,10 +2350,7 @@ function renderMeshPanel(theme, box) {
   }
 
   return `
-    <g filter="url(#shadow)">
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
-    </g>
-    <rect x="${x + 2}" y="${y + 2}" width="${w - 4}" height="${h - 4}" rx="18" fill="none" stroke="#FFFFFF"/>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
     <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${theme.accent_red}"/>
     <text x="${x + 26}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="18" font-weight="700">${copy.svg.meshTitle}</text>
     <rect x="${x + 26}" y="${y + 58}" width="48" height="3" rx="1.5" fill="${theme.accent_red}"/>
@@ -2384,29 +2400,23 @@ function renderHeader(theme, box) {
   `;
 }
 
-function renderFooter(theme, box, showLegend = false) {
+function renderFooter(theme, box) {
   const copy = getCopy();
-  const { x, y, w, h } = box;
+  const { x, y, w } = box;
   const legend = [
     [copy.svg.footerLegend.production, theme.accent_blue],
     [copy.svg.footerLegend.cushioning, theme.accent_orange],
     [copy.svg.footerLegend.contour, theme.accent_red],
   ];
 
-  const legendMarkup = showLegend ? legend.map(([label, color], index) => {
+  const legendMarkup = legend.map(([label, color], index) => {
     const posX = x + 48 + legend.slice(0, index).reduce((acc, [previousLabel]) => acc + measureTextWidth(previousLabel, 14, `'IBM Plex Sans', sans-serif`, 700) + 32, 0);
     return `<rect x="${posX}" y="${y + 14}" width="12" height="12" rx="3" fill="${color}"/><text x="${posX + 18}" y="${y + 25}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${escapeXml(label)}</text>`;
-  }).join('') : '';
-
-  const observationLines = wrapText(state.observation, w - 96, 16, `'IBM Plex Sans', sans-serif`, 400).slice(0, 3);
-  const observationMarkup = observationLines.length
-    ? textBlock(x + 48, y + (showLegend ? 48 : 24), observationLines, { size: 14, weight: 400, fill: theme.muted })
-    : '';
+  }).join('');
 
   return `
     <line x1="${x + 48}" y1="${y}" x2="${x + w - 48}" y2="${y}" stroke="#E5E7EB" stroke-width="1"/>
     ${legendMarkup}
-    ${observationMarkup}
   `;
 }
 
@@ -2415,9 +2425,7 @@ function renderObservationPanel(theme, box) {
   const { x, y, w, h } = box;
   const lines = wrapText(state.observation || copy.defaults.observation, w - 52, 15, `'IBM Plex Sans', sans-serif`, 400).slice(0, 4);
   return `
-    <g filter="url(#shadow)">
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="#FFFFFF" stroke="${theme.panel_border}"/>
-    </g>
+    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="#FFFFFF" stroke="${theme.panel_border}"/>
     <rect x="${x + 16}" y="${y + 14}" width="38" height="3" rx="1.5" fill="${theme.accent_red}"/>
     <text x="${x + 20}" y="${y + 38}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">${escapeXml(copy.fieldLabels.observation)}</text>
     ${textBlock(x + 20, y + 60, lines, { size: 13, weight: 400, fill: theme.muted, lineHeight: 1.4 })}
@@ -2478,22 +2486,15 @@ function renderLayout(currentConfig) {
   }).join('');
 
   const header = renderHeader(theme, { x: 0, y: 0, w: viewW, h: headerH });
-  const footer = compact ? '' : renderFooter(theme, { x: 0, y: viewH - bottom, w: viewW, h: bottom }, Boolean(state.mesh?.dataUrl));
+  const footer = compact || !state.mesh?.dataUrl ? '' : renderFooter(theme, { x: 0, y: viewH - bottom, w: viewW, h: bottom });
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">
       <title id="svgTitle">${copy.svg.title}</title>
       <desc id="svgDesc">${copy.svg.desc}</desc>
       <defs>
-        <linearGradient id="pageBg" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="${theme.bg}"/>
-          <stop offset="100%" stop-color="#F8F9FB"/>
-        </linearGradient>
-        <filter id="shadow" x="-12%" y="-12%" width="124%" height="124%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="${rgbToHex(theme.shadow[0], theme.shadow[1], theme.shadow[2])}" flood-opacity="${(theme.shadow[3] || 35) / 100}"/>
-        </filter>
       </defs>
-      <rect width="100%" height="100%" fill="url(#pageBg)"/>
+      <rect width="100%" height="100%" fill="${theme.bg}"/>
       ${header}
       ${content}
       ${footer}
