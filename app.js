@@ -9,7 +9,7 @@ const FALLBACK_CONFIG = {
     output_dir: 'output',
     log_dir: 'logs',
     state_dir: 'state',
-    logo_path: 'VISUAL/OpenBlast/LOGO OPENBLAST TRANSPARENTE.png',
+    logo_path: 'VISUAL/Enaex Brasil.png',
   },
   layout: {
     scale: 2,
@@ -282,7 +282,7 @@ const COPY = {
       profileNamePrefix: 'Perfil',
     },
     fileChips: {
-      logoDefault: 'Logo OpenBlast padrão',
+      logoDefault: 'Logo Enaex padrão',
       meshDefault: 'Nenhuma malha anexada',
     },
     memory: {
@@ -320,6 +320,7 @@ const COPY = {
       dataTitle: 'DADOS TÉCNICOS',
       dataTitleCompact: 'DADOS',
       groups: { hole: 'Furo e carga', initiation: 'Iniciação e reforço', orientation: 'Orientação e densidade' },
+      confidential: 'ESTRITAMENTE PRIVADO E CONFIDENCIAL',
       bench: 'BANCO',
       benchUnit: 'M',
       footerLegend: {
@@ -501,7 +502,7 @@ const COPY = {
       profileNamePrefix: 'Profile',
     },
     fileChips: {
-      logoDefault: 'Default OpenBlast logo',
+      logoDefault: 'Default Enaex logo',
       meshDefault: 'No mesh attached',
     },
     memory: {
@@ -539,6 +540,7 @@ const COPY = {
       dataTitle: 'TECHNICAL DATA',
       dataTitleCompact: 'DATA',
       groups: { hole: 'Hole and charge', initiation: 'Initiation and booster', orientation: 'Orientation and density' },
+      confidential: 'STRICTLY PRIVATE AND CONFIDENTIAL',
       bench: 'BENCH',
       benchUnit: 'M',
       footerLegend: {
@@ -720,7 +722,7 @@ const COPY = {
       profileNamePrefix: 'Perfil',
     },
     fileChips: {
-      logoDefault: 'Logo OpenBlast predeterminado',
+      logoDefault: 'Logo Enaex predeterminado',
       meshDefault: 'Ninguna malla adjunta',
     },
     memory: {
@@ -758,6 +760,7 @@ const COPY = {
       dataTitle: 'DATOS TÉCNICOS',
       dataTitleCompact: 'DATOS',
       groups: { hole: 'Barreno y carga', initiation: 'Iniciación y refuerzo', orientation: 'Orientación y densidad' },
+      confidential: 'ESTRICTAMENTE PRIVADO Y CONFIDENCIAL',
       bench: 'BANCO',
       benchUnit: 'M',
       footerLegend: {
@@ -939,7 +942,7 @@ const COPY = {
       profileNamePrefix: '剖面',
     },
     fileChips: {
-      logoDefault: '默认 OpenBlast Logo',
+      logoDefault: '默认 Enaex Logo',
       meshDefault: '未附加网格',
     },
     memory: {
@@ -977,6 +980,7 @@ const COPY = {
       dataTitle: '技术数据',
       dataTitleCompact: '数据',
       groups: { hole: '炮孔与装药', initiation: '起爆与增强件', orientation: '方位与密度' },
+      confidential: '严格保密',
       bench: '台阶',
       benchUnit: 'M',
       footerLegend: {
@@ -1917,7 +1921,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const { x, y, w, h } = box;
   const accentInfo = KIND_ACCENTS[profile.kind] || KIND_ACCENTS.personalizado;
   const accent = accentInfo.accent;
-  const accentSoft = accentInfo.soft;
   const name = shortText(profile.name || defaultProfileName(lang, index), compact ? 18 : 22).toUpperCase();
   const badgeLetter = (() => {
     const parts = String(profile.name || '').trim().split(/\s+/);
@@ -1925,24 +1928,23 @@ function renderProfileCard(profile, theme, box, compact, index) {
     return String(profile.name || '?').trim()[0]?.toUpperCase() || '?';
   })();
 
-  const titleSize = compact ? 17 : 20;
-  const subSize = compact ? 10 : 12;
-  const badgeR = compact ? 20 : 22;
-  const badgeCx = x + (compact ? 44 : 46);
-  const badgeCy = y + (compact ? 46 : 50);
-  const profileTitleY = y + (compact ? 40 : 42);
-  const profileSubtitleY = y + (compact ? 62 : 66);
-  const dividerY = y + (compact ? 84 : 96);
-  const contentTop = compact ? y + 90 : y + 112;
-  const contentBottomPad = compact ? 22 : 32;
+  const titleSize = compact ? 19 : 22;
+  const subSize = compact ? 11 : 13;
+  const badgeR = compact ? 13 : 15;
+  const badgeCx = x + 16 + badgeR;
+  const badgeCy = y + 24;
+  const profileTitleY = y + 32;
+  const dividerY = y + 44;
+  const contentTop = y + 62;
+  const contentBottomPad = compact ? 14 : 22;
   const compactDrawingW = w >= 700 ? 250 : 210;
   const compactInfoX = w >= 700 ? 282 : 244;
   const drawingBox = compact
     ? { x: x + 18, y: contentTop, w: compactDrawingW, h: h - (contentTop - y) - contentBottomPad }
-    : { x: x + 34, y: y + 112, w: 160, h: h - 220 };
+    : { x: x + 34, y: contentTop, w: 160, h: h - (contentTop - y) - contentBottomPad };
   const infoBox = compact
     ? { x: x + compactInfoX, y: contentTop, w: w - compactInfoX - 24, h: h - (contentTop - y) - contentBottomPad }
-    : { x: x + 296, y: y + 112, w: w - 324, h: h - 220 };
+    : { x: x + 296, y: contentTop, w: w - 324, h: h - (contentTop - y) - contentBottomPad };
   const left = drawingBox.x;
   const top = drawingBox.y;
   const right = drawingBox.x + drawingBox.w;
@@ -2182,19 +2184,15 @@ function renderProfileCard(profile, theme, box, compact, index) {
     return groupLabel + rows + divider;
   }).join('');
 
+  const profileSubtitle = `${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM`;
+  const nameWidth = measureTextWidth(name, titleSize, `'IBM Plex Sans', sans-serif`, 700);
   return `
-    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
-    <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${accentSoft}"/>
-
     <circle cx="${badgeCx}" cy="${badgeCy}" r="${badgeR}" fill="${accent}"/>
-    <text x="${badgeCx}" y="${badgeCy + 6}" fill="#FFFFFF" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 18 : 20}" font-weight="700">${escapeXml(badgeLetter)}</text>
+    <text x="${badgeCx}" y="${badgeCy + badgeR * 0.36}" fill="#FFFFFF" text-anchor="middle" font-family="IBM Plex Sans, sans-serif" font-size="${badgeR * 0.95}" font-weight="700">${escapeXml(badgeLetter)}</text>
+    <text x="${badgeCx + badgeR + 12}" y="${profileTitleY}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
+    <text x="${badgeCx + badgeR + 24 + nameWidth}" y="${profileTitleY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(profileSubtitle)}</text>
+    <rect x="${x + 16}" y="${dividerY}" width="${w - 32}" height="2" fill="${accent}"/>
 
-    <text x="${x + (compact ? 82 : 82)}" y="${profileTitleY}" fill="${accent}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(name)}</text>
-    <text x="${x + (compact ? 82 : 82)}" y="${profileSubtitleY}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${subSize}" font-weight="700">${escapeXml(`${kindLabel(profile.kind).toUpperCase()}  •  ${Math.round(profile.diametro_furo)} MM`)}</text>
-
-    <rect x="${x + 18}" y="${dividerY}" width="${w - 36}" height="3" rx="1.5" fill="${accent}"/>
-
-    <rect x="${drawingBox.x}" y="${drawingBox.y}" width="${drawingBox.w}" height="${drawingBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
     <line x1="${left + 12}" y1="${collarY}" x2="${right - 12}" y2="${collarY}" stroke="#CBD5E1" stroke-width="1.4"/>
     <line x1="${left + 18}" y1="${collarY + (compact ? 4 : 5)}" x2="${right - 18}" y2="${collarY + (compact ? 4 : 5)}" stroke="#EEF2F7" stroke-width="1" stroke-dasharray="2 5"/>
     ${segmentMarkup.join('')}
@@ -2318,89 +2316,62 @@ function renderProfileCard(profile, theme, box, compact, index) {
     <ellipse cx="${cx}" cy="${holeBottom - 1}" rx="${cylW / 2}" ry="${compact ? 5 : 7}" fill="#2D3748" stroke="${theme.title}" stroke-width="2"/>
     ${compact ? '' : `<text x="${left + 2}" y="${bottom - 4}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-weight="600">${escapeXml(`${copy.svg.bench} ${formatDecimal(profile.altura_banco, 2, lang)} ${copy.svg.benchUnit}`)}</text>`}
 
-    <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${infoBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <rect x="${infoBox.x}" y="${infoBox.y}" width="${infoBox.w}" height="${compact ? 5 : 5}" fill="${accent}" rx="2.5"/>
-    <text x="${infoBox.x + 12}" y="${infoBox.y + (compact ? 24 : 26)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 13 : 15}" font-weight="700">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
+    <text x="${infoBox.x + 8}" y="${infoBox.y + (compact ? 18 : 22)}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 12 : 13}" font-weight="700" letter-spacing="0.06em">${compact ? copy.svg.dataTitleCompact : copy.svg.dataTitle}</text>
     ${rowsMarkup}
   `;
 }
 
+const SHEET_MARGIN = 64;
+
 function renderMeshPanel(theme, box) {
   const copy = getCopy();
   const { x, y, w, h } = box;
+  const titleMarkup = `<text x="${x}" y="${y + 32}" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="${fitFontSize(copy.svg.meshTitle, w, 22, `'IBM Plex Sans', sans-serif`, 700, 16)}" font-weight="700">${escapeXml(copy.svg.meshTitle)}</text>
+    <rect x="${x}" y="${y + 44}" width="${w}" height="1.5" fill="#D9DEE5"/>`;
+  const bodyY = y + 62;
+
   if (state.mesh?.dataUrl) {
-    return `
-      <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
-      <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${theme.accent_red}"/>
-      <text x="${x + 26}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="18" font-weight="700">${copy.svg.meshTitle}</text>
-      <rect x="${x + 26}" y="${y + 58}" width="48" height="3" rx="1.5" fill="${theme.accent_red}"/>
-      <rect x="${x + 26}" y="${y + 78}" width="130" height="26" rx="8" fill="#F8FAFC" stroke="#E5E7EB"/>
-      <text x="${x + 38}" y="${y + 96}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">${copy.svg.meshAttached}</text>
-      <rect x="${x + 32}" y="${y + 128}" width="${w - 64}" height="${h - 176}" rx="20" fill="#F9FAFB" stroke="#E5E7EB"/>
-      <image href="${state.mesh.dataUrl}" x="${x + 44}" y="${y + 140}" width="${w - 88}" height="${h - 200}" preserveAspectRatio="xMidYMid meet"/>
-    `;
+    return `${titleMarkup}
+      <image href="${state.mesh.dataUrl}" x="${x}" y="${bodyY}" width="${w}" height="${h - 62}" preserveAspectRatio="xMidYMid meet"/>`;
   }
 
-  const grid = [];
-  for (let gx = x + 16; gx <= x + w - 16; gx += 18) {
-    grid.push(`<line x1="${gx}" y1="${y + 18}" x2="${gx}" y2="${y + h - 16}" stroke="rgba(29,111,184,0.06)" stroke-width="1"/>`);
-  }
-  for (let gy = y + 18; gy <= y + h - 16; gy += 18) {
-    grid.push(`<line x1="${x + 16}" y1="${gy}" x2="${x + w - 16}" y2="${gy}" stroke="rgba(29,111,184,0.05)" stroke-width="1"/>`);
-  }
-
-  return `
-    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="${theme.panel_bg}" stroke="${theme.panel_border}"/>
-    <rect x="${x + 16}" y="${y + 16}" width="${w - 32}" height="5" rx="2.5" fill="${theme.accent_red}"/>
-    <text x="${x + 26}" y="${y + 42}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="18" font-weight="700">${copy.svg.meshTitle}</text>
-    <rect x="${x + 26}" y="${y + 58}" width="48" height="3" rx="1.5" fill="${theme.accent_red}"/>
-    <text x="${x + 26}" y="${y + 78}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13">${escapeXml(state.polygonName)}</text>
-    <rect x="${x + 32}" y="${y + 104}" width="${w - 64}" height="${h - 194}" rx="16" fill="#F8FAFC" stroke="#E5E7EB" stroke-dasharray="6 6"/>
-    ${grid.join('')}
-    <circle cx="${x + w / 2}" cy="${y + 200}" r="30" fill="#F9FAFB" stroke="#D1D5DB"/>
-    <path d="M${x + w / 2} ${y + 190} V${y + 210}" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/>
-    <path d="M${x + w / 2} ${y + 190} l-6 9 h12 Z" fill="#9CA3AF"/>
-    <text x="${x + w / 2}" y="${y + 248}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${copy.svg.meshPrompt}</text>
-    <text x="${x + w / 2}" y="${y + 270}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11">${copy.svg.meshNoAttachment}</text>
-    <rect x="${x + w / 2 - 58}" y="${y + h - 92}" width="116" height="26" rx="10" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <text x="${x + w / 2}" y="${y + h - 74}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="10" font-weight="700">${copy.svg.referenceMode}</text>
-    <text x="${x + 34}" y="${y + h - 26}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="11">${copy.svg.referenceModeDesc}</text>
-  `;
+  const bodyH = h - 62 - 34;
+  const cx = x + w / 2;
+  const cy = bodyY + bodyH / 2 - 30;
+  return `${titleMarkup}
+    <rect x="${x}" y="${bodyY}" width="${w}" height="${bodyH}" rx="14" fill="#F8FAFC" stroke="#CBD5E1" stroke-width="1.2" stroke-dasharray="6 6"/>
+    <circle cx="${cx}" cy="${cy}" r="30" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+    <path d="M${cx} ${cy + 12} V${cy - 12} M${cx - 8} ${cy - 4} L${cx} ${cy - 12} L${cx + 8} ${cy - 4}" fill="none" stroke="#94A3B8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="${cx}" y="${cy + 64}" text-anchor="middle" fill="${theme.text}" font-family="IBM Plex Sans, sans-serif" font-size="16" font-weight="700">${escapeXml(copy.svg.meshPrompt)}</text>
+    <text x="${cx}" y="${cy + 90}" text-anchor="middle" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13">${escapeXml(copy.svg.meshNoAttachment)}</text>
+    <text x="${x}" y="${bodyY + bodyH + 24}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13">${escapeXml(copy.svg.referenceModeDesc)}</text>`;
 }
 
 function renderHeader(theme, box) {
   const copy = getCopy();
-  const { x, y, w, h } = box;
-  const title = copy.svg.headerTitle;
-  const titleSize = fitFontSize(title, w - 560, 30, `'IBM Plex Sans', sans-serif`, 700, 22);
-  const polygonSize = fitFontSize(state.polygonName, w - 560, 24, `'IBM Plex Sans', sans-serif`, 700, 18);
-  const logoBox = { x: x + 40, y: y + 14, w: 170, h: 80 };
-  const rightBadgeText = String(state.profileType || copy.defaults.profileType).toUpperCase();
-  const badgeFont = 17;
-  const badgeTextWidth = measureTextWidth(rightBadgeText, badgeFont, `'IBM Plex Sans', sans-serif`, 700);
-  const badgeW = Math.max(200, badgeTextWidth + 48);
-  const badgeX = x + w - badgeW - 40;
+  const { x, y, w } = box;
+  const logoW = 200;
+  const logoH = 60;
+  const logoX = x + w - SHEET_MARGIN - logoW;
+  const logoY = y + 40;
+  const logoUrl = state.logo?.dataUrl || logoDataUrl;
+  const logoMarkup = logoUrl
+    ? `<image href="${logoUrl}" x="${logoX}" y="${logoY}" width="${logoW}" height="${logoH}" preserveAspectRatio="xMaxYMid meet"/>`
+    : `<text x="${logoX}" y="${logoY + 40}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="26" font-weight="700">ENAEX</text>`;
+  const availableW = w - SHEET_MARGIN * 2 - logoW - 48;
+  const titleSize = fitFontSize(copy.svg.headerTitle, availableW, 46, `'IBM Plex Sans', sans-serif`, 700, 28);
+  const polygonSize = fitFontSize(state.polygonName, availableW, 24, `'IBM Plex Sans', sans-serif`, 600, 16);
+  const profileType = String(state.profileType || copy.defaults.profileType).toUpperCase();
 
   return `
-    <rect x="0" y="0" width="${w}" height="${h}" fill="#FFFFFF"/>
-    <rect x="0" y="0" width="${w}" height="5" fill="${theme.accent_red}"/>
-    <line x1="${x + 40}" y1="${y + h - 1}" x2="${x + w - 40}" y2="${y + h - 1}" stroke="#EEF2F7" stroke-width="1"/>
-    <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="${logoBox.h}" rx="14" fill="#FFFFFF" stroke="#E5E7EB"/>
-    <rect x="${logoBox.x}" y="${logoBox.y}" width="${logoBox.w}" height="5" rx="2.5" fill="${theme.accent_red}"/>
-    ${(() => {
-      const logoUrl = state.logo?.dataUrl || logoDataUrl;
-      return logoUrl
-        ? `<image href="${logoUrl}" x="${logoBox.x + 12}" y="${logoBox.y + 14}" width="${logoBox.w - 24}" height="${logoBox.h - 22}" preserveAspectRatio="xMidYMid meet"/>`
-        : `<text x="${logoBox.x + 18}" y="${logoBox.y + 56}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="22" font-weight="700">OPENBLAST</text>`;
-    })()}
-    <text x="${x + 240}" y="${y + 40}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(title)}</text>
-    <text x="${x + 240}" y="${y + 74}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="700">${escapeXml(state.polygonName)}</text>
-    <rect x="${badgeX}" y="${y + 28}" width="${badgeW}" height="52" rx="14" fill="${theme.accent_red}"/>
-    <text x="${badgeX + badgeW / 2}" y="${y + 60}" text-anchor="middle" fill="#FFFFFF" font-family="IBM Plex Sans, sans-serif" font-size="${badgeFont}" font-weight="700">${escapeXml(rightBadgeText)}</text>
+    <text x="${x + SHEET_MARGIN}" y="${y + 88}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="${titleSize}" font-weight="700">${escapeXml(copy.svg.headerTitle)}</text>
+    <text x="${x + SHEET_MARGIN}" y="${y + 126}" fill="#4B5563" font-family="IBM Plex Sans, sans-serif" font-size="${polygonSize}" font-weight="600">${escapeXml(state.polygonName)}</text>
+    ${logoMarkup}
+    <text x="${x + w - SHEET_MARGIN}" y="${y + 132}" text-anchor="end" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="15" font-weight="700" letter-spacing="0.06em">${escapeXml(profileType)}</text>
   `;
 }
 
-function renderFooter(theme, box) {
+function renderFooter(theme, box, showLegend) {
   const copy = getCopy();
   const { x, y, w } = box;
   const legend = [
@@ -2409,94 +2380,85 @@ function renderFooter(theme, box) {
     [copy.svg.footerLegend.contour, theme.accent_red],
   ];
 
-  const legendMarkup = legend.map(([label, color], index) => {
-    const posX = x + 48 + legend.slice(0, index).reduce((acc, [previousLabel]) => acc + measureTextWidth(previousLabel, 14, `'IBM Plex Sans', sans-serif`, 700) + 32, 0);
-    return `<rect x="${posX}" y="${y + 14}" width="12" height="12" rx="3" fill="${color}"/><text x="${posX + 18}" y="${y + 25}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${escapeXml(label)}</text>`;
-  }).join('');
+  let posX = x + SHEET_MARGIN;
+  const legendMarkup = showLegend ? legend.map(([label, color]) => {
+    const markup = `<rect x="${posX}" y="${y + 20}" width="12" height="12" rx="3" fill="${color}"/><text x="${posX + 18}" y="${y + 31}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700">${escapeXml(label)}</text>`;
+    posX += measureTextWidth(label, 13, `'IBM Plex Sans', sans-serif`, 700) + 50;
+    return markup;
+  }).join('') : '';
 
   return `
-    <line x1="${x + 48}" y1="${y}" x2="${x + w - 48}" y2="${y}" stroke="#E5E7EB" stroke-width="1"/>
+    <rect x="${x + SHEET_MARGIN}" y="${y}" width="${w - SHEET_MARGIN * 2}" height="2.5" fill="#374151"/>
     ${legendMarkup}
+    <text x="${x + w - SHEET_MARGIN}" y="${y + 34}" text-anchor="end" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700" letter-spacing="0.08em">${escapeXml(copy.svg.confidential)}</text>
   `;
 }
 
-function renderObservationPanel(theme, box) {
+function renderObservationBlock(theme, x, y, w) {
   const copy = getCopy();
-  const { x, y, w, h } = box;
-  const lines = wrapText(state.observation || copy.defaults.observation, w - 52, 15, `'IBM Plex Sans', sans-serif`, 400).slice(0, 4);
+  const text = String(state.observation || '').trim();
+  if (!text) return '';
+  const lines = wrapText(text, w, 20, `'IBM Plex Sans', sans-serif`, 400).slice(0, 3);
   return `
-    <rect x="${x}" y="${y}" width="${w}" height="${h}" rx="16" fill="#FFFFFF" stroke="${theme.panel_border}"/>
-    <rect x="${x + 16}" y="${y + 14}" width="38" height="3" rx="1.5" fill="${theme.accent_red}"/>
-    <text x="${x + 20}" y="${y + 38}" fill="${theme.title}" font-family="IBM Plex Sans, sans-serif" font-size="14" font-weight="700">${escapeXml(copy.fieldLabels.observation)}</text>
-    ${textBlock(x + 20, y + 60, lines, { size: 13, weight: 400, fill: theme.muted, lineHeight: 1.4 })}
-  `;
+    <text x="${x}" y="${y}" fill="${theme.accent_red}" font-family="IBM Plex Sans, sans-serif" font-size="13" font-weight="700" letter-spacing="0.08em">${escapeXml(copy.fieldLabels.observation.toUpperCase())}</text>
+    ${textBlock(x, y + 30, lines, { size: 20, weight: 400, fill: theme.text, lineHeight: 1.3 })}`;
 }
 
 function renderLayout(currentConfig) {
   const copy = getCopy();
   const theme = getTheme(state.templateName);
   const [viewW, viewH] = currentConfig.site?.preview_size || DEFAULT_PREVIEW_SIZE;
-  const margin = 40;
-  const headerH = 120;
-  const mainTop = headerH + 28;
-  const bottom = 32;
-  const panelGap = 32;
+  const headerH = 150;
+  const mainTop = 200;
+  const footerY = viewH - 66;
+  const observationY = footerY - 104;
+  const mainBottom = observationY - 30;
   const compact = state.profileCount >= 3;
-  const meshW = compact ? 340 : 500;
-  const mainH = viewH - mainTop - bottom;
-  const profileAreaW = viewW - (margin * 2) - meshW - panelGap;
-  const observationH = 160;
-  const meshH = mainH - observationH - panelGap;
-  const cards = [];
+  const meshW = compact ? 360 : (state.profileCount > 1 ? 400 : 520);
+  const panelGap = 48;
+  const cardGap = 32;
+  const profileStartX = SHEET_MARGIN + meshW + panelGap;
+  const profileAreaW = viewW - SHEET_MARGIN - profileStartX;
+  const mainH = mainBottom - mainTop;
+  const cards = [{ type: 'mesh', x: SHEET_MARGIN, y: mainTop, w: meshW, h: mainH }];
 
-  cards.push({ type: 'mesh', x: margin, y: mainTop, w: meshW, h: meshH });
-  cards.push({ type: 'observation', x: margin, y: mainTop + meshH + panelGap, w: meshW, h: observationH });
   if (!compact) {
     const count = Math.max(state.profileCount, 1);
-    const gap = count > 1 ? 16 : 0;
-    const cardW = (profileAreaW - gap * (count - 1)) / count;
-    let x = margin + meshW + panelGap;
+    const cardW = (profileAreaW - cardGap * (count - 1)) / count;
     for (let i = 0; i < state.profileCount; i += 1) {
-      cards.push({ type: 'profile', x, y: mainTop, w: cardW, h: mainH, index: i });
-      x += cardW + gap;
+      cards.push({ type: 'profile', x: profileStartX + i * (cardW + cardGap), y: mainTop, w: cardW, h: mainH, index: i });
     }
   } else {
-    const cols = 2;
-    const rows = 2;
-    const cardW = (profileAreaW - panelGap) / cols;
-    const cardH2 = (mainH - panelGap) / rows;
-    const profileStartX = margin + meshW + panelGap;
-    let index = 0;
-    for (let row = 0; row < rows; row += 1) {
-      for (let col = 0; col < cols; col += 1) {
-        if (index >= state.profileCount) break;
-        const cardX = state.profileCount === 3 && row === 1
-          ? profileStartX + (profileAreaW - cardW) / 2
-          : profileStartX + col * (cardW + panelGap);
-        cards.push({ type: 'profile', x: cardX, y: mainTop + row * (cardH2 + panelGap), w: cardW, h: cardH2, index });
-        index += 1;
-      }
+    const cardW = (profileAreaW - cardGap) / 2;
+    const cardH = (mainH - cardGap) / 2;
+    for (let index = 0; index < state.profileCount; index += 1) {
+      const row = Math.floor(index / 2);
+      const col = index % 2;
+      const centered = state.profileCount === 3 && row === 1;
+      const cardX = centered
+        ? profileStartX + (profileAreaW - cardW) / 2
+        : profileStartX + col * (cardW + cardGap);
+      cards.push({ type: 'profile', x: cardX, y: mainTop + row * (cardH + cardGap), w: cardW, h: cardH, index });
     }
   }
 
   const content = cards.map((card) => {
     if (card.type === 'mesh') return renderMeshPanel(theme, card);
-    if (card.type === 'observation') return renderObservationPanel(theme, card);
     return renderProfileCard(state.profiles[card.index], theme, card, compact, card.index);
   }).join('');
 
   const header = renderHeader(theme, { x: 0, y: 0, w: viewW, h: headerH });
-  const footer = compact || !state.mesh?.dataUrl ? '' : renderFooter(theme, { x: 0, y: viewH - bottom, w: viewW, h: bottom });
+  const observation = renderObservationBlock(theme, SHEET_MARGIN, observationY, viewW - SHEET_MARGIN * 2);
+  const footer = renderFooter(theme, { x: 0, y: footerY, w: viewW }, Boolean(state.mesh?.dataUrl));
 
   return `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${viewW} ${viewH}" role="img" aria-labelledby="svgTitle svgDesc">
       <title id="svgTitle">${copy.svg.title}</title>
       <desc id="svgDesc">${copy.svg.desc}</desc>
-      <defs>
-      </defs>
       <rect width="100%" height="100%" fill="${theme.bg}"/>
       ${header}
       ${content}
+      ${observation}
       ${footer}
     </svg>`;
 }
