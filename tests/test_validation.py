@@ -30,13 +30,13 @@ class ValidationTests(unittest.TestCase):
 
     def test_four_profiles_are_allowed(self) -> None:
         cfg = load_config()
-        profiles = cfg["defaults"]["profiles"]
+        profile = cfg["defaults"]["profiles"][0]
         request = {
             "polygon_name": cfg["defaults"]["polygon_name"],
             "template_name": cfg["defaults"]["template_name"],
             "profile_type": cfg["defaults"]["profile_type"],
             "profile_count": 4,
-            "profiles": [profiles[0], profiles[1], profiles[0], profiles[1]],
+            "profiles": [profile, profile, profile, profile],
         }
         validate_run_request(request, cfg["validation"])
 
