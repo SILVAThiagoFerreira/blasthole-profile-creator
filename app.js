@@ -269,7 +269,7 @@ const COPY = {
       observation: 'Observação opcional da exportação.',
     },
     labels: {
-      stemming: 'Tampão',
+      stemming: 'Tampão de Brita',
       blastbag: 'Bolsa de Ar',
       cartridge: 'Cartucho',
       airdeck: 'Deck de ar',
@@ -1494,6 +1494,8 @@ function mergeLoadedState(currentConfig, savedState) {
       if (isNonEmptyString(request.labels[key])) labels[key] = String(request.labels[key]).trim();
     }
   }
+  // Memórias salvas no navegador antes da renomeação mantêm o rótulo antigo do tampão.
+  if (requestedLanguage === 'pt-BR' && labels.stemming === 'Tampão') labels.stemming = base.labels.stemming;
 
   const savedProfiles = Array.isArray(request.profiles) ? request.profiles : [];
   const requestedCount = Number.isInteger(request.profile_count) ? request.profile_count : savedProfiles.length || base.profileCount;
@@ -1911,7 +1913,7 @@ function segmentDisplayLabel(type, lang = getActiveLanguage()) {
   if (configuredLabel && configuredLabel !== defaultLabel) return shortText(configuredLabel, 9);
 
   const labels = {
-    'pt-BR': { stemming: 'Tamp.', column: 'Carga', cartridge: 'Cart.', blastbag: 'B.Ar', airdeck: 'Deck', subdrill: 'Sub.' },
+    'pt-BR': { stemming: 'Tamp. Brit.', column: 'Carga', cartridge: 'Cart.', blastbag: 'B.Ar', airdeck: 'Deck', subdrill: 'Sub.' },
     es: { stemming: 'Taco', column: 'Carga', cartridge: 'Cart.', blastbag: 'B.Aire', airdeck: 'Deck', subdrill: 'Subp.' },
     en: { stemming: 'Stem', column: 'Charge', cartridge: 'Ctg.', blastbag: 'Bag', airdeck: 'Deck', subdrill: 'Sub.' },
     'zh-CN': { stemming: '堵塞', column: '装药', cartridge: '药卷', blastbag: '气袋', airdeck: '空气段', subdrill: '超钻' },
