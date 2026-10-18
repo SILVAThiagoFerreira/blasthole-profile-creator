@@ -97,13 +97,12 @@ def render_mesh_panel(mesh_input: MeshInput, theme, size: tuple[int, int] = (540
 
     # Card base
     draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
-                            radius=_s(22), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
-    draw.rectangle((_s(16), _s(16), w - _s(16), _s(22)), fill=theme.accent_red)
+                            radius=_s(22), fill="#FFFFFF")
 
     # Title
     draw.text((_s(28), _s(26)), "MALHA DE PERFURAÇÃO",
               font=_font(_s(20), bold=True), fill=theme.title)
-    draw.rectangle((_s(28), _s(64), _s(80), _s(67)), fill=theme.accent_red)
+    draw.line((_s(28), _s(66), w - _s(28), _s(66)), fill="#E3E3E3", width=_s(2))
     draw.text((_s(28), _s(78)), mesh_input.polygon_name,
               font=_font(_s(14)), fill=theme.muted)
 

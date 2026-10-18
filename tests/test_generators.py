@@ -37,15 +37,12 @@ class HeaderTests(unittest.TestCase):
         from PIL import Image
         return Image.new("RGBA", (3840, 2160), (240, 242, 245, 255))
 
-    def test_header_top_pixel_is_red(self) -> None:
+    def test_header_top_edge_has_no_stripe(self) -> None:
         from generator.layout import _draw_header, TEMPLATE_PRESETS
         canvas = self._make_canvas()
         theme = TEMPLATE_PRESETS["Corporate clean"]
         _draw_header(canvas, theme, "PP170526 (220-210)", "Perfis técnicos", None)
-        r, g, b, a = canvas.getpixel((1920, 2))
-        self.assertGreater(r, 180)
-        self.assertLess(g, 80)
-        self.assertLess(b, 80)
+        self.assertEqual(canvas.getpixel((1920, 2))[:3], (255, 255, 255))
 
     def test_header_background_is_white(self) -> None:
         from generator.layout import _draw_header, TEMPLATE_PRESETS

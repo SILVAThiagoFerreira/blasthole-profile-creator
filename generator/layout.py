@@ -154,7 +154,6 @@ def _draw_background(canvas: Image.Image, theme: TemplateTheme) -> None:
     draw = ImageDraw.Draw(canvas)
     width, height = canvas.size
     draw.rectangle((0, 0, width, height), fill="#FFFFFF")
-    draw.line((_s(48), HEADER_H + _s(8), width - _s(48), HEADER_H + _s(8)), fill="#EEF2F7", width=_s(1))
 
 
 def _draw_wrapped_text(draw: ImageDraw.ImageDraw, text: str, box: tuple[int, int, int, int], font: ImageFont.FreeTypeFont, fill: str, line_spacing: int = 6) -> None:
@@ -210,16 +209,12 @@ def _draw_header(canvas: Image.Image, theme: TemplateTheme, polygon_name: str, p
 
     # White background
     draw.rectangle((0, 0, width, HEADER_H), fill="#FFFFFF")
-    # Red top stripe
-    draw.rectangle((0, 0, width, _s(6)), fill=theme.accent_red)
     # Bottom separator
     draw.line((0, HEADER_H - _s(1), width, HEADER_H - _s(1)), fill="#E5E7EB", width=_s(1))
-    draw.line((_s(36), _s(154), width - _s(36), _s(154)), fill="#EEF2F7", width=_s(1))
 
     # Logo badge (left)
     badge_box = (_s(36), _s(18), _s(236), _s(142))
-    draw.rounded_rectangle(badge_box, radius=_s(18), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
-    draw.rectangle((badge_box[0], badge_box[1], badge_box[2], badge_box[1] + _s(6)), fill=theme.accent_red)
+    draw.rectangle(badge_box, fill="#FFFFFF")
     if logo_bytes:
         _paste_logo(canvas, logo_bytes, (_s(50), _s(34), _s(220), _s(128)))
     else:
@@ -231,15 +226,13 @@ def _draw_header(canvas: Image.Image, theme: TemplateTheme, polygon_name: str, p
     title_max_w = width - title_x - _s(320)
     draw.text((title_x, _s(26)), "PERFIL DE CARGA",
               font=_fit_font(draw, "PERFIL DE CARGA", title_max_w, _s(34), bold=True),
-              fill="#111827")
+              fill=theme.accent_red)
     draw.text((title_x, _s(72)), polygon_name,
               font=_fit_font(draw, polygon_name, title_max_w, _s(30), bold=True),
-              fill=theme.accent_red)
+              fill="#3D4148")
     draw.text((title_x, _s(114)), "Lâmina técnica 16:9",
               font=_fit_font(draw, "Lâmina técnica 16:9", title_max_w, _s(14)),
               fill="#9CA3AF")
-    draw.rounded_rectangle((title_x, _s(146), title_x + _s(182), _s(170)), radius=_s(10), fill="#F8FAFC", outline="#E5E7EB", width=_s(1))
-    draw.text((title_x + _s(14), _s(150)), "Entrega técnica", font=_font(_s(12), bold=True), fill=theme.muted)
 
     # Right badge (profile type)
     badge_font = _font(_s(19), bold=True)
@@ -318,10 +311,8 @@ def _draw_layout(canvas: Image.Image, theme: TemplateTheme, mesh_panel: Image.Im
 
     for x, y, w, h, panel in cards:
         box = (x, y, x + w, y + h)
-        _gaussian_shadow(canvas, box, radius=_s(28), blur_radius=10)
         draw = ImageDraw.Draw(canvas)
         draw.rounded_rectangle(box, radius=_s(28), fill=theme.panel_bg, outline=theme.panel_border, width=_s(1))
-        draw.rounded_rectangle((x + _s(2), y + _s(2), x + w - _s(2), y + h - _s(2)), radius=_s(26), outline="#FFFFFF", width=_s(1))
         panel_fit = ImageOps.contain(panel, (w - _s(24), h - _s(24)))
         px = x + (w - panel_fit.size[0]) // 2
         if compact:

@@ -227,8 +227,6 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
 
     if compact:
         draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)), radius=_s(22), fill="#FFFFFF")
-        draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)), radius=_s(22), outline="#E5E7EB", width=_s(1))
-        draw.rectangle((_s(16), _s(16), w - _s(16), _s(22)), fill=accent_soft)
 
         badge_letter = _extract_badge_letter(profile.name)
         badge_r = _s(20)
@@ -246,11 +244,11 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
         draw.rounded_rectangle((_s(320) - tag_w // 2, _s(22), _s(320) + tag_w // 2 + _s(14), _s(44)), radius=_s(10), fill=accent_soft)
         draw.text((_s(320) - tag_w // 2 + _s(7), _s(28)), kind_label.upper(), font=tag_font, fill=accent)
 
-        draw.rectangle((_s(18), _s(80), w - _s(18), _s(84)), fill=accent)
+        draw.line((_s(18), _s(82), w - _s(18), _s(82)), fill="#E3E3E3", width=_s(2))
 
         drawing_box = (_s(34), _s(96), _s(166), h - _s(90))
         info_box = (_s(178), _s(96), w - _s(24), h - _s(90))
-        draw.rounded_rectangle(drawing_box, radius=_s(16), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
+        draw.rounded_rectangle(drawing_box, radius=_s(16), fill="#FFFFFF")
 
         left, top_b, right, bottom_b = drawing_box
         cx = left + (right - left) // 2
@@ -304,9 +302,8 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
 
         draw.text((left + _s(6), bottom_b - _s(18)), f"BANCO {_fmt(profile.altura_banco)} M", font=_font(_s(9), bold=True), fill=theme.muted)
 
-        draw.rounded_rectangle(info_box, radius=_s(16), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
+        draw.rounded_rectangle(info_box, radius=_s(16), fill="#FFFFFF")
         ix1, iy1, ix2, iy2 = info_box
-        draw.rectangle((ix1, iy1, ix2, iy1 + _s(5)), fill=accent)
         draw.text((ix1 + _s(12), iy1 + _s(10)), "PARÂMETROS", font=_font(_s(13), bold=True), fill=theme.title)
 
         rows = [
@@ -328,9 +325,6 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
     # ── Card background ───────────────────────────────────────────────────
     draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
                             radius=_s(22), fill="#FFFFFF")
-    draw.rounded_rectangle((_s(12), _s(12), w - _s(12), h - _s(12)),
-                            radius=_s(22), outline="#E5E7EB", width=_s(1))
-    draw.rectangle((_s(16), _s(16), w - _s(16), _s(22)), fill=accent_soft)
 
     # ── Card header ───────────────────────────────────────────────────────
     badge_letter = _extract_badge_letter(profile.name)
@@ -355,14 +349,14 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
     draw.text((_s(380) - tag_w // 2 + _s(8), _s(30)), kind_label.upper(), font=tag_font, fill=accent)
 
     # Accent separator line
-    draw.rectangle((_s(18), _s(88), w - _s(18), _s(92)), fill=accent)
+    draw.line((_s(18), _s(90), w - _s(18), _s(90)), fill="#E3E3E3", width=_s(2))
 
     # ── Cylinder zone ─────────────────────────────────────────────────────
     drawing_box = (_s(34), _s(108), _s(178), h - _s(110))
     info_box    = (_s(274), _s(108), w - _s(28), h - _s(110))
 
     # White background for cylinder zone
-    draw.rounded_rectangle(drawing_box, radius=_s(16), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
+    draw.rounded_rectangle(drawing_box, radius=_s(16), fill="#FFFFFF")
 
     left, top_b, right, bottom_b = drawing_box
     cx = left + (right - left) // 2
@@ -444,7 +438,7 @@ def render_profile_panel(profile: ProfileInput, theme, labels: dict[str, str], s
               font=_font(_s(10), bold=True), fill=theme.muted)
 
     # ── Parameters zone ───────────────────────────────────────────────────
-    draw.rounded_rectangle(info_box, radius=_s(16), fill="#FFFFFF", outline="#E5E7EB", width=_s(1))
+    draw.rounded_rectangle(info_box, radius=_s(16), fill="#FFFFFF")
     ix1, iy1, ix2, iy2 = info_box
     draw.rectangle((ix1, iy1, ix2, iy1 + _s(6)), fill=accent)
 
