@@ -1033,14 +1033,14 @@ body::before {
 }
 
 .validation .notice--error {
-  background: linear-gradient(90deg, #fff0f0 0%, #fffafa 100%);
+  background: #fff1f1;
   border-color: #f2cccc;
   border-left-color: var(--accent-red);
   color: #7a1c1c;
 }
 
 .validation .notice--success {
-  background: linear-gradient(90deg, #edf8ef 0%, #f8fcf9 100%);
+  background: #edf8ef;
   border-color: #cfe9d4;
   border-left-color: var(--success);
   color: #1d5a24;

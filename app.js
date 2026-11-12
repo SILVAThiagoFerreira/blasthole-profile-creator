@@ -2000,11 +2000,16 @@ function deckInitiatorKey(profile) {
 
 // Massa de emulsão (kg) nas colunas de carga: volume do furo × densidade.
 // Densidade em g/cm³ equivale a t/m³; ×1000 converte para kg/m³.
-function emulsionChargeKg(profile) {
+// Massa de emulsão (kg) de um trecho de coluna com a altura dada, para o diâmetro e a densidade do perfil.
+function emulsionKgForHeight(profile, heightM) {
   const radiusM = Math.max(normalizeNumber(profile.diametro_furo, 0), 0) / 2000;
   const densityKgM3 = Math.max(normalizeNumber(profile.densidade, 0), 0) * 1000;
-  const columnM = sumSegmentsByType(profile.segments, 'column');
-  return Math.PI * radiusM * radiusM * columnM * densityKgM3;
+  return Math.PI * radiusM * radiusM * Math.max(heightM, 0) * densityKgM3;
+}
+
+// Total de emulsão do perfil: soma das colunas de carga (os decks somam o mesmo valor).
+function emulsionChargeKg(profile) {
+  return emulsionKgForHeight(profile, sumSegmentsByType(profile.segments, 'column'));
 }
 
 function segmentDisplayLabel(type, lang = getActiveLanguage()) {
@@ -2200,8 +2205,10 @@ function renderProfileCard(profile, theme, box, compact, index) {
   });
   const measurementMarkup = measurementItems.map((item) => {
     const segmentHeight = item.y2 - item.y1;
-    const detailedLabel = `${segmentDisplayLabel(item.type, lang)} ${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}`;
-    const shortLabel = `${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}`;
+    // Cada coluna de carga mostra a massa de emulsão do próprio deck, além do total do perfil.
+    const deckKg = item.type === 'column' ? ` · ${formatDecimal(emulsionKgForHeight(profile, item.value), 1, lang)} kg` : '';
+    const detailedLabel = `${segmentDisplayLabel(item.type, lang)} ${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}${deckKg}`;
+    const shortLabel = `${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}${deckKg}`;
     const minFontSize = compact ? Math.min(9.5, item.labelMaxFontSize) : 8.5;
     const label = measureTextWidth(detailedLabel, minFontSize, `'IBM Plex Sans', sans-serif`, 600) <= measureLabelWidth
       ? detailedLabel
