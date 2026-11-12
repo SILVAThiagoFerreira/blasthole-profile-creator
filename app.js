@@ -3099,6 +3099,39 @@ function scheduleUpdate(force = false) {
   }, force ? 0 : 80);
 }
 
+// Campo numérico apagado vira NaN no estado, que não pode ser desenhado.
+function hasNonFiniteNumbers(appState) {
+  return appState.profiles.some((profile) => (
+    Object.values(profile).some((value) => typeof value === 'number' && !Number.isFinite(value))
+    || (profile.segments || []).some((item) => !Number.isFinite(item.height))
+  ));
+}
+
+function withZeroForBlankNumbers(appState) {
+  const copy = clone(appState);
+  copy.profiles.forEach((profile) => {
+    Object.keys(profile).forEach((key) => {
+      if (typeof profile[key] === 'number' && !Number.isFinite(profile[key])) profile[key] = 0;
+    });
+    (profile.segments || []).forEach((item) => {
+      if (!Number.isFinite(item.height)) item.height = 0;
+    });
+  });
+  return copy;
+}
+
+// Desenha a lâmina do estado atual. Campo vazio aparece como 0 na prévia; a validação continua bloqueando a exportação.
+function renderPreviewSvg() {
+  if (!hasNonFiniteNumbers(state)) return renderLayout(config);
+  const realState = state;
+  state = withZeroForBlankNumbers(realState);
+  try {
+    return renderLayout(config);
+  } finally {
+    state = realState;
+  }
+}
+
 async function updatePreview(force = false) {
   const issues = validateState(state, config);
   // Mantém o resumo H/C/S e o aviso de excesso em dia sem redesenhar os campos (preserva o foco).
@@ -3111,22 +3144,20 @@ async function updatePreview(force = false) {
   if (saveTimer) window.clearTimeout(saveTimer);
   saveTimer = window.setTimeout(() => saveStateToStorage(config, state), force ? 0 : 300);
 
-  if (issues.length) {
-    // Com erro, a última lâmina válida continua visível e a exportação fica bloqueada.
-    // Sem lâmina anterior (reabrir com dados inválidos, importar projeto), mostra o estado atual.
-    if (!lastValidSvg) showPreviewSvg(renderLayout(config));
-    showValidation(issues);
-    return;
+  // A prévia mostra sempre o estado atual. Só a exportação fica bloqueada enquanto houver erro,
+  // porque lastValidSvg só é atualizado com dados válidos.
+  const svg = renderPreviewSvg();
+  if (!issues.length) {
+    // Controles de preview (ex.: remover malha) ficam fora da exportação.
+    lastValidSvg = svg.replace(/<g data-preview-only[\s\S]*?<\/g>/g, '');
+    lastValidState = clone(state);
   }
-
-  const svg = renderLayout(config);
-  // Controles de preview (ex.: remover malha) ficam fora da exportação.
-  lastValidSvg = svg.replace(/<g data-preview-only[\s\S]*?<\/g>/g, '');
-  lastValidState = clone(state);
   showPreviewSvg(svg);
-  showValidation([],
-    true,
-  );
+  if (issues.length) {
+    showValidation(issues);
+  } else {
+    showValidation([], true);
+  }
 }
 
 async function downloadArtifact(type) {
