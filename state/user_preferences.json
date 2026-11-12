@@ -23,7 +23,6 @@
         "diametro_furo": 140.0,
         "booster_weight": 450,
         "has_booster": true,
-        "initiator": "both",
         "inclinacao": 0.0,
         "kind": "Produção",
         "name": "Perfil A",

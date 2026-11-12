@@ -75,7 +75,6 @@ const FALLBACK_CONFIG = {
         inclinacao: 0.0,
         azimute: 0.0,
         densidade: 1.15,
-        initiator: 'brinel',
         has_booster: true,
         booster_weight: 450,
         cordel: 'none',
@@ -1196,7 +1195,6 @@ const PROFILE_FIELDS = [
   'inclinacao',
   'azimute',
   'densidade',
-  'initiator',
   'has_booster',
   'booster_weight',
   'cordel',
@@ -1446,7 +1444,6 @@ function createDefaultState(currentConfig, language = currentConfig?.app?.defaul
     ...profile,
     kind: normalizeKind(profile.kind),
     name: copy.defaults.profileNames[index] || `${copy.defaults.profileNamePrefix} ${index + 1}`,
-    initiator: ['none', 'brinel', 'dvt', 'both'].includes(profile.initiator) ? profile.initiator : 'brinel',
     has_booster: typeof profile.has_booster === 'boolean' ? profile.has_booster : true,
     booster_weight: normalizeNumber(profile.booster_weight, 450),
     cordel: ['none', 'np'].includes(profile.cordel) ? profile.cordel : 'none',
@@ -1498,7 +1495,6 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.inclinacao = normalizeNumber(profile.inclinacao, fallback.inclinacao);
   profile.azimute = normalizeNumber(profile.azimute, fallback.azimute);
   profile.densidade = normalizeNumber(profile.densidade, fallback.densidade);
-  profile.initiator = ['none', 'brinel', 'dvt', 'both'].includes(profile.initiator) ? profile.initiator : (fallback.initiator || 'none');
   profile.has_booster = Boolean(profile.has_booster);
   profile.booster_weight = normalizeNumber(profile.booster_weight, fallback.booster_weight || 450);
   profile.cordel = ['none', 'np'].includes(profile.cordel) ? profile.cordel : (fallback.cordel || 'none');
@@ -1965,6 +1961,17 @@ function buildChargeSegments(profile, accent) {
   return { segments, stem, sub, bb, ad, charge };
 }
 
+// Iniciador do perfil = união dos decks marcados (NE e/ou E) em colunas e cartuchos.
+function deckInitiatorKey(profile) {
+  const decks = (profile.segments || []).filter((item) => item.type === 'column' || item.type === 'cartridge');
+  const nonel = decks.some((item) => item.has_nonel);
+  const electric = decks.some((item) => item.has_electric);
+  if (nonel && electric) return 'both';
+  if (nonel) return 'brinel';
+  if (electric) return 'dvt';
+  return 'none';
+}
+
 // Massa de emulsão (kg) nas colunas de carga: volume do furo × densidade.
 // Densidade em g/cm³ equivale a t/m³; ×1000 converte para kg/m³.
 function emulsionChargeKg(profile) {
@@ -2044,7 +2051,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     dvt: copy.fieldLabels.initiatorDVT,
     both: trimParenthetical(copy.fieldLabels.initiatorBoth),
   };
-  const initiatorLabel = initiatorLabels[profile.initiator] || copy.fieldLabels.initiatorNone;
+  const initiatorLabel = initiatorLabels[deckInitiatorKey(profile)];
   const boosterLabel = trimParenthetical(copy.fieldLabels.hasBooster);
   const total = Math.max(segmentData.reduce((sum, item) => sum + Math.max(item.value, 0), 0), 0.01);
 
@@ -2346,14 +2353,6 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<text x="${labelLaneX}" y="${labelY}" text-anchor="start" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-weight="600" dominant-baseline="middle">${escapeXml(label)}</text>`);
         }
       };
-      if (profile.initiator === 'brinel') {
-        drawCable('#E67E22', compact ? -2 : -4, 'NonEl', 0.46);
-      } else if (profile.initiator === 'dvt') {
-        drawCable('#8E44AD', compact ? -2 : -4, 'Eletrônico', 0.58);
-      } else if (profile.initiator === 'both') {
-        drawCable('#E67E22', compact ? -4 : -6, 'NonEl', 0.42);
-        drawCable('#8E44AD', compact ? 0 : 2, 'Eletrônico', 0.62);
-      }
       if (profile.cordel === 'np') {
         const cordelColor = '#27AE60';
         const cordelX = cx + (compact ? 2 : 4);
@@ -2721,12 +2720,6 @@ function renderProfileEditor(profile, index) {
           ${renderInput(copy.fieldLabels.inclination, `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
           ${renderInput(copy.fieldLabels.azimuth, `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
           ${renderInput(copy.fieldLabels.density, `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
-          ${renderSelect(copy.fieldLabels.initiator, `profiles.${index}.initiator`, profile.initiator, [
-            { value: 'none', label: copy.fieldLabels.initiatorNone },
-            { value: 'brinel', label: copy.fieldLabels.initiatorBrinel },
-            { value: 'dvt', label: copy.fieldLabels.initiatorDVT },
-            { value: 'both', label: copy.fieldLabels.initiatorBoth },
-          ], '')}
           <div class="field-group field-group--cordel">
             ${renderSelect(copy.fieldLabels.cordel, `profiles.${index}.cordel`, profile.cordel, [
               { value: 'none', label: copy.fieldLabels.cordelNone },
