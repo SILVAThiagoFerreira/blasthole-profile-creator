@@ -259,6 +259,7 @@ const COPY = {
       cordelGap: 'Trecho sem cordel (m)',
       cordelGramatura: 'Gramatura (g/m)',
       emulsion: 'Carga emulsão',
+      profileColor: 'Cor do perfil',
     },
     deckPositions: {
       above_stemming: 'Acima do tampão',
@@ -488,6 +489,7 @@ const COPY = {
       cordelGap: 'No-cordel segment (m)',
       cordelGramatura: 'Grammage (g/m)',
       emulsion: 'Emulsion charge',
+      profileColor: 'Profile color',
     },
     deckPositions: {
       above_stemming: 'Above stemming',
@@ -717,6 +719,7 @@ const COPY = {
       cordelGap: 'Tramo sin cordel (m)',
       cordelGramatura: 'Gramaje (g/m)',
       emulsion: 'Carga de emulsión',
+      profileColor: 'Color del perfil',
     },
     deckPositions: {
       above_stemming: 'Encima del taco',
@@ -946,6 +949,7 @@ const COPY = {
       cordelGap: '无导爆索区段 (m)',
       cordelGramatura: '克重 (g/m)',
       emulsion: '乳化炸药',
+      profileColor: '剖面颜色',
     },
     deckPositions: {
       above_stemming: '堵塞上方',
@@ -1062,6 +1066,14 @@ const KIND_ACCENTS = {
   contorno: { accent: '#D71920', soft: '#FFE3E5', title: 'Contorno' },
   personalizado: { accent: '#223A8D', soft: '#E8ECFA', title: 'Personalizado' },
 };
+
+// Cor padrão de cada perfil pela posição (1º a 4º); o usuário pode trocar no editor.
+const PROFILE_COLOR_PRESETS = ['#1565C0', '#D71920', '#2E7D32', '#00838F'];
+
+function normalizeColor(value, fallback) {
+  const text = typeof value === 'string' ? value.trim() : '';
+  return /^#[0-9a-f]{6}$/i.test(text) ? text.toUpperCase() : fallback;
+}
 
 function normalizeLanguage(value) {
   const raw = String(value ?? '').trim();
@@ -1198,6 +1210,7 @@ function translateStateDefaults(previousLanguage, nextLanguage) {
 const PROFILE_FIELDS = [
   'name',
   'kind',
+  'color',
   'diametro_furo',
   'altura_banco',
   'subperfuracao',
@@ -1458,6 +1471,7 @@ function createDefaultState(currentConfig, language = currentConfig?.app?.defaul
   const profiles = clone(defaults.profiles).map((profile, index) => ({
     ...profile,
     kind: normalizeKind(profile.kind),
+    color: PROFILE_COLOR_PRESETS[index] || PROFILE_COLOR_PRESETS[0],
     name: copy.defaults.profileNames[index] || `${copy.defaults.profileNamePrefix} ${index + 1}`,
     has_booster: typeof profile.has_booster === 'boolean' ? profile.has_booster : true,
     booster_weight: normalizeNumber(profile.booster_weight, 450),
@@ -1497,6 +1511,7 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
 
   profile.name = isNonEmptyString(profile.name) ? String(profile.name).trim() : defaultProfileName(language, index);
   profile.kind = normalizeKind(profile.kind);
+  profile.color = normalizeColor(profile.color, PROFILE_COLOR_PRESETS[index] || PROFILE_COLOR_PRESETS[0]);
   profile.diametro_furo = normalizeNumber(profile.diametro_furo, fallback.diametro_furo);
   profile.altura_banco = normalizeNumber(profile.altura_banco, fallback.altura_banco);
   profile.subperfuracao = normalizeNumber(profile.subperfuracao, fallback.subperfuracao);
@@ -2040,7 +2055,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const copy = getCopy(lang);
   const { x, y, w, h } = box;
   const accentInfo = KIND_ACCENTS[profile.kind] || KIND_ACCENTS.personalizado;
-  const accent = accentInfo.accent;
+  const accent = profile.color || accentInfo.accent;
   const name = shortText(profile.name || defaultProfileName(lang, index), compact ? 18 : 22).toUpperCase();
   const badgeLetter = (() => {
     const parts = String(profile.name || '').trim().split(/\s+/);
@@ -2742,7 +2757,7 @@ function renderProfileEditor(profile, index) {
     if (last && last.length === 1 && last === last.toUpperCase()) return last;
     return String(profile.name || '?').trim()[0]?.toUpperCase() || '?';
   })();
-  const accent = KIND_ACCENTS[profile.kind]?.accent || KIND_ACCENTS.personalizado.accent;
+  const accent = profile.color || KIND_ACCENTS[profile.kind]?.accent || KIND_ACCENTS.personalizado.accent;
   const stem = sumSegmentsByType(profile.segments, 'stemming');
   const charge = sumSegmentsByType(profile.segments, 'column')
     + sumSegmentsByType(profile.segments, 'cartridge');
@@ -2759,6 +2774,7 @@ function renderProfileEditor(profile, index) {
         <div class="form-grid form-grid--two">
           ${renderInput(copy.fieldLabels.profileName, `profiles.${index}.name`, profile.name)}
           ${renderSelect(copy.fieldLabels.kind, `profiles.${index}.kind`, profile.kind, KIND_OPTIONS.map((key) => ({ value: key, label: kindLabel(key) })), '')}
+          ${renderInput(copy.fieldLabels.profileColor, `profiles.${index}.color`, profile.color, 'color')}
           ${renderInput(copy.fieldLabels.diameter, `profiles.${index}.diametro_furo`, profile.diametro_furo, 'number', { step: 1, min: 0 })}
           ${renderInput(copy.fieldLabels.height, `profiles.${index}.altura_banco`, profile.altura_banco, 'number', { step: 0.05, min: 0 })}
           ${renderInput(copy.fieldLabels.subdrill, `profiles.${index}.subperfuracao`, profile.subperfuracao, 'number', { step: 0.05, min: 0 })}
@@ -2897,7 +2913,7 @@ function renderProfileTabs() {
   for (let i = 0; i < state.profileCount; i++) {
     const p = state.profiles[i];
     const label = `${i + 1}${suffixes[i] || 'º'}`;
-    const accent = KIND_ACCENTS[p.kind]?.accent || KIND_ACCENTS.personalizado.accent;
+    const accent = p.color || KIND_ACCENTS[p.kind]?.accent || KIND_ACCENTS.personalizado.accent;
     const isActive = i === selectedProfileIndex;
     letters.push(`<button class="profile-tab${isActive ? ' active' : ''}" type="button" data-profile-tab="${i}" style="${isActive ? `--accent:${accent}` : ''}">${escapeXml(label)}</button>`);
   }
@@ -2942,6 +2958,7 @@ function adjustProfileCount(delta) {
       const fallback = state.profiles[state.profiles.length - 1] || defaultProfiles[defaultProfiles.length - 1];
       const cloneProfile = clone(fallback);
       cloneProfile.name = defaultProfileName(lang, i);
+      cloneProfile.color = PROFILE_COLOR_PRESETS[i] || PROFILE_COLOR_PRESETS[0];
       if (!isNonEmptyString(cloneProfile.kind)) cloneProfile.kind = 'personalizado';
       state.profiles.push(cloneProfile);
     }
@@ -3021,6 +3038,11 @@ function handleInputEvent(event) {
         currentProfile[field] = target.type === 'number'
           ? (target.value === '' ? Number.NaN : Number(target.value))
           : value;
+      }
+      // Trocar a categoria visual aplica a cor dela; depois o usuário ajusta a cor do perfil.
+      if (field === 'kind') {
+        currentProfile.color = KIND_ACCENTS[currentProfile.kind]?.accent || currentProfile.color;
+        requiresFormRender = true;
       }
     } else if (path.startsWith('labels.')) {
       const [, key] = path.split('.');

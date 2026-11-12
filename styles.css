@@ -1154,6 +1154,11 @@ body::before {
   padding-right: 26px;
 }
 
+.field input[type='color'] {
+  padding: 3px 4px;
+  cursor: pointer;
+}
+
 .field textarea {
   min-height: 64px;
   resize: vertical;
