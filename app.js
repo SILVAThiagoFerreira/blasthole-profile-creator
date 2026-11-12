@@ -3117,9 +3117,9 @@ async function updatePreview(force = false) {
   saveTimer = window.setTimeout(() => saveStateToStorage(config, state), force ? 0 : 300);
 
   if (issues.length) {
-    // Sem lâmina enquanto houver erro: uma lâmina antiga pareceria válida com os dados atuais.
-    lastValidSvg = '';
-    dom.previewCanvas.innerHTML = '';
+    // Com erro, a última lâmina válida continua visível e a exportação fica bloqueada.
+    // Sem lâmina anterior (reabrir com dados inválidos, importar projeto), mostra o estado atual.
+    if (!lastValidSvg) dom.previewCanvas.innerHTML = renderLayout(config);
     showValidation(issues);
     return;
   }
@@ -3259,6 +3259,8 @@ async function importProjectFile(file) {
   selectedProfileIndex = 0;
   selectedSegmentKey = null;
   saveLanguagePreference(config, state.language);
+  // A lâmina anterior é de outro projeto: sem ela, a visualização mostra o projeto importado.
+  lastValidSvg = '';
   renderStaticChrome();
   renderShell(config);
   scheduleUpdate(true);
