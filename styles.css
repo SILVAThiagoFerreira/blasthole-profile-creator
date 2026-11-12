@@ -678,13 +678,87 @@ body::before {
   color: var(--accent, var(--accent-blue));
 }
 
-.auto-calc-chip--excess {
-  border-color: #efd7d7;
-  background: #fff7f7;
-  color: var(--accent-red);
+/* Progresso da sequência do furo contra a altura do banco (sem subperfuração). */
+.bench-progress {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 }
 
-.auto-calc-chip--excess strong {
+.bench-progress__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.bench-progress__label {
+  color: var(--muted);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.bench-progress__total {
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bench-progress__total strong {
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 800;
+}
+
+.bench-progress__track {
+  position: relative;
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #edf1f6;
+}
+
+.bench-progress__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: inherit;
+  background: var(--accent-blue);
+  transition: width 0.25s ease;
+}
+
+.bench-progress__status {
+  margin: 0;
+  color: var(--accent-blue);
+  font-size: 0.74rem;
+  font-weight: 700;
+}
+
+.bench-progress--full .bench-progress__fill {
+  background: var(--success);
+}
+
+.bench-progress--full .bench-progress__status {
+  color: var(--success);
+}
+
+.bench-progress--over {
+  border-color: #f2cccc;
+  background: #fffafa;
+}
+
+.bench-progress--over .bench-progress__fill {
+  background: var(--accent-red);
+}
+
+.bench-progress--over .bench-progress__status {
   color: var(--accent-red);
 }
 
@@ -940,41 +1014,90 @@ body::before {
 
 .validation {
   flex-shrink: 0;
-  padding: 8px 16px;
+  padding: 12px 16px;
   border-top: 1px solid var(--line);
   background: var(--surface);
 }
 
-.validation .success,
-.validation .error {
+/* Cartão de aviso: erro lista as pendências; sucesso confirma que dá para exportar. */
+.validation .notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-left-width: 4px;
   border-radius: var(--radius-lg);
-  padding: 10px 14px;
-  color: var(--muted);
-  font-size: 0.76rem;
-}
-
-.validation .success {
-  background: #f7fbf7;
-  border: 1px solid #dce8dc;
-  color: var(--success);
-}
-
-.validation .error {
-  background: #fff7f7;
-  border: 1px solid #efd7d7;
-  color: var(--accent-red);
-}
-
-.validation strong {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--text);
   font-size: 0.78rem;
+  line-height: 1.45;
 }
 
-.validation ul {
+.validation .notice--error {
+  background: linear-gradient(90deg, #fff0f0 0%, #fffafa 100%);
+  border-color: #f2cccc;
+  border-left-color: var(--accent-red);
+  color: #7a1c1c;
+}
+
+.validation .notice--success {
+  background: linear-gradient(90deg, #edf8ef 0%, #f8fcf9 100%);
+  border-color: #cfe9d4;
+  border-left-color: var(--success);
+  color: #1d5a24;
+}
+
+.notice__icon {
+  display: grid;
+  flex: 0 0 22px;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.notice--success .notice__icon {
+  background: var(--success);
+}
+
+.notice__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.validation .notice__title {
   margin: 0;
-  padding-left: 18px;
+  color: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.validation .notice__list {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.validation .notice__list li {
+  position: relative;
+  padding-left: 16px;
+}
+
+.validation .notice__list li::before {
+  content: '';
+  position: absolute;
+  top: 0.6em;
+  left: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-red);
 }
 
 /* ── FIELD / FORM BASICS ── */
