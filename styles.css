@@ -866,8 +866,9 @@ body::before {
   overflow: auto;
   padding: 20px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  /* Início no alinhamento: com a lâmina maior que a área, nada fica cortado do lado de trás. */
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .preview-canvas::before {
@@ -881,76 +882,50 @@ body::before {
   background-size: 34px 34px;
 }
 
+/* A lâmina tem largura definida pelo zoom (app.js). Margem automática centraliza
+   sem cortar a parte de cima e a esquerda quando ela é maior que a área. */
 .preview-canvas > svg,
 .preview-canvas > img,
 .preview-canvas > canvas {
   position: relative;
   z-index: 1;
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
+  max-width: none;
+  max-height: none;
   height: auto;
+  flex-shrink: 0;
+  margin: auto;
   display: block;
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
+.preview-canvas {
+  user-select: none;
+}
+
+.preview-canvas.is-zoomed {
+  cursor: grab;
+}
+
+.preview-canvas.is-panning {
+  cursor: grabbing;
+}
+
 .preview-toolbar {
   display: flex;
+  align-items: center;
   justify-content: flex-end;
+  gap: 8px;
   flex-shrink: 0;
   padding: 8px 16px 0;
 }
 
-/* ── ZOOM VIEWER: só a exibição; o SVG do relatório não muda ── */
-
-.zoom-viewer {
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  background: rgba(17, 24, 39, 0.94);
-}
-
-.zoom-viewer[hidden] {
-  display: none;
-}
-
-.zoom-viewer__bar {
-  display: flex;
-  flex-shrink: 0;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 10px 16px;
-  background: var(--surface);
-  border-bottom: 1px solid var(--line);
-}
-
-.zoom-viewer__level {
-  min-width: 56px;
-  text-align: center;
-  font-size: 0.76rem;
+.preview-toolbar__zoom {
+  min-width: 44px;
+  text-align: right;
+  color: var(--muted);
+  font-size: 0.74rem;
   font-weight: 700;
-}
-
-/* Único contêiner com barra de rolagem: a página por trás fica fixa. */
-.zoom-viewer__stage {
-  flex: 1;
-  min-height: 0;
-  overflow: auto;
-  padding: 24px;
-}
-
-.zoom-viewer__stage svg {
-  display: block;
-  height: auto;
-  margin: 0 auto;
-  border-radius: var(--radius-lg);
-  background: #fff;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 
 .preview-canvas svg rect[data-segment-key] {

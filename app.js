@@ -178,10 +178,9 @@ const COPY = {
       reset: 'Restaurar',
       saveProject: 'Salvar projeto',
       importProject: 'Importar projeto',
-      zoomOpen: 'Ampliar lâmina',
-      zoomNormal: 'Visualização normal',
-      zoomIn: 'Aumentar zoom',
-      zoomOut: 'Diminuir zoom',
+      zoomReset: 'Resetar visualização',
+      fullscreen: 'Tela cheia',
+      exitFullscreen: 'Sair da tela cheia',
       removeProfile: 'Remover perfil',
       addProfile: 'Adicionar perfil',
       uploadLogo: 'Anexar logo',
@@ -405,10 +404,9 @@ const COPY = {
       reset: 'Reset',
       saveProject: 'Save project',
       importProject: 'Import project',
-      zoomOpen: 'Enlarge sheet',
-      zoomNormal: 'Normal view',
-      zoomIn: 'Zoom in',
-      zoomOut: 'Zoom out',
+      zoomReset: 'Reset view',
+      fullscreen: 'Full screen',
+      exitFullscreen: 'Exit full screen',
       removeProfile: 'Remove profile',
       addProfile: 'Add profile',
       uploadLogo: 'Upload logo',
@@ -632,10 +630,9 @@ const COPY = {
       reset: 'Restaurar',
       saveProject: 'Guardar proyecto',
       importProject: 'Importar proyecto',
-      zoomOpen: 'Ampliar lámina',
-      zoomNormal: 'Vista normal',
-      zoomIn: 'Acercar',
-      zoomOut: 'Alejar',
+      zoomReset: 'Restablecer vista',
+      fullscreen: 'Pantalla completa',
+      exitFullscreen: 'Salir de pantalla completa',
       removeProfile: 'Eliminar perfil',
       addProfile: 'Agregar perfil',
       uploadLogo: 'Adjuntar logo',
@@ -859,10 +856,9 @@ const COPY = {
       reset: '重置',
       saveProject: '保存项目',
       importProject: '导入项目',
-      zoomOpen: '放大图纸',
-      zoomNormal: '正常视图',
-      zoomIn: '放大',
-      zoomOut: '缩小',
+      zoomReset: '重置视图',
+      fullscreen: '全屏',
+      exitFullscreen: '退出全屏',
       removeProfile: '移除剖面',
       addProfile: '添加剖面',
       uploadLogo: '上传标志',
@@ -1764,7 +1760,6 @@ function toggleDownloads(enabled) {
   dom.downloadButtons?.forEach((button) => {
     button.disabled = !enabled;
   });
-  if (dom.zoomOpenButton) dom.zoomOpenButton.disabled = !enabled;
 }
 
 function setStatusMessage(message) {
@@ -3119,7 +3114,7 @@ async function updatePreview(force = false) {
   if (issues.length) {
     // Com erro, a última lâmina válida continua visível e a exportação fica bloqueada.
     // Sem lâmina anterior (reabrir com dados inválidos, importar projeto), mostra o estado atual.
-    if (!lastValidSvg) dom.previewCanvas.innerHTML = renderLayout(config);
+    if (!lastValidSvg) showPreviewSvg(renderLayout(config));
     showValidation(issues);
     return;
   }
@@ -3128,7 +3123,7 @@ async function updatePreview(force = false) {
   // Controles de preview (ex.: remover malha) ficam fora da exportação.
   lastValidSvg = svg.replace(/<g data-preview-only[\s\S]*?<\/g>/g, '');
   lastValidState = clone(state);
-  dom.previewCanvas.innerHTML = svg;
+  showPreviewSvg(svg);
   showValidation([],
     true,
   );
@@ -3219,8 +3214,6 @@ async function svgToCanvas(svgString, width, height) {
 
 const PROJECT_FORMAT = 'openblast.profile-creator.project';
 const PROJECT_VERSION = 1;
-const ZOOM_LEVELS = [1, 1.25, 1.5, 2, 2.5, 3, 4];
-let zoomIndex = 0;
 
 // Arquivo de projeto: mesmo conteúdo da memória do navegador, para continuar depois em qualquer máquina.
 function saveProjectFile() {
@@ -3266,40 +3259,124 @@ async function importProjectFile(file) {
   scheduleUpdate(true);
 }
 
-function openZoomViewer() {
-  if (!lastValidSvg || !dom.zoomViewer) return;
-  dom.zoomStage.innerHTML = lastValidSvg;
-  zoomIndex = 0;
-  dom.zoomViewer.hidden = false;
-  applyZoom();
-  dom.zoomReset.focus();
-}
+// Zoom na própria lâmina. Só muda a exibição: o SVG do relatório (lastValidSvg) não é alterado.
+// previewScale é a escala em relação ao tamanho real da lâmina (1 = 100%); null = visualização normal.
+let previewScale = null;
+let previewPanning = null;
+let suppressPreviewClick = false;
 
-function closeZoomViewer() {
-  if (!dom.zoomViewer || dom.zoomViewer.hidden) return;
-  dom.zoomViewer.hidden = true;
-  dom.zoomStage.innerHTML = '';
-  dom.zoomOpenButton?.focus();
-}
-
-function changeZoom(step) {
-  zoomIndex = clamp(zoomIndex + step, 0, ZOOM_LEVELS.length - 1);
-  applyZoom();
-}
-
-// Só muda a exibição: 100% ocupa a área disponível e os níveis crescem a partir daí.
-// O SVG do relatório (lastValidSvg) não é alterado, então a exportação continua igual.
-function applyZoom() {
-  const svg = dom.zoomStage.querySelector('svg');
-  if (!svg) return;
+function previewFitWidth(svg) {
+  const canvas = dom.previewCanvas;
+  const style = getComputedStyle(canvas);
+  const padX = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+  const padY = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
   const { width, height } = svg.viewBox.baseVal;
-  const pad = 48;
-  const fitWidth = Math.max(120, Math.min(dom.zoomStage.clientWidth - pad, (dom.zoomStage.clientHeight - pad) * (width / height)));
-  const level = ZOOM_LEVELS[zoomIndex];
-  svg.style.width = `${Math.round(fitWidth * level)}px`;
-  dom.zoomLevel.textContent = `${Math.round(level * 100)}%`;
-  dom.zoomIn.disabled = zoomIndex === ZOOM_LEVELS.length - 1;
-  dom.zoomOut.disabled = zoomIndex === 0;
+  const availW = canvas.clientWidth - padX;
+  const availH = canvas.clientHeight - padY;
+  return Math.max(120, Math.min(availW, availH * (width / height)));
+}
+
+// Visualização normal = a lâmina cabe na área (escala menor que 100%). 100% = tamanho real.
+// Sem zoom, a escala acompanha a área (tela cheia, redimensionamento).
+function applyPreviewZoom() {
+  const svg = dom.previewCanvas.querySelector('svg');
+  if (!svg) {
+    dom.zoomLevel.textContent = '';
+    dom.zoomReset.disabled = true;
+    return;
+  }
+  const native = svg.viewBox.baseVal.width;
+  const normal = previewFitWidth(svg) / native;
+  previewScale = clamp(previewScale ?? normal, normal, Math.max(normal, 1));
+  svg.style.width = `${Math.round(previewScale * native)}px`;
+  dom.zoomLevel.textContent = `${Math.round(previewScale * 100)}%`;
+  const zoomed = previewScale > normal + 0.001;
+  dom.zoomReset.disabled = !zoomed;
+  dom.previewCanvas.classList.toggle('is-zoomed', zoomed);
+}
+
+// Muda o zoom mantendo fixo, na tela, o ponto da lâmina que está sob o cursor.
+function setPreviewZoom(nextScale, clientX, clientY) {
+  const canvas = dom.previewCanvas;
+  const svg = canvas.querySelector('svg');
+  if (!svg) return;
+  const before = svg.getBoundingClientRect();
+  const fx = (clientX - before.left) / before.width;
+  const fy = (clientY - before.top) / before.height;
+  previewScale = nextScale;
+  applyPreviewZoom();
+  const after = svg.getBoundingClientRect();
+  canvas.scrollLeft += after.left + fx * after.width - clientX;
+  canvas.scrollTop += after.top + fy * after.height - clientY;
+}
+
+function showPreviewSvg(markup) {
+  dom.previewCanvas.innerHTML = markup;
+  applyPreviewZoom();
+}
+
+function onPreviewWheel(event) {
+  if (!dom.previewCanvas.querySelector('svg')) return;
+  event.preventDefault();
+  const deltaY = event.deltaMode === 1 ? event.deltaY * 16 : event.deltaY;
+  // Cerca de 10% por giro de roda; gesto de pinça no trackpad usa o mesmo caminho.
+  setPreviewZoom(previewScale * Math.exp(-deltaY * 0.001), event.clientX, event.clientY);
+}
+
+function onPreviewPointerDown(event) {
+  if (event.button !== 0 || !dom.previewCanvas.querySelector('svg')) return;
+  suppressPreviewClick = false;
+  previewPanning = {
+    x: event.clientX,
+    y: event.clientY,
+    left: dom.previewCanvas.scrollLeft,
+    top: dom.previewCanvas.scrollTop,
+    moved: false,
+  };
+}
+
+function onPreviewPointerMove(event) {
+  if (!previewPanning) return;
+  const dx = event.clientX - previewPanning.x;
+  const dy = event.clientY - previewPanning.y;
+  if (!previewPanning.moved) {
+    if (Math.hypot(dx, dy) < 4) return;
+    previewPanning.moved = true;
+    dom.previewCanvas.classList.add('is-panning');
+  }
+  dom.previewCanvas.scrollLeft = previewPanning.left - dx;
+  dom.previewCanvas.scrollTop = previewPanning.top - dy;
+}
+
+function onPreviewPointerUp() {
+  if (!previewPanning) return;
+  // Arrastar não deve virar clique (que selecionaria um segmento).
+  suppressPreviewClick = previewPanning.moved;
+  previewPanning = null;
+  dom.previewCanvas.classList.remove('is-panning');
+}
+
+function onPreviewClick(event) {
+  if (suppressPreviewClick) {
+    suppressPreviewClick = false;
+    event.stopPropagation();
+    return;
+  }
+  handleSVGClick(event);
+}
+
+function toggleFullscreen() {
+  if (document.fullscreenElement) {
+    document.exitFullscreen?.();
+    return;
+  }
+  dom.canvasArea?.requestFullscreen?.();
+}
+
+function syncFullscreenButton() {
+  if (!dom.fullscreenButton) return;
+  const copy = getCopy();
+  dom.fullscreenButton.textContent = document.fullscreenElement ? copy.buttons.exitFullscreen : copy.buttons.fullscreen;
 }
 
 function renderStaticChrome() {
@@ -3335,20 +3412,10 @@ function renderStaticChrome() {
   const importProjectButton = document.getElementById('importProjectButton');
   if (importProjectButton) importProjectButton.textContent = copy.buttons.importProject;
 
-  const zoomOpenButton = document.getElementById('zoomOpenButton');
-  if (zoomOpenButton) zoomOpenButton.textContent = copy.buttons.zoomOpen;
+  const zoomResetButton = document.getElementById('zoomReset');
+  if (zoomResetButton) zoomResetButton.textContent = copy.buttons.zoomReset;
 
-  const zoomNormalButton = document.getElementById('zoomReset');
-  if (zoomNormalButton) zoomNormalButton.textContent = copy.buttons.zoomNormal;
-
-  const zoomInButton = document.getElementById('zoomIn');
-  if (zoomInButton) zoomInButton.setAttribute('aria-label', copy.buttons.zoomIn);
-
-  const zoomOutButton = document.getElementById('zoomOut');
-  if (zoomOutButton) zoomOutButton.setAttribute('aria-label', copy.buttons.zoomOut);
-
-  const zoomViewer = document.getElementById('zoomViewer');
-  if (zoomViewer) zoomViewer.setAttribute('aria-label', copy.buttons.zoomOpen);
+  syncFullscreenButton();
 
   const languageSelect = document.getElementById('languageSelect');
   if (languageSelect) {
@@ -3430,13 +3497,10 @@ async function init() {
   dom.logoChip = null;
   dom.meshChip = null;
   dom.polygonNameTop = document.getElementById('polygonNameTop');
-  dom.zoomOpenButton = document.getElementById('zoomOpenButton');
-  dom.zoomViewer = document.getElementById('zoomViewer');
-  dom.zoomStage = document.getElementById('zoomStage');
+  dom.canvasArea = document.querySelector('.canvas-area');
   dom.zoomLevel = document.getElementById('zoomLevel');
-  dom.zoomIn = document.getElementById('zoomIn');
-  dom.zoomOut = document.getElementById('zoomOut');
   dom.zoomReset = document.getElementById('zoomReset');
+  dom.fullscreenButton = document.getElementById('fullscreenButton');
   dom.projectFile = document.getElementById('projectFile');
   dom.downloadButtons = Array.from(document.querySelectorAll('[data-download]'));
 
@@ -3477,7 +3541,7 @@ async function init() {
     scheduleUpdate();
   });
 
-  dom.previewCanvas?.addEventListener('click', handleSVGClick);
+  dom.previewCanvas?.addEventListener('click', onPreviewClick);
 
   document.getElementById('languageSelect')?.addEventListener('change', (event) => {
     if (event.target instanceof HTMLSelectElement) setLanguage(event.target.value);
@@ -3492,21 +3556,22 @@ async function init() {
     if (file) importProjectFile(file);
   });
 
-  dom.zoomOpenButton?.addEventListener('click', openZoomViewer);
-  dom.zoomIn?.addEventListener('click', () => changeZoom(1));
-  dom.zoomOut?.addEventListener('click', () => changeZoom(-1));
-  dom.zoomReset?.addEventListener('click', closeZoomViewer);
-  dom.zoomStage?.addEventListener('wheel', (event) => {
-    if (!event.ctrlKey) return;
-    event.preventDefault();
-    changeZoom(event.deltaY < 0 ? 1 : -1);
-  }, { passive: false });
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeZoomViewer();
+  dom.zoomReset?.addEventListener('click', () => {
+    previewScale = null;
+    dom.previewCanvas.scrollLeft = 0;
+    dom.previewCanvas.scrollTop = 0;
+    applyPreviewZoom();
   });
-  window.addEventListener('resize', () => {
-    if (dom.zoomViewer && !dom.zoomViewer.hidden) applyZoom();
-  });
+  dom.fullscreenButton?.addEventListener('click', toggleFullscreen);
+  document.addEventListener('fullscreenchange', syncFullscreenButton);
+  dom.previewCanvas.addEventListener('wheel', onPreviewWheel, { passive: false });
+  dom.previewCanvas.addEventListener('pointerdown', onPreviewPointerDown);
+  window.addEventListener('pointermove', onPreviewPointerMove);
+  window.addEventListener('pointerup', onPreviewPointerUp);
+  if ('ResizeObserver' in window) {
+    // Tela cheia e redimensionamento mudam a visualização normal; o zoom relativo é mantido.
+    new ResizeObserver(() => requestAnimationFrame(applyPreviewZoom)).observe(dom.previewCanvas);
+  }
 
   await updatePreview(true);
 }
