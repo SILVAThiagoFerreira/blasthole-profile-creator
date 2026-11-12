@@ -31,7 +31,7 @@
         "subperfuracao": 0.6,
         "segments": [
           { "height": 2.3, "type": "stemming" },
-          { "height": 8.3, "has_booster": true, "type": "column" }
+          { "height": 7.7, "has_booster": true, "type": "column" }
         ]
       }
     ],

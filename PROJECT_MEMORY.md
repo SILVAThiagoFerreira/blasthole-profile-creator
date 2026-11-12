@@ -1,6 +1,6 @@
 # Project Memory
 
-- Título do projeto: Criador de Perfil de Carga.
+- Título do projeto: Perfil de Carga.
 
 ## Comportamento Atual
 

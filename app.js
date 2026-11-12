@@ -1,6 +1,6 @@
 const FALLBACK_CONFIG = {
   app: {
-    title: 'Criador de Perfil de Carga',
+    title: 'Perfil de Carga',
     subtitle: 'Workspace técnico para perfis de carga.',
     default_profile_type: 'DOCUMENTO DE USO TÉCNICO',
     default_language: 'pt-BR',
@@ -70,7 +70,7 @@ const FALLBACK_CONFIG = {
         blastbags: [],
         segments: [
           { type: 'stemming', height: 2.3 },
-          { type: 'column', height: 8.3, has_booster: true },
+          { type: 'column', height: 7.7, has_booster: true },
         ],
         inclinacao: 0.0,
         azimute: 0.0,
@@ -137,11 +137,11 @@ const DEFAULT_SUPPORTED_LANGUAGES = ['pt-BR', 'es', 'en', 'zh-CN'];
 const COPY = {
   'pt-BR': {
     meta: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       description: 'Workspace profissional para criação, validação e exportação local de perfis de carga.',
     },
     brand: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -176,7 +176,12 @@ const COPY = {
     },
     buttons: {
       reset: 'Restaurar',
-      save: 'Salvar',
+      saveProject: 'Salvar projeto',
+      importProject: 'Importar projeto',
+      zoomOpen: 'Ampliar lâmina',
+      zoomNormal: 'Visualização normal',
+      zoomIn: 'Aumentar zoom',
+      zoomOut: 'Diminuir zoom',
       removeProfile: 'Remover perfil',
       addProfile: 'Adicionar perfil',
       uploadLogo: 'Anexar logo',
@@ -243,6 +248,8 @@ const COPY = {
       initiatorDVT: 'Eletrônico',
       initiatorBoth: 'NonEl + Eletrônico (Dupla)',
       hasBooster: 'Reforçador (Booster)',
+      initiatorNonelDeck: 'Não elétrico (NonEl)',
+      initiatorElectricDeck: 'Eletrônico',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pré-corte)',
       cordel: 'Cordel NP',
@@ -250,6 +257,7 @@ const COPY = {
       cordelNP: 'Cordel NP',
       cordelGap: 'Trecho sem cordel (m)',
       cordelGramatura: 'Gramatura (g/m)',
+      emulsion: 'Carga emulsão',
     },
     deckPositions: {
       above_stemming: 'Acima do tampão',
@@ -304,11 +312,14 @@ const COPY = {
       nonNegative: (field, index) => `${field} do perfil ${index} deve ser maior ou igual a zero.`,
       previewError: (message) => `Falha ao gerar pré-visualização: ${message}`,
       pdfUnavailable: 'Biblioteca PDF indisponível no momento.',
-      saveSuccess: 'Memória salva no navegador.',
       saveFailure: 'Não foi possível salvar a memória local.',
+      projectSaved: 'Arquivo do projeto gerado.',
+      projectInvalid: 'Arquivo de projeto inválido. Selecione um JSON gerado por "Salvar projeto".',
+      benchExceeded: (index, sequence, bench, excess) => `Perfil ${index}: a sequência do furo ultrapassa a altura do banco em ${excess} m (sequência ${sequence} m, banco ${bench} m). A subperfuração não entra nesse limite.`,
+      excessLabel: 'Excesso',
     },
     svg: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       desc: 'Perfil de carga editável com composição vetorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: '',
@@ -341,11 +352,6 @@ const COPY = {
       'contorno': 'Contorno',
       'personalizado': 'Personalizado',
     },
-    templates: {
-      'Corporate clean': 'Corporate clean',
-      'Boardroom minimal': 'Boardroom minimal',
-      'Executive brief': 'Executive brief',
-    },
     languageNames: {
       'pt-BR': 'Português (Brasil)',
       es: 'Español',
@@ -358,11 +364,11 @@ const COPY = {
   },
   en: {
     meta: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       description: 'Professional workspace for creating, validating, and exporting charge profiles locally.',
     },
     brand: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -397,7 +403,12 @@ const COPY = {
     },
     buttons: {
       reset: 'Reset',
-      save: 'Save',
+      saveProject: 'Save project',
+      importProject: 'Import project',
+      zoomOpen: 'Enlarge sheet',
+      zoomNormal: 'Normal view',
+      zoomIn: 'Zoom in',
+      zoomOut: 'Zoom out',
       removeProfile: 'Remove profile',
       addProfile: 'Add profile',
       uploadLogo: 'Upload logo',
@@ -464,6 +475,8 @@ const COPY = {
       initiatorDVT: 'Electronic',
       initiatorBoth: 'NonEl + Electronic (Dual)',
       hasBooster: 'Booster',
+      initiatorNonelDeck: 'Non-electric (NonEl)',
+      initiatorElectricDeck: 'Electronic',
       boosterWeight: 'Weight (g)',
       cartridgeCount: 'Cartridges (pre-cut)',
       cordel: 'NP Cord',
@@ -471,6 +484,7 @@ const COPY = {
       cordelNP: 'Cord NP',
       cordelGap: 'No-cordel segment (m)',
       cordelGramatura: 'Grammage (g/m)',
+      emulsion: 'Emulsion charge',
     },
     deckPositions: {
       above_stemming: 'Above stemming',
@@ -525,11 +539,14 @@ const COPY = {
       nonNegative: (field, index) => `${field} for profile ${index} must be zero or greater.`,
       previewError: (message) => `Preview generation failed: ${message}`,
       pdfUnavailable: 'PDF library is unavailable right now.',
-      saveSuccess: 'Browser memory saved.',
       saveFailure: 'Could not save local memory.',
+      projectSaved: 'Project file generated.',
+      projectInvalid: 'Invalid project file. Choose a JSON generated by "Save project".',
+      benchExceeded: (index, sequence, bench, excess) => `Profile ${index}: the hole sequence exceeds the bench height by ${excess} m (sequence ${sequence} m, bench ${bench} m). Subdrilling is not counted in this limit.`,
+      excessLabel: 'Excess',
     },
     svg: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       desc: 'Editable charge profile with vector composition.',
       headerTitle: 'CHARGE PROFILE',
       headerBadge: '',
@@ -562,11 +579,6 @@ const COPY = {
       'contorno': 'Contour',
       'personalizado': 'Custom',
     },
-    templates: {
-      'Corporate clean': 'Corporate clean',
-      'Boardroom minimal': 'Boardroom minimal',
-      'Executive brief': 'Executive brief',
-    },
     languageNames: {
       'pt-BR': 'Portuguese (Brazil)',
       es: 'Spanish',
@@ -579,11 +591,11 @@ const COPY = {
   },
   es: {
     meta: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       description: 'Workspace profesional para crear, validar y exportar perfiles de carga localmente.',
     },
     brand: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -618,7 +630,12 @@ const COPY = {
     },
     buttons: {
       reset: 'Restaurar',
-      save: 'Guardar',
+      saveProject: 'Guardar proyecto',
+      importProject: 'Importar proyecto',
+      zoomOpen: 'Ampliar lámina',
+      zoomNormal: 'Vista normal',
+      zoomIn: 'Acercar',
+      zoomOut: 'Alejar',
       removeProfile: 'Eliminar perfil',
       addProfile: 'Agregar perfil',
       uploadLogo: 'Adjuntar logo',
@@ -685,6 +702,8 @@ const COPY = {
       initiatorDVT: 'Electrónico',
       initiatorBoth: 'NonEl + Electrónico (Doble)',
       hasBooster: 'Reforzador (Booster)',
+      initiatorNonelDeck: 'No eléctrico (NonEl)',
+      initiatorElectricDeck: 'Electrónico',
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pre-corte)',
       cordel: 'Cordel NP',
@@ -692,6 +711,7 @@ const COPY = {
       cordelNP: 'Cordel NP',
       cordelGap: 'Tramo sin cordel (m)',
       cordelGramatura: 'Gramaje (g/m)',
+      emulsion: 'Carga de emulsión',
     },
     deckPositions: {
       above_stemming: 'Encima del taco',
@@ -746,11 +766,14 @@ const COPY = {
       nonNegative: (field, index) => `${field} del perfil ${index} debe ser mayor o igual a cero.`,
       previewError: (message) => `Error al generar la vista previa: ${message}`,
       pdfUnavailable: 'La biblioteca PDF no está disponible en este momento.',
-      saveSuccess: 'Memoria guardada en el navegador.',
       saveFailure: 'No fue posible guardar la memoria local.',
+      projectSaved: 'Archivo del proyecto generado.',
+      projectInvalid: 'Archivo de proyecto no válido. Seleccione un JSON generado por "Guardar proyecto".',
+      benchExceeded: (index, sequence, bench, excess) => `Perfil ${index}: la secuencia del barreno supera la altura del banco en ${excess} m (secuencia ${sequence} m, banco ${bench} m). La sobreperforación no entra en este límite.`,
+      excessLabel: 'Exceso',
     },
     svg: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       desc: 'Perfil de carga editable con composición vectorial.',
       headerTitle: 'PERFIL DE CARGA',
       headerBadge: '',
@@ -783,11 +806,6 @@ const COPY = {
       'contorno': 'Contorno',
       'personalizado': 'Personalizado',
     },
-    templates: {
-      'Corporate clean': 'Corporate clean',
-      'Boardroom minimal': 'Boardroom minimal',
-      'Executive brief': 'Executive brief',
-    },
     languageNames: {
       'pt-BR': 'Portugués (Brasil)',
       es: 'Español',
@@ -800,11 +818,11 @@ const COPY = {
   },
   'zh-CN': {
     meta: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       description: '用于本地创建、验证并导出装药剖面的专业工作区。',
     },
     brand: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       subtitle: 'Charge Profile Workspace',
     },
     topbar: {
@@ -839,7 +857,12 @@ const COPY = {
     },
     buttons: {
       reset: '重置',
-      save: '保存',
+      saveProject: '保存项目',
+      importProject: '导入项目',
+      zoomOpen: '放大图纸',
+      zoomNormal: '正常视图',
+      zoomIn: '放大',
+      zoomOut: '缩小',
       removeProfile: '移除剖面',
       addProfile: '添加剖面',
       uploadLogo: '上传标志',
@@ -906,6 +929,8 @@ const COPY = {
       initiatorDVT: '电子',
       initiatorBoth: 'NonEl + 电子 (双重)',
       hasBooster: '增强器 (Booster)',
+      initiatorNonelDeck: '非电 (NonEl)',
+      initiatorElectricDeck: '电子',
       boosterWeight: '重量 (g)',
       cartridgeCount: '药卷 (预裂)',
       cordel: '导爆索 NP',
@@ -913,6 +938,7 @@ const COPY = {
       cordelNP: '导爆索 NP',
       cordelGap: '无导爆索区段 (m)',
       cordelGramatura: '克重 (g/m)',
+      emulsion: '乳化炸药',
     },
     deckPositions: {
       above_stemming: '堵塞上方',
@@ -967,11 +993,14 @@ const COPY = {
       nonNegative: (field, index) => `剖面 ${index} 的 ${field} 必须大于或等于零。`,
       previewError: (message) => `预览生成失败：${message}`,
       pdfUnavailable: '当前无法使用 PDF 库。',
-      saveSuccess: '已保存到浏览器。',
       saveFailure: '无法保存本地记忆。',
+      projectSaved: '项目文件已生成。',
+      projectInvalid: '项目文件无效。请选择由“保存项目”生成的 JSON 文件。',
+      benchExceeded: (index, sequence, bench, excess) => `剖面 ${index}：炮孔序列超出台阶高度 ${excess} m（序列 ${sequence} m，台阶 ${bench} m）。超钻不计入此限制。`,
+      excessLabel: '超出',
     },
     svg: {
-      title: 'Criador de Perfil de Carga',
+      title: 'Perfil de Carga',
       desc: '可编辑的装药剖面，采用矢量组成。',
       headerTitle: '装药剖面',
       headerBadge: '',
@@ -1003,11 +1032,6 @@ const COPY = {
       'amortecimento': '缓冲',
       'contorno': '轮廓',
       'personalizado': '自定义',
-    },
-    templates: {
-      'Corporate clean': 'Corporate clean',
-      'Boardroom minimal': 'Boardroom minimal',
-      'Executive brief': 'Executive brief',
     },
     languageNames: {
       'pt-BR': '葡萄牙语（巴西）',
@@ -1098,11 +1122,6 @@ function stateLabel(field, lang = getActiveLanguage()) {
 function kindLabel(kind, lang = getActiveLanguage()) {
   const copy = getCopy(lang);
   return copy.kinds[normalizeKind(kind)] || copy.kinds.personalizado;
-}
-
-function templateDisplayName(templateName, lang = getActiveLanguage()) {
-  const copy = getCopy(lang);
-  return copy.templates[templateName] || templateName;
 }
 
 function languageDisplayName(code, lang = getActiveLanguage()) {
@@ -1293,6 +1312,8 @@ function normalizeSegments(items, profile, fallbackSegments = []) {
       type: normalizeSegmentType(item?.type, fallbackItem.type || 'column'),
       height: Math.max(normalizeNumber(item?.height, fallbackItem.height ?? 0), 0),
       has_booster: Boolean(item?.has_booster),
+      has_nonel: Boolean(item?.has_nonel),
+      has_electric: Boolean(item?.has_electric),
       cartridge_count: clampInteger(item?.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN),
     };
   }).filter((item) => item.height > 0).slice(0, 24);
@@ -1302,6 +1323,19 @@ function sumSegmentsByType(segments, type) {
   return Array.isArray(segments)
     ? segments.reduce((total, item) => total + (item.type === type ? Math.max(normalizeNumber(item.height, 0), 0) : 0), 0)
     : 0;
+}
+
+function sumSequenceHeights(segments) {
+  return Array.isArray(segments)
+    ? segments.reduce((total, item) => total + Math.max(normalizeNumber(item?.height, 0), 0), 0)
+    : 0;
+}
+
+// Diferença, em centímetros, entre a sequência do furo e a altura do banco.
+// A subperfuração não entra: o banco é medido até o fundo da carga. Positivo = ultrapassa.
+function benchExcessCm(profile) {
+  if (!Number.isFinite(profile.altura_banco)) return 0;
+  return Math.round(sumSequenceHeights(profile.segments) * 100) - Math.round(profile.altura_banco * 100);
 }
 
 function clamp(value, min, max) {
@@ -1376,6 +1410,15 @@ function normalizeKind(value) {
 
 function isNonEmptyString(value) {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+// Logo e malha só entram no estado como imagens data:, evitando atributos injetados por arquivos de projeto.
+// Qualquer subtipo de imagem em base64 (sem aspas nem colchetes, que quebrariam o atributo no SVG).
+const DATA_IMAGE_URL_PATTERN = /^data:image\/[a-z0-9.+-]+;base64,[A-Za-z0-9+\/=]+$/i;
+
+function safeDataUrl(value) {
+  const text = isNonEmptyString(value) ? String(value).trim() : '';
+  return DATA_IMAGE_URL_PATTERN.test(text) ? text : '';
 }
 
 function resolveTemplateName(value, currentConfig = config) {
@@ -1482,9 +1525,11 @@ function mergeLoadedState(currentConfig, savedState) {
 
   if (!request || typeof request !== 'object') return base;
 
-  const templateName = resolveTemplateName(request.template_name, currentConfig) || base.templateName;
+  // Aceita as chaves do seed (snake_case) e as do estado salvo no navegador ou no projeto (camelCase).
+  const templateName = resolveTemplateName(request.template_name ?? request.templateName, currentConfig) || base.templateName;
 
-  const polygonName = isNonEmptyString(request.polygon_name) ? String(request.polygon_name).trim() : base.polygonName;
+  const rawPolygonName = request.polygon_name ?? request.polygonName;
+  const polygonName = isNonEmptyString(rawPolygonName) ? String(rawPolygonName).trim() : base.polygonName;
   const observation = typeof request.observation === 'string' ? request.observation : base.observation;
   const profileType = base.profileType;
 
@@ -1498,7 +1543,8 @@ function mergeLoadedState(currentConfig, savedState) {
   if (requestedLanguage === 'pt-BR' && labels.stemming === 'Tampão') labels.stemming = base.labels.stemming;
 
   const savedProfiles = Array.isArray(request.profiles) ? request.profiles : [];
-  const requestedCount = Number.isInteger(request.profile_count) ? request.profile_count : savedProfiles.length || base.profileCount;
+  const rawCount = request.profile_count ?? request.profileCount;
+  const requestedCount = Number.isInteger(rawCount) ? rawCount : savedProfiles.length || base.profileCount;
   const profileCount = clamp(requestedCount, validation.min_profiles, validation.max_profiles);
   const profiles = [];
 
@@ -1521,7 +1567,7 @@ function mergeLoadedState(currentConfig, savedState) {
       return {
         name: isNonEmptyString(asset.name) ? String(asset.name).trim() : '',
         type: isNonEmptyString(asset.type) ? String(asset.type).trim() : '',
-        dataUrl: isNonEmptyString(asset.dataUrl) ? String(asset.dataUrl) : '',
+        dataUrl: safeDataUrl(asset.dataUrl),
       };
     })(),
     mesh: (() => {
@@ -1529,13 +1575,13 @@ function mergeLoadedState(currentConfig, savedState) {
       return {
         name: isNonEmptyString(asset?.name) ? String(asset.name).trim() : '',
         type: isNonEmptyString(asset?.type) ? String(asset.type).trim() : '',
-        dataUrl: isNonEmptyString(asset?.dataUrl) ? String(asset.dataUrl) : '',
+        dataUrl: safeDataUrl(asset?.dataUrl),
       };
     })(),
   };
 
-  const errors = validateState(state, currentConfig);
-  if (errors.length) return base;
+  // Estado com erro é carregado mesmo assim: a validação mostra o motivo e bloqueia
+  // lâmina e exportação, sem descartar o trabalho salvo.
   return state;
 }
 
@@ -1612,6 +1658,15 @@ function validateState(appState, currentConfig) {
           }
         }
       });
+    }
+    const excessCm = benchExcessCm(profile);
+    if (excessCm > 0) {
+      issues.push(copy.validation.benchExceeded(
+        index + 1,
+        formatDecimal(sumSequenceHeights(profile.segments), 2, lang),
+        formatDecimal(profile.altura_banco, 2, lang),
+        formatDecimal(excessCm / 100, 2, lang),
+      ));
     }
   });
 
@@ -1699,10 +1754,17 @@ function showValidation(issues, persist = false) {
   dom.validation.innerHTML = `<div class="error"><strong>${escapeXml(getCopy().validation.fixBefore)}</strong><ul>${messages.map((issue) => `<li>${escapeXml(issue)}</li>`).join('')}</ul></div>`;
 }
 
+// Erro de arquivo não muda o estado atual: exportação e lâmina válida continuam disponíveis.
+function showFileError(message) {
+  if (!dom.validation) return;
+  dom.validation.innerHTML = `<div class="error">${escapeXml(message)}</div>`;
+}
+
 function toggleDownloads(enabled) {
   dom.downloadButtons?.forEach((button) => {
     button.disabled = !enabled;
   });
+  if (dom.zoomOpenButton) dom.zoomOpenButton.disabled = !enabled;
 }
 
 function setStatusMessage(message) {
@@ -1898,12 +1960,23 @@ function buildChargeSegments(profile, accent) {
     type: item.type,
     value: item.height,
     has_booster: Boolean(item.has_booster),
+    has_nonel: Boolean(item.has_nonel),
+    has_electric: Boolean(item.has_electric),
     cartridge_count: clampInteger(item.cartridge_count, CARTRIDGE_COUNT_MIN, CARTRIDGE_COUNT_MAX, CARTRIDGE_COUNT_MIN),
     color: item.type === 'blastbag' ? '#1F2937' : (item.type === 'stemming' ? '#C8CDD5' : accent),
   }));
   if (sub > 0) segments.push({ key: 'subdrill', type: 'subdrill', value: sub, color: '#4B5563' });
 
   return { segments, stem, sub, bb, ad, charge };
+}
+
+// Massa de emulsão (kg) nas colunas de carga: volume do furo × densidade.
+// Densidade em g/cm³ equivale a t/m³; ×1000 converte para kg/m³.
+function emulsionChargeKg(profile) {
+  const radiusM = Math.max(normalizeNumber(profile.diametro_furo, 0), 0) / 2000;
+  const densityKgM3 = Math.max(normalizeNumber(profile.densidade, 0), 0) * 1000;
+  const columnM = sumSegmentsByType(profile.segments, 'column');
+  return Math.PI * radiusM * radiusM * columnM * densityKgM3;
 }
 
 function segmentDisplayLabel(type, lang = getActiveLanguage()) {
@@ -2135,6 +2208,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ...(ad > 0 ? [['airdeck', labels.airdeck, `${formatDecimal(ad)} m`, 'airdeck']] : []),
     ['charge', labels.column, `${formatDecimal(charge)} m`, 'column'],
     ...(cartridgeMeasure ? [['cartridge', labels.cartridge, cartridgeMeasure, 'column']] : []),
+    ['emulsion', fieldLabel('emulsion', lang), `${formatDecimal(emulsionChargeKg(profile), 1, lang)} kg`, 'column'],
     ['initiator', copy.fieldLabels.initiator, initiatorLabel, 'initiator'],
     ...(hasBooster ? [['booster', boosterLabel, `${formatDecimal(profile.booster_weight, 0, lang)} g`, 'booster']] : []),
     ...(cordelTag ? [['cordel', copy.fieldLabels.cordel, cordelTag, 'cordel']] : []),
@@ -2144,7 +2218,7 @@ function renderProfileCard(profile, theme, box, compact, index) {
   ];
 
   const metricGroups = [
-    { title: copy.svg.groups.hole, keys: ['diameter', 'height', 'subdrill', 'stemming', 'blastbag', 'airdeck', 'charge', 'cartridge'] },
+    { title: copy.svg.groups.hole, keys: ['diameter', 'height', 'subdrill', 'stemming', 'blastbag', 'airdeck', 'charge', 'cartridge', 'emulsion'] },
     { title: copy.svg.groups.initiation, keys: ['initiator', 'booster', 'cordel'] },
     { title: copy.svg.groups.orientation, keys: ['inclination', 'azimuth', 'density'] },
   ]
@@ -2266,10 +2340,10 @@ function renderProfileCard(profile, theme, box, compact, index) {
         sideLabelYs.push(picked);
         return picked;
       };
-      const drawCable = (color, offsetX, label, labelYRatio = 0.5) => {
+      const drawCable = (color, offsetX, label, labelYRatio = 0.5, endY = holeBottom - 4) => {
         const cableX = cx + offsetX;
         const cableStartY = collarY - (compact ? 5 : 7);
-        overlay.push(`<line x1="${cableX}" y1="${cableStartY}" x2="${cableX}" y2="${holeBottom - 4}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
+        overlay.push(`<line x1="${cableX}" y1="${cableStartY}" x2="${cableX}" y2="${endY}" stroke="${color}" stroke-width="${compact ? 1.5 : 2}" stroke-linecap="round"/>`);
         overlay.push(`<circle cx="${cableX}" cy="${cableStartY}" r="${compact ? 2.5 : 3.5}" fill="#FFFFFF" stroke="${color}" stroke-width="${compact ? 1.2 : 1.5}"/>`);
         if (!compact && label) {
           const labelY = reserveSideLabelY(holeTop + holeH * labelYRatio);
@@ -2309,6 +2383,18 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<text x="${labelLaneX}" y="${labelY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 10.5}" font-weight="700" dominant-baseline="middle">${escapeXml(sideTag)}</text>`);
         }
       }
+      // Iniciadores por deck: cada coluna ou cartucho marcado recebe cabo do colar até a sua base.
+      let deckTop = holeTop;
+      segmentData.forEach((seg) => {
+        const segStart = deckTop;
+        const segEnd = seg.type === 'subdrill' ? holeBottom : deckTop + holeH * (Math.max(seg.value, 0) / total);
+        deckTop = segEnd;
+        if (!(seg.type === 'column' || seg.type === 'cartridge') || seg.value <= 0) return;
+        const deckEndY = segEnd - 4;
+        const deckLabelRatio = ((segStart + segEnd) / 2 - holeTop) / holeH;
+        if (seg.has_nonel) drawCable('#E67E22', compact ? -4 : -8, 'NonEl', deckLabelRatio, deckEndY);
+        if (seg.has_electric) drawCable('#8E44AD', compact ? 4 : 8, copy.fieldLabels.initiatorElectricDeck, deckLabelRatio, deckEndY);
+      });
       for (const item of measurementItems) {
         if (Math.abs(item.midY - item.sourceMidY) < 1.5) continue;
         const leader = '<line x1="' + (measureX + measureCap + 1) + '" y1="' + item.sourceMidY + '" x2="' + (measureLabelX - 3) + '" y2="' + item.midY + '" stroke="' + theme.muted + '" stroke-width="0.65" opacity="0.55"/>';
@@ -2566,6 +2652,11 @@ function segmentTypeOptions() {
   return SEGMENT_TYPES.map((value) => ({ value, label: compactLabels[value] || types[value] || value }));
 }
 
+// Iniciador por deck: NE (não elétrico) e E (elétrico) são independentes e podem ser combinados.
+function renderInitiatorToggle(profileIndex, itemIndex, flag, checked, kind, title) {
+  return `<label class="initiator-toggle initiator-toggle--${kind}" title="${escapeXml(title)}"><input type="checkbox" data-path="profiles.${profileIndex}.segments.${itemIndex}.${flag}"${checked ? ' checked' : ''} aria-label="${escapeXml(title)}"><span>${kind === 'nonel' ? 'NE' : 'E'}</span></label>`;
+}
+
 function renderSegmentEditor(profile, index) {
   const copy = getCopy();
   const typeOpts = segmentTypeOptions();
@@ -2583,6 +2674,7 @@ function renderSegmentEditor(profile, index) {
         <input data-path="profiles.${index}.segments.${itemIndex}.height" type="number" step="0.05" min="0" value="${escapeXml(String(item.height ?? ''))}">
       </div>
       ${showBooster ? `<div class="segment-row__booster"><label class="booster-toggle" title="Reforçador (Booster)"><input type="checkbox" data-path="profiles.${index}.segments.${itemIndex}.has_booster"${item.has_booster ? ' checked' : ''}><span class="booster-toggle__icon"></span></label></div>` : ''}
+      ${showBooster ? `<div class="segment-row__initiators">${renderInitiatorToggle(index, itemIndex, 'has_nonel', item.has_nonel, 'nonel', copy.fieldLabels.initiatorNonelDeck)}${renderInitiatorToggle(index, itemIndex, 'has_electric', item.has_electric, 'electric', copy.fieldLabels.initiatorElectricDeck)}</div>` : ''}
       ${showCartridgeCount ? `<div class="segment-row__cartridges" title="${escapeXml(copy.fieldLabels.cartridgeCount)}"><select aria-label="${escapeXml(copy.fieldLabels.cartridgeCount)}" data-path="profiles.${index}.segments.${itemIndex}.cartridge_count">${Array.from({ length: CARTRIDGE_COUNT_MAX - CARTRIDGE_COUNT_MIN + 1 }, (_, offset) => CARTRIDGE_COUNT_MIN + offset).map((count) => `<option value="${count}"${count === cartridgeCount ? ' selected' : ''}>${count}x</option>`).join('')}</select></div>` : ''}
       <div class="segment-row__btns">
         <button class="segment-row__btn" type="button" data-action="move-segment-up" data-profile-index="${index}" data-item-index="${itemIndex}" title="Subir">&#9650;</button>
@@ -2678,6 +2770,7 @@ function renderAutoCalcSummary(profile, lang) {
   const sub = Math.max(profile.subperfuracao, 0);
   const bb = sumSegmentsByType(profile.segments, 'blastbag');
   const ad = sumSegmentsByType(profile.segments, 'airdeck');
+  const excessCm = benchExcessCm(profile);
   return `
     <div class="auto-calc-bar">
       <span class="auto-calc-chip" style="border-left: 3px solid var(--accent-blue);"><strong>H:</strong> ${formatDecimal(profile.altura_banco)}</span>
@@ -2686,6 +2779,7 @@ function renderAutoCalcSummary(profile, lang) {
       ${bb > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid #2F343B;"><strong>BB:</strong> ${formatDecimal(bb)}</span>` : ''}
       ${ad > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid var(--accent-orange);"><strong>AD:</strong> ${formatDecimal(ad)}</span>` : ''}
       ${sub > 0 ? `<span class="auto-calc-chip" style="border-left: 3px solid #4B5563;"><strong>Sub:</strong> ${formatDecimal(sub)}</span>` : ''}
+      ${excessCm > 0 ? `<span class="auto-calc-chip auto-calc-chip--excess"><strong>${escapeXml(copy.validation.excessLabel)}:</strong> +${formatDecimal(excessCm / 100, 2, lang)} m</span>` : ''}
     </div>`;
 }
 
@@ -2771,11 +2865,6 @@ function renderAttachmentRow({ label, buttonLabel, inputId, role, accept, chipId
 function syncTopbarInputs() {
   if (dom.polygonNameTop) {
     dom.polygonNameTop.value = state.polygonName || '';
-  }
-  if (dom.templateNameTop) {
-    const copy = getCopy();
-    const opts = Object.keys(config.templates).map((t) => `<option value="${escapeXml(t)}"${t === state.templateName ? ' selected' : ''}>${escapeXml(templateDisplayName(t))}</option>`).join('');
-    dom.templateNameTop.innerHTML = opts;
   }
 }
 
@@ -2998,15 +3087,6 @@ function handleClickEvent(event) {
   if (target.id === 'profilePlus') adjustProfileCount(1);
   if (target.id === 'profileMinus') adjustProfileCount(-1);
   if (target.id === 'resetButton') resetState(config);
-  if (target.id === 'saveButton') {
-    const issues = validateState(state, config);
-    if (issues.length) {
-      showValidation(issues);
-      return;
-    }
-    saveStateToStorage(config, state);
-    setStatusMessage(getCopy().validation.saveSuccess);
-  }
 
   const downloadType = target.getAttribute('data-download');
   if (downloadType) {
@@ -3026,7 +3106,20 @@ function scheduleUpdate(force = false) {
 
 async function updatePreview(force = false) {
   const issues = validateState(state, config);
+  // Mantém o resumo H/C/S e o aviso de excesso em dia sem redesenhar os campos (preserva o foco).
+  const summaryProfile = state.profiles[selectedProfileIndex] || state.profiles[0];
+  if (dom.autoCalcSummary && summaryProfile) {
+    dom.autoCalcSummary.innerHTML = renderAutoCalcSummary(summaryProfile, getActiveLanguage());
+  }
+  // Salva também com erro: a edição em andamento não se perde ao recarregar.
+  // A validação continua bloqueando lâmina e exportação.
+  if (saveTimer) window.clearTimeout(saveTimer);
+  saveTimer = window.setTimeout(() => saveStateToStorage(config, state), force ? 0 : 300);
+
   if (issues.length) {
+    // Sem lâmina enquanto houver erro: uma lâmina antiga pareceria válida com os dados atuais.
+    lastValidSvg = '';
+    dom.previewCanvas.innerHTML = '';
     showValidation(issues);
     return;
   }
@@ -3039,9 +3132,6 @@ async function updatePreview(force = false) {
   showValidation([],
     true,
   );
-
-  if (saveTimer) window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => saveStateToStorage(config, state), force ? 0 : 300);
 }
 
 async function downloadArtifact(type) {
@@ -3127,6 +3217,89 @@ async function svgToCanvas(svgString, width, height) {
   }
 }
 
+const PROJECT_FORMAT = 'openblast.profile-creator.project';
+const PROJECT_VERSION = 1;
+const ZOOM_LEVELS = [1, 1.25, 1.5, 2, 2.5, 3, 4];
+let zoomIndex = 0;
+
+// Arquivo de projeto: mesmo conteúdo da memória do navegador, para continuar depois em qualquer máquina.
+function saveProjectFile() {
+  const issues = validateState(state, config);
+  if (issues.length) {
+    showValidation(issues);
+    return;
+  }
+  const payload = {
+    format: PROJECT_FORMAT,
+    version: PROJECT_VERSION,
+    savedAt: new Date().toISOString(),
+    request: serializeForStorage(state),
+  };
+  const slug = String(state.polygonName || '').trim().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
+  downloadBlob(
+    new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }),
+    `${getDownloadBaseName()}-${slug || 'projeto'}.json`,
+  );
+  setStatusMessage(getCopy().validation.projectSaved);
+}
+
+async function importProjectFile(file) {
+  let payload = null;
+  try {
+    payload = JSON.parse(await file.text());
+  } catch {
+    payload = null;
+  }
+  if (!payload || payload.format !== PROJECT_FORMAT || payload.version !== PROJECT_VERSION
+    || !payload.request || typeof payload.request !== 'object') {
+    showFileError(getCopy().validation.projectInvalid);
+    return;
+  }
+  state = mergeLoadedState(config, payload);
+  selectedProfileIndex = 0;
+  selectedSegmentKey = null;
+  saveLanguagePreference(config, state.language);
+  renderStaticChrome();
+  renderShell(config);
+  scheduleUpdate(true);
+}
+
+function openZoomViewer() {
+  if (!lastValidSvg || !dom.zoomViewer) return;
+  dom.zoomStage.innerHTML = lastValidSvg;
+  zoomIndex = 0;
+  dom.zoomViewer.hidden = false;
+  applyZoom();
+  dom.zoomReset.focus();
+}
+
+function closeZoomViewer() {
+  if (!dom.zoomViewer || dom.zoomViewer.hidden) return;
+  dom.zoomViewer.hidden = true;
+  dom.zoomStage.innerHTML = '';
+  dom.zoomOpenButton?.focus();
+}
+
+function changeZoom(step) {
+  zoomIndex = clamp(zoomIndex + step, 0, ZOOM_LEVELS.length - 1);
+  applyZoom();
+}
+
+// Só muda a exibição: 100% ocupa a área disponível e os níveis crescem a partir daí.
+// O SVG do relatório (lastValidSvg) não é alterado, então a exportação continua igual.
+function applyZoom() {
+  const svg = dom.zoomStage.querySelector('svg');
+  if (!svg) return;
+  const { width, height } = svg.viewBox.baseVal;
+  const pad = 48;
+  const fitWidth = Math.max(120, Math.min(dom.zoomStage.clientWidth - pad, (dom.zoomStage.clientHeight - pad) * (width / height)));
+  const level = ZOOM_LEVELS[zoomIndex];
+  svg.style.width = `${Math.round(fitWidth * level)}px`;
+  dom.zoomLevel.textContent = `${Math.round(level * 100)}%`;
+  dom.zoomIn.disabled = zoomIndex === ZOOM_LEVELS.length - 1;
+  dom.zoomOut.disabled = zoomIndex === 0;
+}
+
 function renderStaticChrome() {
   const lang = getActiveLanguage();
   const copy = getCopy(lang);
@@ -3154,8 +3327,26 @@ function renderStaticChrome() {
   const resetButton = document.getElementById('resetButton');
   if (resetButton) resetButton.textContent = copy.buttons.reset;
 
-  const saveButton = document.getElementById('saveButton');
-  if (saveButton) saveButton.textContent = copy.buttons.save;
+  const saveProjectButton = document.getElementById('saveProjectButton');
+  if (saveProjectButton) saveProjectButton.textContent = copy.buttons.saveProject;
+
+  const importProjectButton = document.getElementById('importProjectButton');
+  if (importProjectButton) importProjectButton.textContent = copy.buttons.importProject;
+
+  const zoomOpenButton = document.getElementById('zoomOpenButton');
+  if (zoomOpenButton) zoomOpenButton.textContent = copy.buttons.zoomOpen;
+
+  const zoomNormalButton = document.getElementById('zoomReset');
+  if (zoomNormalButton) zoomNormalButton.textContent = copy.buttons.zoomNormal;
+
+  const zoomInButton = document.getElementById('zoomIn');
+  if (zoomInButton) zoomInButton.setAttribute('aria-label', copy.buttons.zoomIn);
+
+  const zoomOutButton = document.getElementById('zoomOut');
+  if (zoomOutButton) zoomOutButton.setAttribute('aria-label', copy.buttons.zoomOut);
+
+  const zoomViewer = document.getElementById('zoomViewer');
+  if (zoomViewer) zoomViewer.setAttribute('aria-label', copy.buttons.zoomOpen);
 
   const languageSelect = document.getElementById('languageSelect');
   if (languageSelect) {
@@ -3237,7 +3428,14 @@ async function init() {
   dom.logoChip = null;
   dom.meshChip = null;
   dom.polygonNameTop = document.getElementById('polygonNameTop');
-  dom.templateNameTop = document.getElementById('templateNameTop');
+  dom.zoomOpenButton = document.getElementById('zoomOpenButton');
+  dom.zoomViewer = document.getElementById('zoomViewer');
+  dom.zoomStage = document.getElementById('zoomStage');
+  dom.zoomLevel = document.getElementById('zoomLevel');
+  dom.zoomIn = document.getElementById('zoomIn');
+  dom.zoomOut = document.getElementById('zoomOut');
+  dom.zoomReset = document.getElementById('zoomReset');
+  dom.projectFile = document.getElementById('projectFile');
   dom.downloadButtons = Array.from(document.querySelectorAll('[data-download]'));
 
   renderStaticChrome();
@@ -3246,11 +3444,6 @@ async function init() {
 
   dom.polygonNameTop?.addEventListener('input', (event) => {
     state.polygonName = event.target.value;
-    scheduleUpdate();
-  });
-
-  dom.templateNameTop?.addEventListener('change', (event) => {
-    state.templateName = resolveTemplateName(event.target.value, config) || createDefaultState(config, getActiveLanguage()).templateName;
     scheduleUpdate();
   });
 
@@ -3286,6 +3479,31 @@ async function init() {
 
   document.getElementById('languageSelect')?.addEventListener('change', (event) => {
     if (event.target instanceof HTMLSelectElement) setLanguage(event.target.value);
+  });
+
+  document.getElementById('saveProjectButton')?.addEventListener('click', saveProjectFile);
+  document.getElementById('importProjectButton')?.addEventListener('click', () => dom.projectFile?.click());
+  dom.projectFile?.addEventListener('change', (event) => {
+    const input = event.target;
+    const file = input.files?.[0];
+    input.value = '';
+    if (file) importProjectFile(file);
+  });
+
+  dom.zoomOpenButton?.addEventListener('click', openZoomViewer);
+  dom.zoomIn?.addEventListener('click', () => changeZoom(1));
+  dom.zoomOut?.addEventListener('click', () => changeZoom(-1));
+  dom.zoomReset?.addEventListener('click', closeZoomViewer);
+  dom.zoomStage?.addEventListener('wheel', (event) => {
+    if (!event.ctrlKey) return;
+    event.preventDefault();
+    changeZoom(event.deltaY < 0 ? 1 : -1);
+  }, { passive: false });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeZoomViewer();
+  });
+  window.addEventListener('resize', () => {
+    if (dom.zoomViewer && !dom.zoomViewer.hidden) applyZoom();
   });
 
   await updatePreview(true);
