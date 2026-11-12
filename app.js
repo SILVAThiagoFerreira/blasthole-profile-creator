@@ -1589,7 +1589,8 @@ function mergeLoadedState(currentConfig, savedState) {
   return state;
 }
 
-function validateState(appState, currentConfig) {
+// options.ignoreBenchExcess: deixa de fora o erro de sequência acima do banco (usado ao salvar o projeto).
+function validateState(appState, currentConfig, options = {}) {
   const issues = [];
   const validation = currentConfig.validation;
   const lang = normalizeLanguage(appState?.language || getActiveLanguage());
@@ -1664,7 +1665,7 @@ function validateState(appState, currentConfig) {
       });
     }
     const excessCm = benchExcessCm(profile);
-    if (excessCm > 0) {
+    if (excessCm > 0 && !options.ignoreBenchExcess) {
       issues.push(copy.validation.benchExceeded(
         index + 1,
         formatDecimal(sumSequenceHeights(profile.segments), 2, lang),
@@ -3292,9 +3293,11 @@ const PROJECT_VERSION = 1;
 
 // Arquivo de projeto: mesmo conteúdo da memória do navegador, para continuar depois em qualquer máquina.
 function saveProjectFile() {
-  const issues = validateState(state, config);
-  if (issues.length) {
-    showValidation(issues);
+  // Erro de altura não impede salvar: o arquivo guarda o trabalho para continuar depois.
+  // Outros erros (campo vazio, valor inválido) ainda bloqueiam, porque o arquivo precisa ser importável.
+  const blocking = validateState(state, config, { ignoreBenchExcess: true });
+  if (blocking.length) {
+    showValidation(blocking);
     return;
   }
   const payload = {
@@ -3308,7 +3311,8 @@ function saveProjectFile() {
     new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }),
     `${getDownloadBaseName()}-${slug || 'projeto'}.json`,
   );
-  setStatusMessage(getCopy().validation.projectSaved);
+  // Com erro de altura, o cartão de erro continua no painel em vez de ser trocado pela confirmação.
+  if (!validateState(state, config).length) setStatusMessage(getCopy().validation.projectSaved);
 }
 
 async function importProjectFile(file) {
