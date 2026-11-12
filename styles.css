@@ -1020,6 +1020,11 @@ body::before {
 }
 
 /* Cartão de aviso: erro lista as pendências; sucesso confirma que dá para exportar. */
+/* Sem aviso, o painel some e a lâmina ganha a altura. */
+.validation:empty {
+  display: none;
+}
+
 .validation .notice {
   display: flex;
   align-items: flex-start;

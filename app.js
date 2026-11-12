@@ -298,7 +298,6 @@ const COPY = {
       defaultConfig: 'Configuração padrão',
     },
     validation: {
-      ready: 'Pronto para exportar. Pré-visualização validada.',
       fixBefore: 'Corrija antes de exportar:',
       required: (label) => `${label} é obrigatório.`,
       modelInvalid: 'Modelo visual inválido.',
@@ -528,7 +527,6 @@ const COPY = {
       defaultConfig: 'Default configuration',
     },
     validation: {
-      ready: 'Ready to export. Preview validated.',
       fixBefore: 'Fix before export:',
       required: (label) => `${label} is required.`,
       modelInvalid: 'Invalid visual template.',
@@ -758,7 +756,6 @@ const COPY = {
       defaultConfig: 'Configuración predeterminada',
     },
     validation: {
-      ready: 'Listo para exportar. Vista previa validada.',
       fixBefore: 'Corrija antes de exportar:',
       required: (label) => `${label} es obligatorio.`,
       modelInvalid: 'Modelo visual inválido.',
@@ -988,7 +985,6 @@ const COPY = {
       defaultConfig: '默认配置',
     },
     validation: {
-      ready: '准备导出。预览已验证。',
       fixBefore: '导出前请修正：',
       required: (label) => `${label} 为必填项。`,
       modelInvalid: '无效的可视模板。',
@@ -1759,7 +1755,8 @@ function renderNotice(tone, title, items = []) {
 function showValidation(issues, persist = false) {
   if (!dom.validation) return;
   if (!issues.length) {
-    dom.validation.innerHTML = renderNotice('success', getCopy().validation.ready);
+    // Sem problemas o painel fica vazio: o aviso só aparece quando há algo a corrigir.
+    dom.validation.innerHTML = '';
     toggleDownloads(true);
     if (persist && lastValidState) {
       updateMemoryStatus(getMemoryStatusText(seedSource));
