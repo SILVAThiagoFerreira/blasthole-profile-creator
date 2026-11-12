@@ -42,6 +42,9 @@ const FALLBACK_CONFIG = {
     max_profiles: 4,
     required_text_fields: ['polygon_name', 'template_name', 'profile_type'],
   },
+  stemming: {
+    gravel_density_kg_m3: 1400,
+  },
   defaults: {
     template_name: 'Corporate clean',
     polygon_name: 'PP170526 (220-210)',
@@ -2005,6 +2008,13 @@ function emulsionKgForHeight(profile, heightM) {
   return Math.PI * radiusM * radiusM * Math.max(heightM, 0) * densityKgM3;
 }
 
+// Massa de brita (kg) de um tampão com a altura dada: volume do furo × densidade da brita (planilha Brita.xlsx).
+function gravelKgForHeight(profile, heightM) {
+  const radiusM = Math.max(normalizeNumber(profile.diametro_furo, 0), 0) / 2000;
+  const densityKgM3 = config?.stemming?.gravel_density_kg_m3 ?? FALLBACK_CONFIG.stemming.gravel_density_kg_m3;
+  return Math.PI * radiusM * radiusM * Math.max(heightM, 0) * densityKgM3;
+}
+
 // Total de emulsão do perfil: soma das colunas de carga (os decks somam o mesmo valor).
 function emulsionChargeKg(profile) {
   return emulsionKgForHeight(profile, sumSegmentsByType(profile.segments, 'column'));
@@ -2204,7 +2214,11 @@ function renderProfileCard(profile, theme, box, compact, index) {
   const measurementMarkup = measurementItems.map((item) => {
     const segmentHeight = item.y2 - item.y1;
     // Cada coluna de carga mostra a massa de emulsão do próprio deck, além do total do perfil.
-    const deckKg = item.type === 'column' ? ` · ${formatDecimal(emulsionKgForHeight(profile, item.value), 1, lang)} kg` : '';
+    // Cada deck mostra a massa do próprio material: emulsão na coluna de carga e brita no tampão.
+    const deckKgValue = item.type === 'column'
+      ? emulsionKgForHeight(profile, item.value)
+      : (item.type === 'stemming' ? gravelKgForHeight(profile, item.value) : null);
+    const deckKg = deckKgValue === null ? '' : ` · ${formatDecimal(deckKgValue, 1, lang)} kg`;
     const detailedLabel = `${segmentDisplayLabel(item.type, lang)} ${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}${deckKg}`;
     const shortLabel = `${formatDecimal(item.value, 2, lang)}m${item.cartridgeCount ? ` · ${item.cartridgeCount}x` : ''}${deckKg}`;
     const minFontSize = compact ? Math.min(9.5, item.labelMaxFontSize) : 8.5;

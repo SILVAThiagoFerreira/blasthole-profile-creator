@@ -55,6 +55,9 @@
       "densidade"
     ]
   },
+  "stemming": {
+    "gravel_density_kg_m3": 1400
+  },
   "defaults": {
     "template_name": "Corporate clean",
     "polygon_name": "PP170526 (220-210)",
