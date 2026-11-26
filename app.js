@@ -1375,9 +1375,11 @@ function benchExcessCm(profile) {
   return Math.round(sumSequenceHeights(profile.segments) * 100) - Math.round(benchLimitM(profile) * 100);
 }
 
-// Comprimento do furo desenhado: sequência + subperfuração. Os metros do cordel seguem essa escala, a partir da boca.
+// Comprimento do furo desenhado: sequência + subperfuração, em centímetros para não mostrar ruído de ponto flutuante.
+// Os metros do cordel seguem essa escala, a partir da boca.
 function holeLengthM(profile) {
-  return sumSequenceHeights(profile.segments) + Math.max(normalizeNumber(profile.subperfuracao, 0), 0);
+  const lengthM = sumSequenceHeights(profile.segments) + Math.max(normalizeNumber(profile.subperfuracao, 0), 0);
+  return Math.round(lengthM * 100) / 100;
 }
 
 // Trechos de cordel NP: { start, end } em metros medidos a partir da boca do furo.
