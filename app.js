@@ -1381,11 +1381,16 @@ function holeLengthM(profile) {
 }
 
 // Trechos de cordel NP: { start, end } em metros medidos a partir da boca do furo.
+// Campo apagado é salvo como null (JSON de NaN): volta vazio, para a validação acusar em vez de assumir 0.
+function normalizeCordelMeters(value) {
+  return value === null ? Number.NaN : normalizeNumber(value, 0);
+}
+
 function normalizeCordelTrechos(items) {
   if (!Array.isArray(items)) return [];
   return items.map((item) => ({
-    start: normalizeNumber(item?.start, 0),
-    end: normalizeNumber(item?.end, 0),
+    start: normalizeCordelMeters(item?.start),
+    end: normalizeCordelMeters(item?.end),
   }));
 }
 
@@ -2790,11 +2795,11 @@ function renderCordelEditor(profile, index) {
     <div class="cordel-row">
       <div class="field">
         <label>${escapeXml(copy.fieldLabels.cordelFrom)}</label>
-        <input data-path="profiles.${index}.cordel_trechos.${itemIndex}.start" type="number" step="0.05" min="0" value="${escapeXml(String(trecho.start))}">
+        <input data-path="profiles.${index}.cordel_trechos.${itemIndex}.start" type="number" step="0.05" min="0" value="${Number.isFinite(trecho.start) ? trecho.start : ''}">
       </div>
       <div class="field">
         <label>${escapeXml(copy.fieldLabels.cordelTo)}</label>
-        <input data-path="profiles.${index}.cordel_trechos.${itemIndex}.end" type="number" step="0.05" min="0" value="${escapeXml(String(trecho.end))}">
+        <input data-path="profiles.${index}.cordel_trechos.${itemIndex}.end" type="number" step="0.05" min="0" value="${Number.isFinite(trecho.end) ? trecho.end : ''}">
       </div>
       <button class="segment-row__btn danger" type="button" data-action="remove-cordel" data-profile-index="${index}" data-item-index="${itemIndex}" title="${escapeXml(copy.fieldLabels.cordelRemove)}">&#10005;</button>
     </div>`).join('');
