@@ -627,18 +627,6 @@ body::before {
   grid-template-columns: repeat(2, 1fr);
 }
 
-.profile-params .field-group--cordel {
-  display: grid;
-  grid-column: 1 / -1;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  align-items: start;
-}
-
-.profile-params .field-group--cordel .field {
-  min-width: 0;
-}
-
 .profile-params .field input,
 .profile-params .field select {
   min-height: 32px;
@@ -648,6 +636,32 @@ body::before {
 
 .profile-params .field label {
   font-size: 0.62rem;
+}
+
+/* ── CORDEL NP (trechos por metro inicial e final) ── */
+
+.cordel-editor-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.cordel-editor-card__body .field input {
+  min-height: 32px;
+  font-size: 0.74rem;
+  padding: 0 8px;
+}
+
+.cordel-editor-card__body .field label {
+  font-size: 0.62rem;
+}
+
+.cordel-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 6px;
 }
 
 /* ── AUTO CALC SUMMARY ── */
@@ -1232,10 +1246,6 @@ body::before {
 
   .brand-text {
     display: none;
-  }
-
-  .profile-params .field-group--cordel {
-    grid-template-columns: 1fr;
   }
 }
 

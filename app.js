@@ -254,9 +254,11 @@ const COPY = {
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pré-corte)',
       cordel: 'Cordel NP',
-      cordelNone: 'Nenhum',
-      cordelNP: 'Cordel NP',
-      cordelGap: 'Trecho sem cordel (m)',
+      addCordel: 'Adicionar cordel',
+      cordelFrom: 'De (m)',
+      cordelTo: 'Até (m)',
+      cordelRemove: 'Remover cordel',
+      cordelEmpty: 'Nenhum trecho de cordel. Adicione um e informe o metro inicial e o final.',
       cordelGramatura: 'Gramatura (g/m)',
       emulsion: 'Carga emulsão',
       profileColor: 'Cor do perfil',
@@ -310,6 +312,7 @@ const COPY = {
       profilesMismatch: 'Perfis não correspondem à quantidade selecionada.',
       profileNameRequired: (index) => `Nome do perfil ${index} é obrigatório.`,
       numericRequired: (field, index) => `${field} do perfil ${index} deve ser numérico.`,
+      cordelRange: (index, trecho, max) => `Perfil ${index}: o trecho de cordel ${trecho} deve ficar entre 0 e ${max} m, com o fim maior que o início.`,
       nonNegative: (field, index) => `${field} do perfil ${index} deve ser maior ou igual a zero.`,
       previewError: (message) => `Falha ao gerar pré-visualização: ${message}`,
       pdfUnavailable: 'Biblioteca PDF indisponível no momento.',
@@ -484,9 +487,11 @@ const COPY = {
       boosterWeight: 'Weight (g)',
       cartridgeCount: 'Cartridges (pre-cut)',
       cordel: 'NP Cord',
-      cordelNone: 'None',
-      cordelNP: 'Cord NP',
-      cordelGap: 'No-cordel segment (m)',
+      addCordel: 'Add cordel',
+      cordelFrom: 'From (m)',
+      cordelTo: 'To (m)',
+      cordelRemove: 'Remove cordel',
+      cordelEmpty: 'No cordel sections. Add one and enter the start and end meters.',
       cordelGramatura: 'Grammage (g/m)',
       emulsion: 'Emulsion charge',
       profileColor: 'Profile color',
@@ -540,6 +545,7 @@ const COPY = {
       profilesMismatch: 'Profiles do not match the selected count.',
       profileNameRequired: (index) => `Profile ${index} name is required.`,
       numericRequired: (field, index) => `${field} for profile ${index} must be numeric.`,
+      cordelRange: (index, trecho, max) => `Profile ${index}: cordel section ${trecho} must be between 0 and ${max} m, with the end after the start.`,
       nonNegative: (field, index) => `${field} for profile ${index} must be zero or greater.`,
       previewError: (message) => `Preview generation failed: ${message}`,
       pdfUnavailable: 'PDF library is unavailable right now.',
@@ -714,9 +720,11 @@ const COPY = {
       boosterWeight: 'Peso (g)',
       cartridgeCount: 'Cartuchos (pre-corte)',
       cordel: 'Cordel NP',
-      cordelNone: 'Ninguno',
-      cordelNP: 'Cordel NP',
-      cordelGap: 'Tramo sin cordel (m)',
+      addCordel: 'Agregar cordel',
+      cordelFrom: 'Desde (m)',
+      cordelTo: 'Hasta (m)',
+      cordelRemove: 'Quitar cordel',
+      cordelEmpty: 'Ningún tramo de cordel. Agregue uno e indique el metro inicial y final.',
       cordelGramatura: 'Gramaje (g/m)',
       emulsion: 'Carga de emulsión',
       profileColor: 'Color del perfil',
@@ -770,6 +778,7 @@ const COPY = {
       profilesMismatch: 'Los perfiles no corresponden a la cantidad seleccionada.',
       profileNameRequired: (index) => `El nombre del perfil ${index} es obligatorio.`,
       numericRequired: (field, index) => `${field} del perfil ${index} debe ser numérico.`,
+      cordelRange: (index, trecho, max) => `Perfil ${index}: el tramo de cordel ${trecho} debe estar entre 0 y ${max} m, con el fin mayor que el inicio.`,
       nonNegative: (field, index) => `${field} del perfil ${index} debe ser mayor o igual a cero.`,
       previewError: (message) => `Error al generar la vista previa: ${message}`,
       pdfUnavailable: 'La biblioteca PDF no está disponible en este momento.',
@@ -944,9 +953,11 @@ const COPY = {
       boosterWeight: '重量 (g)',
       cartridgeCount: '药卷 (预裂)',
       cordel: '导爆索 NP',
-      cordelNone: '无',
-      cordelNP: '导爆索 NP',
-      cordelGap: '无导爆索区段 (m)',
+      addCordel: '添加导爆索',
+      cordelFrom: '起点 (m)',
+      cordelTo: '终点 (m)',
+      cordelRemove: '移除导爆索',
+      cordelEmpty: '暂无导爆索段。请添加并填写起止米数。',
       cordelGramatura: '克重 (g/m)',
       emulsion: '乳化炸药',
       profileColor: '剖面颜色',
@@ -1000,6 +1011,7 @@ const COPY = {
       profilesMismatch: '剖面与所选数量不一致。',
       profileNameRequired: (index) => `剖面 ${index} 的名称必填。`,
       numericRequired: (field, index) => `剖面 ${index} 的 ${field} 必须为数字。`,
+      cordelRange: (index, trecho, max) => `剖面 ${index}：导爆索第 ${trecho} 段需在 0 到 ${max} m 之间，且终点大于起点。`,
       nonNegative: (field, index) => `剖面 ${index} 的 ${field} 必须大于或等于零。`,
       previewError: (message) => `预览生成失败：${message}`,
       pdfUnavailable: '当前无法使用 PDF 库。',
@@ -1225,8 +1237,7 @@ const PROFILE_FIELDS = [
   'densidade',
   'has_booster',
   'booster_weight',
-  'cordel',
-  'cordel_gap',
+  'cordel_trechos',
   'cordel_gramatura',
 ];
 
@@ -1364,6 +1375,20 @@ function benchExcessCm(profile) {
   return Math.round(sumSequenceHeights(profile.segments) * 100) - Math.round(benchLimitM(profile) * 100);
 }
 
+// Comprimento do furo desenhado: sequência + subperfuração. Os metros do cordel seguem essa escala, a partir da boca.
+function holeLengthM(profile) {
+  return sumSequenceHeights(profile.segments) + Math.max(normalizeNumber(profile.subperfuracao, 0), 0);
+}
+
+// Trechos de cordel NP: { start, end } em metros medidos a partir da boca do furo.
+function normalizeCordelTrechos(items) {
+  if (!Array.isArray(items)) return [];
+  return items.map((item) => ({
+    start: normalizeNumber(item?.start, 0),
+    end: normalizeNumber(item?.end, 0),
+  }));
+}
+
 function clamp(value, min, max) {
   return Math.min(max, Math.max(min, value));
 }
@@ -1479,8 +1504,7 @@ function createDefaultState(currentConfig, language = currentConfig?.app?.defaul
     name: copy.defaults.profileNames[index] || `${copy.defaults.profileNamePrefix} ${index + 1}`,
     has_booster: typeof profile.has_booster === 'boolean' ? profile.has_booster : true,
     booster_weight: normalizeNumber(profile.booster_weight, 450),
-    cordel: ['none', 'np'].includes(profile.cordel) ? profile.cordel : 'none',
-    cordel_gap: normalizeNumber(profile.cordel_gap, 0),
+    cordel_trechos: [],
     cordel_gramatura: normalizeNumber(profile.cordel_gramatura, 40),
   }));
   return {
@@ -1531,8 +1555,11 @@ function normalizeProfile(source, fallback, index, defaultCount, language = DEFA
   profile.densidade = normalizeNumber(profile.densidade, fallback.densidade);
   profile.has_booster = Boolean(profile.has_booster);
   profile.booster_weight = normalizeNumber(profile.booster_weight, fallback.booster_weight || 450);
-  profile.cordel = ['none', 'np'].includes(profile.cordel) ? profile.cordel : (fallback.cordel || 'none');
-  profile.cordel_gap = normalizeNumber(profile.cordel_gap, fallback.cordel_gap || 0);
+  // Formato antigo (cordel 'np' + trecho sem cordel): vira um trecho do metro do gap até o fim do furo.
+  const legacyCordel = source?.cordel === 'np' && !Array.isArray(source?.cordel_trechos);
+  profile.cordel_trechos = legacyCordel
+    ? [{ start: normalizeNumber(source.cordel_gap, 0), end: holeLengthM(profile) }]
+    : normalizeCordelTrechos(profile.cordel_trechos);
   profile.cordel_gramatura = normalizeNumber(profile.cordel_gramatura, fallback.cordel_gramatura || 40);
 
   if (index >= defaultCount && !isNonEmptyString(source?.name)) {
@@ -1648,7 +1675,6 @@ function validateState(appState, currentConfig, options = {}) {
     'inclinacao',
     'azimute',
     'densidade',
-    'cordel_gap',
     'cordel_gramatura',
   ];
 
@@ -1686,6 +1712,12 @@ function validateState(appState, currentConfig, options = {}) {
         }
       });
     }
+    const cordelMaxM = holeLengthM(profile);
+    (profile.cordel_trechos || []).forEach((trecho, trechoIndex) => {
+      const valid = Number.isFinite(trecho.start) && Number.isFinite(trecho.end)
+        && trecho.start >= 0 && trecho.end > trecho.start && trecho.end <= cordelMaxM;
+      if (!valid) issues.push(copy.validation.cordelRange(index + 1, trechoIndex + 1, formatDecimal(cordelMaxM, 2, lang)));
+    });
     const excessCm = benchExcessCm(profile);
     if (excessCm > 0 && !options.ignoreBenchExcess) {
       issues.push(copy.validation.benchExceeded(
@@ -2261,8 +2293,9 @@ function renderProfileCard(profile, theme, box, compact, index) {
     ? `<g class="bank-measurement" pointer-events="none"><line x1="${bankDimensionX}" y1="${holeTop}" x2="${bankDimensionX}" y2="${bankDimensionBottom}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.8}"/><line x1="${bankDimensionX - 4}" y1="${holeTop}" x2="${bankDimensionX + 4}" y2="${holeTop}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.8}"/><line x1="${bankDimensionX - 4}" y1="${bankDimensionBottom}" x2="${bankDimensionX + 4}" y2="${bankDimensionBottom}" stroke="${theme.muted}" stroke-width="${compact ? 0.7 : 0.8}"/><text x="${bankLabelX}" y="${(holeTop + bankDimensionBottom) / 2}" fill="${theme.muted}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 10}" font-weight="600" text-anchor="end" transform="rotate(-90, ${bankLabelX}, ${(holeTop + bankDimensionBottom) / 2})">${formatDecimal(profile.altura_banco, 2, lang)} m</text></g>`
     : '';
 
-  const cordelTag = profile.cordel === 'np'
-    ? `NP ${Math.round(profile.cordel_gramatura)}${normalizeNumber(profile.cordel_gap, 0) > 0 ? ` • sem cordel ${formatDecimal(profile.cordel_gap, 2, lang)} m` : ''}`
+  const cordelTrechos = (profile.cordel_trechos || []).filter((trecho) => trecho.end > trecho.start);
+  const cordelTag = cordelTrechos.length
+    ? `NP ${Math.round(profile.cordel_gramatura)} • ${cordelTrechos.map((trecho) => `${formatDecimal(trecho.start, 2, lang)}–${formatDecimal(trecho.end, 2, lang)} m`).join(' • ')}`
     : '';
   const labels = labelSet();
   const metricRows = [
@@ -2417,28 +2450,25 @@ function renderProfileCard(profile, theme, box, compact, index) {
           overlay.push(`<text x="${labelLaneX}" y="${labelY}" text-anchor="start" fill="${color}" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-weight="600" dominant-baseline="middle">${escapeXml(label)}</text>`);
         }
       };
-      if (profile.cordel === 'np') {
+      if (cordelTrechos.length) {
         const cordelColor = '#27AE60';
         const cordelX = cx + (compact ? 2 : 4);
         const cordelW = compact ? 3 : 4.5;
-        const cordelGap = Math.max(normalizeNumber(profile.cordel_gap, 0), 0);
-        const holeDepthMeters = Math.max(normalizeNumber(profile.altura_banco, 0) + Math.max(normalizeNumber(profile.subperfuracao, 0), 0), 0.01);
-        const cordelGapPx = Math.min(holeH, holeH * (cordelGap / holeDepthMeters));
-        const cordelVisibleTop = Math.min(holeBottom - 4, holeTop + cordelGapPx);
-        const cordelVisibleHeight = Math.max(0, holeBottom - 4 - cordelVisibleTop);
-        overlay.push(`<circle cx="${cordelX}" cy="${holeBottom - 4}" r="${compact ? 2.5 : 3.5}" fill="${cordelColor}"/>`);
-        if (cordelVisibleHeight > 0) {
-          overlay.push(`<line x1="${cordelX}" y1="${holeBottom - 4}" x2="${cordelX}" y2="${cordelVisibleTop}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
-          overlay.push(`<circle cx="${cordelX}" cy="${cordelVisibleTop}" r="${compact ? 2 : 3}" fill="${cordelColor}"/>`);
+        // Mesma escala da sequência do furo: o metro é contado a partir da boca.
+        const cordelY = (meters) => Math.min(holeBottom - 4, holeTop + holeH * (clamp(meters, 0, total) / total));
+        for (const trecho of cordelTrechos) {
+          const y1 = cordelY(trecho.start);
+          const y2 = cordelY(trecho.end);
+          overlay.push(`<line x1="${cordelX}" y1="${y1}" x2="${cordelX}" y2="${y2}" stroke="${cordelColor}" stroke-width="${cordelW}" stroke-linecap="round"/>`);
+          overlay.push(`<circle cx="${cordelX}" cy="${y1}" r="${compact ? 2 : 3}" fill="${cordelColor}"/>`);
+          overlay.push(`<circle cx="${cordelX}" cy="${y2}" r="${compact ? 2 : 3}" fill="${cordelColor}"/>`);
         }
-        if (cordelTag && !compact) {
-          const desiredLabelY = cordelVisibleHeight > 0
-            ? Math.min(holeBottom - 10, cordelVisibleTop + cordelVisibleHeight * 0.35)
-            : holeBottom - 18;
-          const labelY = reserveSideLabelY(desiredLabelY);
-          const sideTag = shortText(cordelTag, compact ? 12 : 24);
+        if (!compact) {
+          const first = cordelTrechos[0];
+          const labelY = reserveSideLabelY(cordelY((first.start + first.end) / 2));
+          const sideTag = `NP ${Math.round(profile.cordel_gramatura)}`;
           overlay.push(`<line x1="${cordelX}" y1="${labelY}" x2="${labelLaneX - 5}" y2="${labelY}" stroke="${cordelColor}" stroke-width="0.7"/>`);
-          overlay.push(`<text x="${labelLaneX}" y="${labelY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="${compact ? 8 : 10.5}" font-weight="700" dominant-baseline="middle">${escapeXml(sideTag)}</text>`);
+          overlay.push(`<text x="${labelLaneX}" y="${labelY + 1}" text-anchor="start" fill="${cordelColor}" font-family="IBM Plex Sans, sans-serif" font-size="10.5" font-weight="700" dominant-baseline="middle">${escapeXml(sideTag)}</text>`);
         }
       }
       // Iniciadores por deck: cada coluna ou cartucho marcado recebe cabo do colar até a sua base.
@@ -2753,6 +2783,34 @@ function renderSegmentEditor(profile, index) {
     </div>`;
 }
 
+// Cordel NP: cada trecho tem metro inicial e final, contados a partir da boca do furo.
+function renderCordelEditor(profile, index) {
+  const copy = getCopy();
+  const rows = profile.cordel_trechos.map((trecho, itemIndex) => `
+    <div class="cordel-row">
+      <div class="field">
+        <label>${escapeXml(copy.fieldLabels.cordelFrom)}</label>
+        <input data-path="profiles.${index}.cordel_trechos.${itemIndex}.start" type="number" step="0.05" min="0" value="${escapeXml(String(trecho.start))}">
+      </div>
+      <div class="field">
+        <label>${escapeXml(copy.fieldLabels.cordelTo)}</label>
+        <input data-path="profiles.${index}.cordel_trechos.${itemIndex}.end" type="number" step="0.05" min="0" value="${escapeXml(String(trecho.end))}">
+      </div>
+      <button class="segment-row__btn danger" type="button" data-action="remove-cordel" data-profile-index="${index}" data-item-index="${itemIndex}" title="${escapeXml(copy.fieldLabels.cordelRemove)}">&#10005;</button>
+    </div>`).join('');
+  return `
+    <div class="segment-editor-card">
+      <div class="segment-editor-card__head">
+        <p class="segment-editor-card__title">${escapeXml(copy.fieldLabels.cordel)}</p>
+        <button class="ghost-button" type="button" data-action="add-cordel" data-profile-index="${index}" style="min-height:28px;font-size:0.66rem;">+ ${escapeXml(copy.fieldLabels.addCordel)}</button>
+      </div>
+      <div class="cordel-editor-card__body">
+        ${renderInput(copy.fieldLabels.cordelGramatura, `profiles.${index}.cordel_gramatura`, profile.cordel_gramatura, 'number', { step: 1, min: 0 })}
+        ${rows || `<span class="hint">${escapeXml(copy.fieldLabels.cordelEmpty)}</span>`}
+      </div>
+    </div>`;
+}
+
 function renderProfileEditor(profile, index) {
   const copy = getCopy();
   const letter = (() => {
@@ -2767,9 +2825,6 @@ function renderProfileEditor(profile, index) {
     + sumSegmentsByType(profile.segments, 'cartridge');
   const bb = sumSegmentsByType(profile.segments, 'blastbag');
   const ad = sumSegmentsByType(profile.segments, 'airdeck');
-  const cordelTag = profile.cordel === 'np'
-    ? `NP ${Math.round(profile.cordel_gramatura)}${normalizeNumber(profile.cordel_gap, 0) > 0 ? ` • sem cordel ${formatDecimal(profile.cordel_gap, 2)} m` : ''}`
-    : '';
 
   return `
     <div class="segment-editor-area">
@@ -2785,18 +2840,11 @@ function renderProfileEditor(profile, index) {
           ${renderInput(copy.fieldLabels.inclination, `profiles.${index}.inclinacao`, profile.inclinacao, 'number', { step: 1, min: 0 })}
           ${renderInput(copy.fieldLabels.azimuth, `profiles.${index}.azimute`, profile.azimute, 'number', { step: 1, min: 0 })}
           ${renderInput(copy.fieldLabels.density, `profiles.${index}.densidade`, profile.densidade, 'number', { step: 0.01, min: 0 })}
-          <div class="field-group field-group--cordel">
-            ${renderSelect(copy.fieldLabels.cordel, `profiles.${index}.cordel`, profile.cordel, [
-              { value: 'none', label: copy.fieldLabels.cordelNone },
-              { value: 'np', label: copy.fieldLabels.cordelNP },
-            ], '')}
-            ${renderInput(copy.fieldLabels.cordelGap, `profiles.${index}.cordel_gap`, profile.cordel_gap, 'number', { step: 0.05, min: 0, disabled: profile.cordel !== 'np' })}
-          </div>
           ${renderInput(copy.fieldLabels.boosterWeight, `profiles.${index}.booster_weight`, profile.booster_weight, 'number', { step: 10, min: 0 })}
-          ${renderInput(copy.fieldLabels.cordelGramatura, `profiles.${index}.cordel_gramatura`, profile.cordel_gramatura, 'number', { step: 1, min: 0, disabled: profile.cordel !== 'np' })}
         </div>
       </div>
       ${renderSegmentEditor(profile, index)}
+      ${renderCordelEditor(profile, index)}
     </div>`;
 }
 
@@ -3022,7 +3070,7 @@ function handleInputEvent(event) {
       const [, index, field, itemIndex, itemField] = path.split('.');
       if (!state.profiles[Number(index)]) return;
       const currentProfile = state.profiles[Number(index)];
-      if ((field === 'blastbags' || field === 'air_decks' || field === 'segments') && currentProfile[field]?.[Number(itemIndex)]) {
+      if ((field === 'blastbags' || field === 'air_decks' || field === 'segments' || field === 'cordel_trechos') && currentProfile[field]?.[Number(itemIndex)]) {
         currentProfile[field][Number(itemIndex)][itemField] = target.type === 'number'
           ? (target.value === '' ? Number.NaN : Number(target.value))
           : value;
@@ -3160,6 +3208,20 @@ function handleClickEvent(event) {
     }
     profile.blastbag = sumDeckItems(profile.blastbags);
     profile.air_deck = sumDeckItems(profile.air_decks);
+    renderForms();
+    scheduleUpdate();
+    return;
+  }
+  if (deckAction === 'add-cordel' || deckAction === 'remove-cordel') {
+    const profileIndex = Number(target.getAttribute('data-profile-index'));
+    const profile = state.profiles[profileIndex];
+    if (!profile) return;
+    if (!Array.isArray(profile.cordel_trechos)) profile.cordel_trechos = [];
+    if (deckAction === 'add-cordel') {
+      profile.cordel_trechos.push({ start: 0, end: 0 });
+    } else {
+      profile.cordel_trechos.splice(Number(target.getAttribute('data-item-index')), 1);
+    }
     renderForms();
     scheduleUpdate();
     return;
