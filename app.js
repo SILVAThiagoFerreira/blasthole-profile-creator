@@ -1384,8 +1384,10 @@ function holeLengthM(profile) {
 
 // Trechos de cordel NP: { start, end } em metros medidos a partir da boca do furo.
 // Campo apagado é salvo como null (JSON de NaN): volta vazio, para a validação acusar em vez de assumir 0.
+// Arredonda a centímetros: valores já salvos com ruído de ponto flutuante voltam limpos.
 function normalizeCordelMeters(value) {
-  return value === null ? Number.NaN : normalizeNumber(value, 0);
+  if (value === null) return Number.NaN;
+  return Math.round(normalizeNumber(value, 0) * 100) / 100;
 }
 
 function normalizeCordelTrechos(items) {
